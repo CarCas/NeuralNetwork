@@ -33,6 +33,7 @@ class TestMonk(unittest.TestCase):
         try:
             while(nn.test(train_data) > 1):
                 nn.train(train_data, 1, 0.5)
+                print('Error on train data:', nn.test(train_data))
         except KeyboardInterrupt:
             pass
 
@@ -43,6 +44,11 @@ class TestMonk(unittest.TestCase):
         error_test = 0
         for x, d in test_data:
             error_test += (round(nn(*x)[0]) - d[0])**2
+
+        print('train:',
+              str(((len(train_data)-error_train)/len(train_data))*100) + '%')
+        print('test: ',
+              str(((len(test_data)-error_test)/len(test_data))*100) + '%')
 
         self.assertEqual(((len(train_data)-error_train)/len(train_data)), 1)
         self.assertEqual(((len(test_data)-error_test)/len(test_data)), 1)
