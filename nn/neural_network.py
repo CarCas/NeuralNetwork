@@ -1,8 +1,8 @@
 from __future__ import annotations
-import numpy as np
-from typing import Sequence, Optional, Callable, Tuple
+from typing import Sequence, Optional, Callable, Tuple, List
+import random
 
-from nn import ActivationFunction
+from nn.activation_function import ActivationFunction
 from nn.neuron_layer import NeuronLayer
 
 
@@ -20,7 +20,10 @@ def back_propagation(
     for j in range(len(nn.hidden_layer)):
         n_j = nn.hidden_layer[j]
         wk_j = nn.output_layer.w_from(j)
-        delta_j.append(np.dot(delta_k, wk_j) * n_j.fprime)
+        delta = 0
+        for i in range(len(delta_k)):
+            delta += delta_k[i] * wk_j[i]
+        delta_j.append(delta * n_j.fprime)
 
     for k in range(len(nn.output_layer)):
         n_k = nn.output_layer[k]
@@ -28,15 +31,17 @@ def back_propagation(
         for i in range(len(nn.hidden_layer)):
             o_i = nn.hidden_layer[i].out
             delta_w.append(delta_k[k] * o_i)
-        n_k.w += np.multiply(eta, delta_w)
+        for i in range(len(delta_w)):
+            n_k.w[i] += eta * delta_w[i]
 
     for j in range(len(nn.hidden_layer)):
         n_j = nn.hidden_layer[j]
         delta_w = []
-        for i in range(len(nn.input_layer)):
-            o_i = nn.input_layer[i]
+        for i in range(len(nn.input)):
+            o_i = nn.input[i]
             delta_w.append(delta_j[j] * o_i)
-        n_j.w += np.multiply(eta, delta_w)
+        for i in range(len(delta_w)):
+            n_j.w[i] += eta * delta_w[i]
 
 
 class NeuralNetwork:
@@ -49,48 +54,30 @@ class NeuralNetwork:
         self.activation = activation
         self.learning_algorithm = learning_algorithm
 
-        self._layers = [
-            NeuronLayer(
+        self.hidden_layer = NeuronLayer(
                 size=architecture.number_hidden,
                 activation=activation,
                 weights=architecture.hidden_weights,
-                bias=architecture.hidden_bias),
-            NeuronLayer(
+                bias=architecture.hidden_bias)
+        self.output_layer = NeuronLayer(
                 size=architecture.number_outputs,
                 activation=activation,
                 weights=architecture.output_weights,
-                bias=architecture.output_bias),
-        ]
+                bias=architecture.output_bias)
+
+        self.input: Sequence[float]
+        self.out: Sequence[float]
 
     def __call__(self, *args: float) -> Sequence[float]:
-        self._input = tuple(args)
-
-        output = self._input
-        for layer in self._layers:
-            output = layer(*output)
-        return output
-
-    @property
-    def out(self) -> Sequence[float]:
-        return self.output_layer.out
-
-    @property
-    def input_layer(self) -> Sequence[float]:
-        return self._input
-
-    @property
-    def output_layer(self) -> NeuronLayer:
-        return self._layers[-1]
-
-    @property
-    def hidden_layer(self) -> NeuronLayer:
-        return self._layers[0]
+        self.input = tuple(args)
+        self.out = self.output_layer(*self.hidden_layer(*self.input))
+        return self.out
 
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[float], Sequence[float]]],
         epoch_number: int,
-        eta: float = 0.1
+        eta: float = 0.5
     ):
         for _ in range(epoch_number):
             for x, d in patterns:
@@ -100,12 +87,12 @@ class NeuralNetwork:
     def test(
         self,
         patterns: Sequence[Tuple[Sequence[float], Sequence[float]]],
-
     ) -> float:
         error = 0
         for x, d in patterns:
-            error += (np.subtract(self(*x), d)**2).sum()/2
-
+            self(*x)
+            for i in range(len(d)):
+                error += 0.5 * (d[i] - self.out[i])**2
         return error
 
     class Architecture:
@@ -115,68 +102,50 @@ class NeuralNetwork:
             number_hidden: int,
             number_outputs: int,
 
-            hidden_bias=0,
-            hidden_weights: Optional[Sequence[Sequence[float]]] = None,
-            output_bias=0,
-            output_weights: Optional[Sequence[Sequence[float]]] = None,
-        ):
-            if number_inputs < 1 or number_hidden < 1 or number_outputs < 1:
-                raise ValueError('number_* cattot be lesser than 1')
+            hidden_weights: Optional[Sequence[List[float]]] = None,
+            output_weights: Optional[Sequence[List[float]]] = None,
 
-            self._hidden_bias = hidden_bias
-            self._output_bias = output_bias
-            self._number_inputs = number_inputs
-            self._number_hidden = number_hidden
-            self._number_outputs = number_outputs
+            hidden_bias: Optional[float] = None,
+            output_bias: Optional[float] = None,
+        ):
+            self.number_inputs: int = number_inputs
+            self.number_hidden: int = number_hidden
+            self.number_outputs: int = number_outputs
+
+            self.hidden_bias: float
+            self.output_bias: float
+
+            self.hidden_weights: Sequence[List[float]]
+            self.output_weights: Sequence[List[float]]
 
             if hidden_weights is None:
-                self._hidden_weights = (((0.1,) * (self.number_inputs),)
-                                        * self.number_hidden)
+                _hidden_weights = []
+                for _ in range(number_hidden):
+                    w = []
+                    for _ in range(number_inputs):
+                        w.append(random.random()*0.4-0.2)
+                    _hidden_weights.append(w)
+                self.hidden_weights = _hidden_weights
             else:
-                if len(hidden_weights) != number_hidden:
-                    raise ValueError('len(hidden_weights) != number_hidden')
-                for i, w in enumerate(hidden_weights):
-                    if len(w) != number_inputs:
-                        raise ValueError('len(hidden_weights['
-                                         + str(i) + ']) != number_inputs')
-                self._hidden_weights = hidden_weights
+                self.hidden_weights = hidden_weights
 
             if output_weights is None:
-                self._output_weights = (((0.1,) * (self.number_hidden),)
-                                        * self.number_outputs)
+                _output_weights = []
+                for _ in range(number_outputs):
+                    w = []
+                    for _ in range(number_hidden):
+                        w.append(random.random()*0.4-0.2)
+                    _output_weights.append(w)
+                self.output_weights = _output_weights
             else:
-                if len(output_weights) != number_outputs:
-                    raise ValueError('len(output_weights) != number_outputs')
-                for i, w in enumerate(output_weights):
-                    if len(w) != number_hidden:
-                        raise ValueError('len(output_weights['
-                                         + str(i) + ']) != number_hidden')
-                self._output_weights = output_weights
+                self.output_weights = output_weights
 
-        @property
-        def hidden_bias(self):
-            return self._hidden_bias
+            if hidden_bias is None:
+                self.hidden_bias = random.random()*0.4-0.2
+            else:
+                self.hidden_bias = hidden_bias
 
-        @property
-        def output_bias(self):
-            return self._output_bias
-
-        @property
-        def number_inputs(self):
-            return self._number_inputs
-
-        @property
-        def number_hidden(self):
-            return self._number_hidden
-
-        @property
-        def number_outputs(self):
-            return self._number_outputs
-
-        @property
-        def hidden_weights(self):
-            return self._hidden_weights
-
-        @property
-        def output_weights(self):
-            return self._output_weights
+            if output_bias is None:
+                self.output_bias = random.random()*0.4-0.2
+            else:
+                self.output_bias = output_bias

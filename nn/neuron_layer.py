@@ -1,6 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional, Sequence, List
 
-from nn import Neuron, ActivationFunction
+from nn.neuron import Neuron
+from nn.activation_function import ActivationFunction
 
 
 class NeuronLayer:
@@ -8,33 +9,22 @@ class NeuronLayer:
         self,
         size: int,
         activation: ActivationFunction,
-        weights: Optional[Sequence[Sequence[float]]] = None,
+        weights: Optional[Sequence[List[float]]] = None,
         bias: float = 0,
     ):
-        self._neurons = tuple(
-            Neuron(activation, weights[i], bias)
-            for i in range(size))
-        self._out = None
+        self.neurons: Sequence[Neuron] = tuple(
+            Neuron(activation, weights[i], bias) for i in range(size))
+        self.out: Sequence[float]
 
     def __call__(self, *args: float) -> Sequence[float]:
-        self._out = tuple(neuron(*args) for neuron in self.neurons)
+        self.out = tuple(neuron(*args) for neuron in self.neurons)
         return self.out
 
     def w_from(self, index: int) -> Sequence[float]:
         return tuple(neuron.w[index] for neuron in self.neurons)
 
-    @property
-    def out(self) -> Sequence[float]:
-        if self._out is None:
-            raise RuntimeError('neural network not executed')
-        return self._out
-
-    @property
-    def neurons(self) -> Sequence[Neuron]:
-        return self._neurons
-
     def __len__(self) -> int:
-        return len(self._neurons)
+        return len(self.neurons)
 
     def __getitem__(self, i) -> Neuron:
-        return self._neurons[i]
+        return self.neurons[i]

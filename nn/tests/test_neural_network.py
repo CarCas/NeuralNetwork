@@ -1,8 +1,7 @@
 import unittest
-import numpy as np
 
 from nn import NeuralNetwork as NN
-from nn.activation_function import identity, sigmoidal_1 as sigmoidal
+from nn.activation_function import sigmoidal
 
 
 class TestNeuralNetwork(unittest.TestCase):
@@ -17,9 +16,9 @@ class TestNeuralNetwork(unittest.TestCase):
                 number_outputs=2,
                 number_hidden=2,
                 hidden_bias=0.35,
-                hidden_weights=((0.15, 0.2), (0.25, 0.3)),
+                hidden_weights=[[0.15, 0.2], [0.25, 0.3]],
                 output_bias=0.6,
-                output_weights=((0.4, 0.45), (0.5, 0.55))
+                output_weights=[[0.4, 0.45], [0.5, 0.55]]
             ))
 
         self.assertEqual(nn(1, 1),

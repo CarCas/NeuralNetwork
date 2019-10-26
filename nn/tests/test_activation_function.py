@@ -1,12 +1,12 @@
 import unittest
-import numpy as np
+import math
 import sympy as sp
 
 from nn.activation_function import (
     ActivationFunction,
     identity,
     sign,
-    sigmoidal_a)
+    sigmoidal)
 
 
 class TestActivationFunction(unittest.TestCase):
@@ -36,19 +36,6 @@ class TestActivationFunction(unittest.TestCase):
         self.assertFalse(sign.isdifferentiable())
         with self.assertRaises(RuntimeError):
             sign.derivative(1)
-
-    def test_sigmoidal_a(self):
-        sigmoidal_2 = sigmoidal_a(2)
-
-        self.assertEqual(sigmoidal_2(0), 1/2)
-        self.assertAlmostEqual(sigmoidal_2(1), np.exp(2)/(1+np.exp(2)))
-        self.assertAlmostEqual(sigmoidal_2(2), np.exp(4)/(1+np.exp(4)))
-
-        self.assertTrue(sigmoidal_2.isdifferentiable())
-        self.assertEqual(sigmoidal_2.derivative(0), 1/2)
-        # from wolframalpha
-        self.assertAlmostEqual(sigmoidal_2.derivative(1), 0.209987170807013)
-        self.assertEqual(sigmoidal_2.derivative(2), 0.03532541242658223)
 
     def test_init(self):
         fs = [
