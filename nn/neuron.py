@@ -9,22 +9,22 @@ from nn import ActivationFunction
 class Neuron:
     def __init__(
         self,
+        activation: ActivationFunction,
         w: Sequence[float],
-        activation: Union[ActivationFunction, sp.Expr, str]
+        bias: float
     ):
         if not len(w):
             raise ValueError('w cannot be empty')
 
         self._w = np.array(w)
-        self._activation = ActivationFunction(activation)
+        self._activation = activation
+        self._bias = bias
 
         self._state: Optional[Neuron._State] = None
 
     def __call__(self, *args: float) -> float:
-        input = (1,)+tuple(args)
-        if len(input) != len(self.w):
-            raise ValueError('bad input size')
-        net = np.dot(input, self.w)
+        input = tuple(args)
+        net = np.dot(input, self.w)+self._bias
         out = self.activation(net)
         self._state = Neuron._State(input, net, out)
         return out

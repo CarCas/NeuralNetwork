@@ -9,9 +9,10 @@ class NeuronLayer:
         size: int,
         activation: ActivationFunction,
         weights: Optional[Sequence[Sequence[float]]] = None,
+        bias: float = 0,
     ):
         self._neurons = tuple(
-            Neuron(weights[i], activation)
+            Neuron(activation, weights[i], bias)
             for i in range(size))
         self._out = None
 
@@ -20,7 +21,7 @@ class NeuronLayer:
         return self.out
 
     def w_from(self, index: int) -> Sequence[float]:
-        return tuple(neuron.w[index+1] for neuron in self.neurons)
+        return tuple(neuron.w[index] for neuron in self.neurons)
 
     @property
     def out(self) -> Sequence[float]:

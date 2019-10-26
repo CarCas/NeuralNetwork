@@ -12,19 +12,22 @@ class TestNeuron(unittest.TestCase):
         self.net_result = np.dot((1,)+self.x, self.w)
 
         self.and_neuron = Neuron(
-            w=(-1.5, 1, 1),
+            bias=-1.5,
+            w=(1, 1),
             activation=sign)
 
         self.or_neuron = Neuron(
-            w=(-0.5, 1, 1),
+            bias=-0.5,
+            w=(1, 1),
             activation=sign)
 
         self.xor_out_neuron = Neuron(
-            w=(-0.5, -1, 1),
+            bias=-0.5,
+            w=(-1, 1),
             activation=sign)
 
     def test_net(self):
-        u = Neuron(self.w, activation=identity)
+        u = Neuron(bias=self.w[0], w=self.w[1:], activation=identity)
         u(*self.x)
         self.assertEqual(u.net, self.net_result)
 

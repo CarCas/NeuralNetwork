@@ -16,9 +16,10 @@ class TestNeuralNetwork(unittest.TestCase):
                 number_inputs=2,
                 number_outputs=2,
                 number_hidden=2,
-
-                hidden_weights=((0.35, 0.15, 0.2), (0.35, 0.25, 0.3)),
-                output_weights=((0.6, 0.4, 0.45), (0.6, 0.5, 0.55))
+                hidden_bias=0.35,
+                hidden_weights=((0.15, 0.2), (0.25, 0.3)),
+                output_bias=0.6,
+                output_weights=((0.4, 0.45), (0.5, 0.55))
             ))
 
         self.assertEqual(nn(1, 1),
