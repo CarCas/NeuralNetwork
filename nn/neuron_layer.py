@@ -20,7 +20,7 @@ class NeuronLayer:
         return self.out
 
     def w_from(self, index: int) -> Sequence[float]:
-        return tuple(neuron.w[index] for neuron in self.neurons)
+        return tuple(neuron.w[index+1] for neuron in self.neurons)
 
     @property
     def out(self) -> Sequence[float]:

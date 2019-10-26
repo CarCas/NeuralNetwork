@@ -16,22 +16,26 @@ def back_propagation(
         n_k = nn.output_layer[k]
         delta_k.append((d[k] - n_k.out) * n_k.fprime)
 
-        delta_w = [0]
-        for i in range(len(nn.hidden_layer)):
-            o_i = nn.hidden_layer[i].out
-            delta_w.append(delta_k[-1] * o_i)
-        n_k.w += np.multiply(eta, delta_w)
-
     delta_j = []
     for j in range(len(nn.hidden_layer)):
         n_j = nn.hidden_layer[j]
         wk_j = nn.output_layer.w_from(j)
         delta_j.append(np.dot(delta_k, wk_j) * n_j.fprime)
 
+    for k in range(len(nn.output_layer)):
+        n_k = nn.output_layer[k]
+        delta_w = [0]
+        for i in range(len(nn.hidden_layer)):
+            o_i = nn.hidden_layer[i].out
+            delta_w.append(delta_k[k] * o_i)
+        n_k.w += np.multiply(eta, delta_w)
+
+    for j in range(len(nn.hidden_layer)):
+        n_j = nn.hidden_layer[j]
         delta_w = [0]
         for i in range(len(nn.input_layer)):
             o_i = nn.input_layer[i]
-            delta_w.append(delta_j[-1] * o_i)
+            delta_w.append(delta_j[j] * o_i)
         n_j.w += np.multiply(eta, delta_w)
 
 

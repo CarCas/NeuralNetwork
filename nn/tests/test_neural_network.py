@@ -28,6 +28,13 @@ class TestNeuralNetwork(unittest.TestCase):
         self.assertEqual(nn(0.05, 0.1),
                          (0.7513650695523157, 0.7729284653214625))
 
+        nn.train([([1, 1], [1, 1])], 1, 0.5)
+        self.assertEqual(nn(1, 1),
+                         (0.7700458403850474, 0.7930571932467279))
+        nn.train([([2, 10], [0.05, 0.1])], 1, 0.5)
+        self.assertEqual(nn(1, 1),
+                         (0.7552637045019276, 0.7810102555963433))
+
 
 if __name__ == '__main__':
     unittest.main()
