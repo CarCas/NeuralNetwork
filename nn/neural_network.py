@@ -68,7 +68,7 @@ class NeuralNetwork:
         self.input: Sequence[float]
         self.out: Sequence[float]
 
-    # feed-forward carmine
+    # feed-forward william carmine
     def __call__(self, *args: float) -> Sequence[float]:
         self.input = tuple(args)
         self.out = self.output_layer(*self.hidden_layer(*self.input))
