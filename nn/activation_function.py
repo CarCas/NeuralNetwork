@@ -5,14 +5,14 @@ from typing import Union
 
 
 class ActivationFunction:
-    def __init__(self, exepression: Union[ActivationFunction, sp.Expr, str]):
+    def __init__(self, expression: Union[ActivationFunction, sp.Expr, str]):
         self._expr: sp.Expr
-        if isinstance(exepression, ActivationFunction):
-            self._expr = exepression._expr
-        elif isinstance(exepression, sp.Expr):
-            self._expr = exepression
-        elif isinstance(exepression, str):
-            self._expr = sp.sympify(exepression)
+        if isinstance(expression, ActivationFunction):
+            self._expr = expression._expr
+        elif isinstance(expression, sp.Expr):
+            self._expr = expression
+        elif isinstance(expression, str):
+            self._expr = sp.sympify(expression)
         else:
             raise TypeError('expression')
 
