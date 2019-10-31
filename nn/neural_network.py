@@ -108,10 +108,18 @@ class NeuralNetwork:
 
             hidden_bias: Optional[float] = None,
             output_bias: Optional[float] = None,
+
+            threshold: Optional[int] = None,
+            range_weights: Optional[float] = None,
+
         ):
+
             self.number_inputs: int = number_inputs
             self.number_hidden: int = number_hidden
             self.number_outputs: int = number_outputs
+
+            self.threshold: int = threshold
+            self.range_weights: float = range_weights
 
             self.hidden_bias: float
             self.output_bias: float
@@ -121,10 +129,16 @@ class NeuralNetwork:
 
             if hidden_weights is None:
                 _hidden_weights = []
-                for _ in range(number_hidden):
+                for _ in range(self.number_hidden):
                     w = []
-                    for _ in range(number_inputs):
-                        w.append(random.random()*0.4-0.2)
+                    for _ in range(self.number_inputs):
+                        # starting values updated:
+                        # if #inputs > threshold ==> as before: rand * 0.4 - 0.2
+                        # else #inputs <= threshold ==> (rand * 0.4 - 0.2) * 2 / #inputs
+
+                        w.append(random.uniform(- self.range_weights, self.range_weights)
+                                 if self.number_inputs > self.threshold else
+                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs)
                     _hidden_weights.append(w)
                 self.hidden_weights = _hidden_weights
             else:
@@ -132,21 +146,27 @@ class NeuralNetwork:
 
             if output_weights is None:
                 _output_weights = []
-                for _ in range(number_outputs):
+                for _ in range(self.number_outputs):
                     w = []
-                    for _ in range(number_hidden):
-                        w.append(random.random()*0.4-0.2)
+                    for _ in range(self.number_hidden):
+                        w.append(random.uniform(- self.range_weights, self.range_weights)
+                                 if self.number_inputs > self.threshold else
+                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs)
                     _output_weights.append(w)
                 self.output_weights = _output_weights
             else:
                 self.output_weights = output_weights
 
             if hidden_bias is None:
-                self.hidden_bias = random.random()*0.4-0.2
+                self.hidden_bias = random.uniform(- self.range_weights, self.range_weights) \
+                    if self.number_inputs > self.threshold else \
+                    random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs
             else:
                 self.hidden_bias = hidden_bias
 
             if output_bias is None:
-                self.output_bias = random.random()*0.4-0.2
+                self.output_bias = random.uniform(- self.range_weights, self.range_weights) \
+                                 if self.number_inputs > self.threshold else \
+                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs
             else:
                 self.output_bias = output_bias

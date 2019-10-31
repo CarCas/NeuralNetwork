@@ -4,6 +4,11 @@ from nn.activation_function import sigmoidal
 import random
 
 
+# monks-1: con threshold > #inputs, range_weights = (0.35, 0.60] ---> Test passed
+# - ho provato anche con range_weights=0.60005 e il test viene superato, pero' credo sia dovuto al fatto che
+# viene approssimato a 0.6
+# - ho provato con range_weights=0.6005 e il test non viene superato, quindi magari viene approssimato a 0.601,
+# e quindi fallisce perchè è maggiore di 0.6
 class TestMonk(unittest.TestCase):
     def test_monk1(self):
         random.seed(3)
@@ -12,10 +17,12 @@ class TestMonk(unittest.TestCase):
             architecture=NN.Architecture(
                 number_inputs=6,
                 number_outputs=1,
-                number_hidden=5
+                number_hidden=5,
+                threshold=8,
+                range_weights=.5
             ))
 
-        with open('monks/monks-1.train') as f:
+        with open('../../monks/monks-2.train') as f:
             train_data = f.readlines()
         train_data = [line.split(' ') for line in train_data]
         train_data = tuple(map(
@@ -24,7 +31,7 @@ class TestMonk(unittest.TestCase):
                 [float(el[1])]),
             train_data))
 
-        with open('monks/monks-1.test') as f:
+        with open('../../monks/monks-2.test') as f:
             test_data = f.readlines()
         test_data = [line.split(' ') for line in test_data]
         test_data = tuple(map(
