@@ -18,20 +18,20 @@ class TestMonk(unittest.TestCase):
                 number_inputs=6,
                 number_outputs=1,
                 number_hidden=5,
-                threshold=8,
+                threshold=4,
                 range_weights=.5
             ))
 
-        with open('../../monks/monks-2.train') as f:
+        with open('../../monks/monks-1.train') as f:
             train_data = f.readlines()
         train_data = [line.split(' ') for line in train_data]
         train_data = tuple(map(
             lambda el: (
-                tuple(map(lambda x: float(x), el[2:-1])),
+                tuple(map(lambda y: float(y), el[2:-1])),
                 [float(el[1])]),
             train_data))
 
-        with open('../../monks/monks-2.test') as f:
+        with open('../../monks/monks-1.test') as f:
             test_data = f.readlines()
         test_data = [line.split(' ') for line in test_data]
         test_data = tuple(map(
@@ -40,7 +40,25 @@ class TestMonk(unittest.TestCase):
                 [float(el[1])]),
             test_data))
 
-        nn.train(train_data, 127, 0.5)
+        nn.plotting_results(train_data, test_data, 100, 0.5)  # 127 --> passa i test gia' con 100
+
+        # nn.train(train_data, 127, 0.5)
+        train_errs = nn.get_training_errors()
+        print("TRAINING ERRORS: ")
+        for e in train_errs:
+            print(e)
+
+        # nn.test(test_data)
+        test_errs = nn.get_testing_errors()
+        print("TESTING ERRORS:")
+        for e in test_errs:
+            print(e)
+
+        # for e in nn.training_errors:
+        #    print(e)
+        # while true
+        # nn.train(train_data, 1, 0.5)
+        # print(nn.test(train_data))
 
         error_train = 0
         for x, d in train_data:

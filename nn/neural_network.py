@@ -5,6 +5,8 @@ import random
 from nn.activation_function import ActivationFunction
 from nn.neuron_layer import NeuronLayer
 
+from enum import Enum
+
 
 def back_propagation(
     d: Sequence[float],
@@ -44,6 +46,11 @@ def back_propagation(
             n_j.w[i] += eta * delta_w[i]
 
 
+class ErrorTypes(Enum):
+    MEE = 1
+    MAE = 2
+
+
 class NeuralNetwork:
     def __init__(
         self,
@@ -51,6 +58,7 @@ class NeuralNetwork:
         architecture: Architecture,
         learning_algorithm: Callable = back_propagation
     ):
+
         self.activation = activation
         self.learning_algorithm = learning_algorithm
 
@@ -68,11 +76,27 @@ class NeuralNetwork:
         self.input: Sequence[float]
         self.out: Sequence[float]
 
+        self.training_errors: List[float] = []
+        self.testing_errors: List[float] = []
+
+        self.error: ErrorTypes = ErrorTypes.MEE
+
     # feed-forward william carmine
     def __call__(self, *args: float) -> Sequence[float]:
         self.input = tuple(args)
         self.out = self.output_layer(*self.hidden_layer(*self.input))
         return self.out
+
+    def compute_error(
+            self,
+            patterns: Sequence[Tuple[Sequence[float], Sequence[float]]]
+    ) -> float:
+        error = 0
+        for x, d in patterns:
+            self(*x)
+            for i in range(len(d)):
+                error += 0.5 * (d[i] - self.out[i])**2
+        return error
 
     def train(
         self,
@@ -85,16 +109,35 @@ class NeuralNetwork:
                 self(*x)
                 self.learning_algorithm(d, eta, self)
 
+            error = self.compute_error(patterns)
+            self.training_errors.append(error)
+
     def test(
         self,
         patterns: Sequence[Tuple[Sequence[float], Sequence[float]]],
     ) -> float:
-        error = 0
-        for x, d in patterns:
-            self(*x)
-            for i in range(len(d)):
-                error += 0.5 * (d[i] - self.out[i])**2
+        error = self.compute_error(patterns)
+        self.testing_errors.append(error)
         return error
+
+    def get_training_errors(self):
+        return self.training_errors
+
+    def get_testing_errors(self):
+        return self.testing_errors
+
+    # per avere il grafico di entrambe bisogna fare una funzione che prende come argomento sia il training set e il
+    # test set e dopo ogni epoca di training calcola l'errore anche sul test set
+    def plotting_results(
+            self,
+            train_set: Sequence[Tuple[Sequence[float], Sequence[float]]],
+            test_set: Sequence[Tuple[Sequence[float], Sequence[float]]],
+            epoch_number: int,
+            eta: float
+    ):
+        for ep in range(epoch_number):
+            self.train(train_set, epoch_number=1, eta=eta)
+            self.test(test_set)
 
     class Architecture:
         def __init__(
@@ -111,7 +154,6 @@ class NeuralNetwork:
 
             threshold: Optional[int] = None,
             range_weights: Optional[float] = None,
-
         ):
 
             self.number_inputs: int = number_inputs
@@ -133,7 +175,7 @@ class NeuralNetwork:
                     w = []
                     for _ in range(self.number_inputs):
                         # starting values updated:
-                        # if #inputs > threshold ==> as before: rand * 0.4 - 0.2
+                        # if #inputs > threshold ==> quite as before: rand * 0.4 - 0.2
                         # else #inputs <= threshold ==> (rand * 0.4 - 0.2) * 2 / #inputs
 
                         w.append(random.uniform(- self.range_weights, self.range_weights)
@@ -150,8 +192,8 @@ class NeuralNetwork:
                     w = []
                     for _ in range(self.number_hidden):
                         w.append(random.uniform(- self.range_weights, self.range_weights)
-                                 if self.number_inputs > self.threshold else
-                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs)
+                                 if self.number_hidden > self.threshold else
+                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_hidden)
                     _output_weights.append(w)
                 self.output_weights = _output_weights
             else:
@@ -166,7 +208,7 @@ class NeuralNetwork:
 
             if output_bias is None:
                 self.output_bias = random.uniform(- self.range_weights, self.range_weights) \
-                                 if self.number_inputs > self.threshold else \
-                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs
+                     if self.number_hidden > self.threshold else \
+                     random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_hidden
             else:
                 self.output_bias = output_bias
