@@ -2,5 +2,6 @@
     "python.linting.pycodestyleArgs": [
         "--ignore=E501,E126,E226"
     ],
+    "python.linting.pycodestyleEnabled": true,
     "code-runner.fileDirectoryAsCwd": true
 }
