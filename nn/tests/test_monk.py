@@ -14,6 +14,8 @@ class TestMonk(unittest.TestCase):
         random.seed(3)
         nn = NN(
             activation=sigmoidal,
+            early_stopping=100,
+            epsilon=1e-3,
             architecture=NN.Architecture(
                 number_inputs=6,
                 number_outputs=1,
@@ -21,13 +23,12 @@ class TestMonk(unittest.TestCase):
                 threshold=4,
                 range_weights=.5
             ))
-
         with open('../../monks/monks-1.train') as f:
             train_data = f.readlines()
         train_data = [line.split(' ') for line in train_data]
         train_data = tuple(map(
             lambda el: (
-                tuple(map(lambda y: float(y), el[2:-1])),
+                tuple(map(lambda lx: float(lx), el[2:-1])),
                 [float(el[1])]),
             train_data))
 
@@ -40,9 +41,10 @@ class TestMonk(unittest.TestCase):
                 [float(el[1])]),
             test_data))
 
-        nn.plotting_results(train_data, test_data, 100, 0.5)  # 127 --> passa i test gia' con 100
+        # nn.fill_error_lists(train_data, test_data, 0.5, epoch_number=100)  # 127 --> passa i test gia' con 100
+        # nn.fill_error_lists(train_data, test_data, 0.5)  # 127 --> passa i test gia' con 100
 
-        # nn.train(train_data, 127, 0.5)
+        nn.train(train_data, test_data, eta=0.5)
         train_errs = nn.get_training_errors()
         print("TRAINING ERRORS: ")
         for e in train_errs:
@@ -79,3 +81,19 @@ class TestMonk(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+# TEST PASSED USING
+# nn = NN(
+#     activation=sigmoidal,
+#     early_stopping=100,
+#     epsilon=1e-2, 1e-3, 1e-4, 1e-7
+#     architecture=NN.Architecture(
+#         number_inputs=6,
+#         number_outputs=1,
+#         number_hidden=5,
+#         threshold=4,
+#         range_weights=.5
+#     ))
+# TRAIN 0.3344626053485594
+# TEST 1.8598428089999413
