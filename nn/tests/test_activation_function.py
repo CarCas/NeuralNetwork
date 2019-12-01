@@ -1,12 +1,10 @@
 import unittest
-import math
 import sympy as sp
 
 from nn.activation_function import (
     ActivationFunction,
     identity,
-    sign,
-    sigmoidal)
+    sign)
 
 
 class TestActivationFunction(unittest.TestCase):
