@@ -44,7 +44,7 @@ class TestNNBoolFunc(unittest.TestCase):
 
         error = 1
         while(error):
-            nn.train2(data)
+            nn.train(data, [])
             error = 0
             for x, d in data:
                 error += (round(nn(*x)[0]) - d[0])**2

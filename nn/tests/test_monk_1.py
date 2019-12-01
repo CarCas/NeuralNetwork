@@ -55,7 +55,4 @@ class TestMonk(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import os
-    os.environ['OPENBLAS_NUM_THREADS'] = '1'
-    os.environ['MKL_NUM_THREADS'] = '1'
     unittest.main()
