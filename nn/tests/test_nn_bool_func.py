@@ -1,12 +1,13 @@
 import unittest
-from nn import NeuralNetwork as NN
+from nn import NeuralNetwork as NN, Architecture
 from nn.activation_function import sigmoidal
-import random
+import numpy as np
 
 
 class TestNNBoolFunc(unittest.TestCase):
     def setUp(self):
-        random.seed(1)
+        np.random.seed(1)
+        pass
 
     def test_and(self):
         self.try_data([
@@ -35,18 +36,20 @@ class TestNNBoolFunc(unittest.TestCase):
     def try_data(self, data):
         nn = NN(
             activation=sigmoidal,
-            architecture=NN.Architecture(
-                number_inputs=2,
-                number_outputs=1,
-                number_hidden=5
+            architecture=Architecture(
+                size_input_nodes=2,
+                size_output_nodes=1,
+                size_hidden_nodes=5
             ))
 
         error = 1
         while(error):
-            nn.train(data, 1, 1)
+            nn.train2(data)
             error = 0
             for x, d in data:
                 error += (round(nn(*x)[0]) - d[0])**2
+
+            # print(nn.test(data), error)
 
         self.assertEqual(error, 0)
 

@@ -1,7 +1,8 @@
+from nn.architecture import Architecture
 import unittest
-from nn import NeuralNetwork as NN
+from nn import NeuralNetwork as NN, Architecture
 from nn.activation_function import sigmoidal
-import random
+import numpy as np
 
 
 # monks-1: con threshold > #inputs, range_weights = (0.35, 0.60] ---> Test passed
@@ -11,17 +12,17 @@ import random
 # e quindi fallisce perchè è maggiore di 0.6
 class TestMonk(unittest.TestCase):
     def test_monk1(self):
-        random.seed(3)
+        np.random.seed(3)
         nn = NN(
             activation=sigmoidal,
-            early_stopping=100,
+            early_stopping=71,
             epsilon=1e-3,
-            architecture=NN.Architecture(
-                number_inputs=6,
-                number_outputs=1,
-                number_hidden=5,
+            architecture=Architecture(
+                size_input_nodes=6,
+                size_output_nodes=1,
+                size_hidden_nodes=5,
+                range_weights=.2,
                 threshold=4,
-                range_weights=.5
             ))
         with open('../../monks/monks-1.train') as f:
             train_data = f.readlines()
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 # TEST PASSED USING
 # nn = NN(
 #     activation=sigmoidal,
-#     early_stopping=100,
+#     early_stopping=71,
 #     epsilon=1e-2, 1e-3, 1e-4, 1e-7
 #     architecture=NN.Architecture(
 #         number_inputs=6,

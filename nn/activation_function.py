@@ -1,7 +1,8 @@
 from __future__ import annotations
 from numba import jit
 import sympy as sp
-from typing import Union
+from typing import Union, Optional
+from nn.number import number
 
 
 class ActivationFunction:
@@ -31,15 +32,15 @@ class ActivationFunction:
             self._derivative = jit(
                 sp.lambdify(x, derivative))
 
-    def __call__(self, x: float) -> float:
+    def __call__(self, x: number) -> number:
         return self._function(x)
 
     def isdifferentiable(self) -> bool:
         return True if self._derivative else False
 
-    def derivative(self, x: float) -> float:
+    def derivative(self, x: number) -> number:
         if not self.isdifferentiable():
-            raise RuntimeError('this function is not differentiable')
+            return 0
 
         return self._derivative(x)
 

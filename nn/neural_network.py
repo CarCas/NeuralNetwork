@@ -1,49 +1,25 @@
 from __future__ import annotations
 from typing import Sequence, Optional, Callable, Tuple, List
-import random
+import numpy as np
 
 from nn.activation_function import ActivationFunction
 from nn.neuron_layer import NeuronLayer
+from nn.number import number
+from nn.architecture import Architecture
 
 from enum import Enum
 
 
 def back_propagation(
-    d: Sequence[float],
-    eta: float,
+    d: Sequence[number],
+    eta: number,
     nn: NeuralNetwork,
 ):
-    delta_k = []
-    for k in range(len(nn.output_layer)):
-        n_k = nn.output_layer[k]
-        delta_k.append((d[k] - n_k.out) * n_k.fprime)
+    delta_k = np.subtract(d, nn.output_layer.out) * nn.output_layer.fprime
+    delta_j = np.array(nn.output_layer.w).T[1:] @ delta_k * nn.hidden_layer.fprime
 
-    delta_j = []
-    for j in range(len(nn.hidden_layer)):
-        n_j = nn.hidden_layer[j]
-        wk_j = nn.output_layer.w_from(j)
-        delta = 0
-        for i in range(len(delta_k)):
-            delta += delta_k[i] * wk_j[i]
-        delta_j.append(delta * n_j.fprime)
-
-    for k in range(len(nn.output_layer)):
-        n_k = nn.output_layer[k]
-        delta_w = []
-        for i in range(len(nn.hidden_layer)):
-            o_i = nn.hidden_layer[i].out
-            delta_w.append(delta_k[k] * o_i)
-        for i in range(len(delta_w)):
-            n_k.w[i] += eta * delta_w[i]
-
-    for j in range(len(nn.hidden_layer)):
-        n_j = nn.hidden_layer[j]
-        delta_w = []
-        for i in range(len(nn.input)):
-            o_i = nn.input[i]
-            delta_w.append(delta_j[j] * o_i)
-        for i in range(len(delta_w)):
-            n_j.w[i] += eta * delta_w[i]
+    nn.output_layer.w += eta * (delta_k * np.insert(nn.hidden_layer.out, 0, 1)[np.newaxis].T).T
+    nn.hidden_layer.w += eta * (delta_j * np.insert(nn.input, 0, 1)[np.newaxis].T).T
 
 
 class ErrorTypes(Enum):
@@ -59,8 +35,8 @@ class ErrorComputation:
 
     def __call__(
             self,
-            d: Sequence[float],
-            out: Sequence[float]
+            d: Sequence[number],
+            out: Sequence[number]
     ):
         if self.identifier == ErrorTypes.MSE:
             return self.mean_square_error(d, out)
@@ -95,7 +71,7 @@ class NeuralNetwork:
         activation: ActivationFunction,
         architecture: Architecture,
         early_stopping: int = 0,
-        epsilon: float = 0,
+        epsilon: number = 0,
         learning_algorithm: Callable = back_propagation
     ):
 
@@ -103,39 +79,35 @@ class NeuralNetwork:
         self.learning_algorithm = learning_algorithm
 
         self.hidden_layer = NeuronLayer(
-                size=architecture.number_hidden,
                 activation=activation,
-                weights=architecture.hidden_weights,
-                bias=architecture.hidden_bias)
+                weights=architecture.hidden_weights)
         self.output_layer = NeuronLayer(
-                size=architecture.number_outputs,
                 activation=activation,
-                weights=architecture.output_weights,
-                bias=architecture.output_bias)
+                weights=architecture.output_weights)
 
-        self.input: Sequence[float]
-        self.out: Sequence[float]
+        self.input: Sequence[number]
+        self.out: Sequence[number]
 
-        self.training_errors: List[float] = []
-        self.testing_errors: List[float] = []
+        self.training_errors: List[number] = []
+        self.testing_errors: List[number] = []
 
         self.error: ErrorTypes = ErrorTypes.MSE
         self.early_stopping = early_stopping
         self.epsilon = epsilon
 
-    # feed-forward william carmine
+    # feed-forward
     def __call__(
         self,
-        *args: float
-    ) -> Sequence[float]:
-        self.input = tuple(args)
+        *args: number
+    ) -> Sequence[number]:
+        self.input = np.array(args)
         self.out = self.output_layer(*self.hidden_layer(*self.input))
         return self.out
 
     def compute_error(
         self,
-        patterns: Sequence[Tuple[Sequence[float], Sequence[float]]]
-    ) -> float:
+        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
+    ) -> number:
         error = 0
         ec: ErrorComputation = ErrorComputation(self.error)
         for x, d in patterns:
@@ -143,37 +115,45 @@ class NeuralNetwork:
             error += ec(d, self.out)
         return error
 
+    def _train_on_patterns(self, in_patterns, in_eta, test_patterns):
+        for x, d in in_patterns:
+            self(*x)
+            self.learning_algorithm(d, in_eta, self)
+        in_error = self.compute_error(in_patterns)
+        self.training_errors.append(in_error)
+        # needed for constructing the learning curve relative to the testing errors
+        self.testing_errors.append(self.test(test_patterns))
+        return in_error
+
     def train(
         self,
-        patterns: Sequence[Tuple[Sequence[float], Sequence[float]]],
-        test_patterns: Sequence[Tuple[Sequence[float], Sequence[float]]],
-        eta: float = 0.5
+        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        eta: number = 0.5
     ) -> None:
-        def train_on_patterns(in_patterns, in_eta):
-            for x, d in in_patterns:
-                self(*x)
-                self.learning_algorithm(d, in_eta, self)
-            in_error = self.compute_error(in_patterns)
-            self.training_errors.append(in_error)
-            # needed for constructing the learning curve relative to the testing errors
-            self.testing_errors.append(self.test(test_patterns))
-            return in_error
-
         if self.early_stopping > 0 and self.epsilon > 0:
             for _ in range(self.early_stopping):
-                if train_on_patterns(patterns, eta) < self.epsilon:
+                if self._train_on_patterns(patterns, eta, test_patterns) < self.epsilon:
                     break
         elif self.early_stopping > 0:
             for _ in range(self.early_stopping):
-                train_on_patterns(patterns, eta)
+                self._train_on_patterns(patterns, eta, test_patterns)
         elif self.epsilon > 0:
-            while train_on_patterns(patterns, eta) >= self.epsilon:
+            while self._train_on_patterns(patterns, eta, test_patterns) >= self.epsilon:
                 pass
+        else:
+            self._train_on_patterns(patterns, eta, test_patterns)
+
+    # TODO remove
+    def train2(self, data, eta=0.5):
+        for x, d in data:
+            self(*x)
+            self.learning_algorithm(d, eta, self)
 
     def test(
         self,
-        patterns: Sequence[Tuple[Sequence[float], Sequence[float]]]
-    ) -> float:
+        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
+    ) -> number:
         error = self.compute_error(patterns)
         self.testing_errors.append(error)
         return error
@@ -192,9 +172,9 @@ class NeuralNetwork:
     # The function needs to take into account also the early stopping hyper-parameter.
     def fill_error_lists(
         self,
-        train_set: Sequence[Tuple[Sequence[float], Sequence[float]]],
-        test_set: Sequence[Tuple[Sequence[float], Sequence[float]]],
-        eta: float,
+        train_set: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_set: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        eta: number,
         epoch_number: int = 0
     ) -> None:
         epoch_number = len(self.training_errors) if epoch_number == 0 else \
@@ -202,77 +182,3 @@ class NeuralNetwork:
         for ep in range(epoch_number):
             self.train(train_set, test_set, eta=eta)
             self.test(test_set)
-
-    class Architecture:
-        def __init__(
-            self,
-            number_inputs: int,
-            number_hidden: int,
-            number_outputs: int,
-
-            hidden_weights: Optional[Sequence[List[float]]] = None,
-            output_weights: Optional[Sequence[List[float]]] = None,
-
-            hidden_bias: Optional[float] = None,
-            output_bias: Optional[float] = None,
-
-            threshold: Optional[int] = None,
-            range_weights: float = 0.5,
-        ):
-
-            self.number_inputs: int = number_inputs
-            self.number_hidden: int = number_hidden
-            self.number_outputs: int = number_outputs
-
-            self.threshold: Optional[int] = threshold
-            self.range_weights: float = range_weights
-
-            self.hidden_bias: float
-            self.output_bias: float
-
-            self.hidden_weights: Sequence[List[float]]
-            self.output_weights: Sequence[List[float]]
-
-            if hidden_weights is None:
-                _hidden_weights = []
-                for _ in range(self.number_hidden):
-                    w = []
-                    for _ in range(self.number_inputs):
-                        # starting values updated:
-                        # if #inputs > threshold ==> quite as before: rand * 0.4 - 0.2
-                        # else #inputs <= threshold ==> (rand * 0.4 - 0.2) * 2 / #inputs
-
-                        w.append(random.uniform(- self.range_weights, self.range_weights)
-                                 if self.threshold is not None and self.number_inputs > self.threshold else
-                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs)
-                    _hidden_weights.append(w)
-                self.hidden_weights = _hidden_weights
-            else:
-                self.hidden_weights = hidden_weights
-
-            if output_weights is None:
-                _output_weights = []
-                for _ in range(self.number_outputs):
-                    w = []
-                    for _ in range(self.number_hidden):
-                        w.append(random.uniform(- self.range_weights, self.range_weights)
-                                 if self.threshold is not None and self.number_hidden > self.threshold else
-                                 random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_hidden)
-                    _output_weights.append(w)
-                self.output_weights = _output_weights
-            else:
-                self.output_weights = output_weights
-
-            if hidden_bias is None:
-                self.hidden_bias = random.uniform(- self.range_weights, self.range_weights) \
-                    if self.threshold is not None and self.number_inputs > self.threshold else \
-                    random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_inputs
-            else:
-                self.hidden_bias = hidden_bias
-
-            if output_bias is None:
-                self.output_bias = random.uniform(- self.range_weights, self.range_weights) \
-                     if self.threshold is not None and self.number_hidden > self.threshold else \
-                     random.uniform(- self.range_weights, self.range_weights) * 2 / self.number_hidden
-            else:
-                self.output_bias = output_bias

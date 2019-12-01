@@ -1,36 +1,30 @@
 from __future__ import annotations
-from typing import List
-import math
+from typing import Sequence
+import numpy as np
 
 from nn.activation_function import ActivationFunction
+from nn.number import number
 
 
 class Neuron:
     def __init__(
         self,
+        w: Sequence[number],
         activation: ActivationFunction,
-        w: List[float],
-        bias: float
     ):
         if not len(w):
             raise ValueError('w cannot be empty')
 
-        self.bias: float = bias
-        self.w: List[float] = w
+        self.w: Sequence[number] = np.array(w)
         self.activation: ActivationFunction = activation
 
-        self.net: float
-        self.out: float
+        self.net: number
+        self.out: number
+        self.fprime: number
 
-    def __call__(self, *args: float) -> float:
-        input = tuple(args)
-        self.net = 0
-        for i in range(len(input)):
-            self.net += input[i] * self.w[i]
-        self.net += self.bias
+    def __call__(self, *args: number) -> number:
+        input_ = np.insert(args, 0, 1)
+        self.net = np.dot(input_, self.w)
         self.out = self.activation(self.net)
+        self.fprime = self.activation.derivative(self.net)
         return self.out
-
-    @property
-    def fprime(self) -> float:
-        return self.activation.derivative(self.net)

@@ -34,8 +34,7 @@ class TestActivationFunction(unittest.TestCase):
         self.assertEqual(sign(-1), 0)
 
         self.assertFalse(sign.isdifferentiable())
-        with self.assertRaises(RuntimeError):
-            sign.derivative(1)
+        self.assertEqual(sign.derivative(1), 0)
 
     def test_init(self):
         fs = [
