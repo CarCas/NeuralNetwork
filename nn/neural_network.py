@@ -128,7 +128,7 @@ class NeuralNetwork:
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
         eta: number = 0.5
     ) -> None:
         if self.early_stopping > 0 and self.epsilon > 0:

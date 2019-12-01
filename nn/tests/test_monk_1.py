@@ -43,7 +43,7 @@ class TestMonk(unittest.TestCase):
         counter = 0
         while(error):
             counter += 1
-            nn.train(train_data, [])
+            nn.train(train_data)
             error = 0
             for x, d in data:
                 error += (round(nn(*x)[0]) - d[0])**2

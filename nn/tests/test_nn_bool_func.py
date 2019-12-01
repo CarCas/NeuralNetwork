@@ -44,12 +44,12 @@ class TestNNBoolFunc(unittest.TestCase):
 
         error = 1
         while(error):
-            nn.train(data, [])
+            nn.train(data)
             error = 0
             for x, d in data:
                 error += (round(nn(*x)[0]) - d[0])**2
 
-            # print(nn.test(data), error)
+            print(nn.test(data), error)
 
         self.assertEqual(error, 0)
 
