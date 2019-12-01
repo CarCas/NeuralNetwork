@@ -18,8 +18,8 @@ def back_propagation(
     delta_k = np.subtract(d, nn.output_layer.out) * nn.output_layer.fprime
     delta_j = np.array(nn.output_layer.w).T[1:] @ delta_k * nn.hidden_layer.fprime
 
-    nn.output_layer.w += eta * (delta_k * np.insert(nn.hidden_layer.out, 0, 1)[np.newaxis].T).T
-    nn.hidden_layer.w += eta * (delta_j * np.insert(nn.input, 0, 1)[np.newaxis].T).T
+    nn.output_layer.w += eta * (delta_k * np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis].T).T
+    nn.hidden_layer.w += eta * (delta_j * np.array((1,) + tuple(nn.input))[np.newaxis].T).T
 
 
 class ErrorTypes(Enum):
@@ -100,7 +100,7 @@ class NeuralNetwork:
         self,
         *args: number
     ) -> Sequence[number]:
-        self.input = np.array(args)
+        self.input = args
         self.out = self.output_layer(*self.hidden_layer(*self.input))
         return self.out
 

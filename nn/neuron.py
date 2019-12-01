@@ -15,7 +15,7 @@ class Neuron:
         if not len(w):
             raise ValueError('w cannot be empty')
 
-        self.w: Sequence[number] = np.array(w)
+        self.w: Sequence[number] = w
         self.activation: ActivationFunction = activation
 
         self.net: number
@@ -23,7 +23,7 @@ class Neuron:
         self.fprime: number
 
     def __call__(self, *args: number) -> number:
-        input_ = np.insert(args, 0, 1)
+        input_ = (1,) + tuple(args)
         self.net = np.dot(input_, self.w)
         self.out = self.activation(self.net)
         self.fprime = self.activation.derivative(self.net)
