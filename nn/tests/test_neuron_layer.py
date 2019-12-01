@@ -14,10 +14,10 @@ class TestNeuronLayer(unittest.TestCase):
             activation=sign,
             weights=[[-0.5, -1, 1]])
 
-        self.assertEqual(output_layer(*hidden_layer(0, 0)), 0)
-        self.assertEqual(output_layer(*hidden_layer(0, 1)), 1)
-        self.assertEqual(output_layer(*hidden_layer(1, 0)), 1)
-        self.assertEqual(output_layer(*hidden_layer(1, 1)), 0)
+        self.assertEqual(output_layer(*hidden_layer(0, 0)), (0,))
+        self.assertEqual(output_layer(*hidden_layer(0, 1)), (1,))
+        self.assertEqual(output_layer(*hidden_layer(1, 0)), (1,))
+        self.assertEqual(output_layer(*hidden_layer(1, 1)), (0,))
 
 
 if __name__ == '__main__':
