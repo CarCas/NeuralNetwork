@@ -19,7 +19,7 @@ def back_propagation(
     delta_j = np.array(nn.output_layer.w).T[1:] @ delta_k * nn.hidden_layer.fprime
 
     nn.output_layer.w += eta * (delta_k * np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis].T).T
-    nn.hidden_layer.w += eta * (delta_j * np.array((1,) + tuple(nn.input))[np.newaxis].T).T
+    nn.hidden_layer.w += eta * (delta_j * np.array((1,) + tuple(nn.input_layer))[np.newaxis].T).T
 
 
 class ErrorTypes(Enum):
@@ -85,7 +85,7 @@ class NeuralNetwork:
                 activation=activation,
                 weights=architecture.output_weights)
 
-        self.input: Sequence[number]
+        self.input_layer: Sequence[number] = np.zeros(architecture.size_input_nodes)
         self.out: Sequence[number]
 
         self.training_errors: List[number] = []
@@ -100,8 +100,8 @@ class NeuralNetwork:
         self,
         *args: number
     ) -> Sequence[number]:
-        self.input = args
-        self.out = self.output_layer(*self.hidden_layer(*self.input))
+        self.input_layer = args
+        self.out = self.output_layer(*self.hidden_layer(*self.input_layer))
         return self.out
 
     def compute_error(

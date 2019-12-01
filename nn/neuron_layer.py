@@ -1,4 +1,5 @@
 from typing import Sequence
+import numpy as np
 
 from nn.neuron import Neuron
 from nn.activation_function import ActivationFunction
@@ -24,7 +25,7 @@ class NeuronLayer:
 
     @property
     def w(self) -> Sequence[Sequence[number]]:
-        return [n.w for n in self.neurons]
+        return np.array([n.w for n in self.neurons])
 
     @w.setter
     def w(self, w):
