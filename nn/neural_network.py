@@ -144,12 +144,6 @@ class NeuralNetwork:
         else:
             self._train_on_patterns(patterns, eta, test_patterns)
 
-    # TODO remove
-    def train2(self, data, eta=0.5):
-        for x, d in data:
-            self(*x)
-            self.learning_algorithm(d, eta, self)
-
     def test(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
