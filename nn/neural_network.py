@@ -23,10 +23,10 @@ def back_propagation(
     delta_j = (output_layer_w.T[1:] @ delta_k) * nn.hidden_layer.fprime
 
     hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
-    input_layer_out = np.array((1,) + tuple(nn.input_layer))[np.newaxis]
+    input__layer_out = np.array((1,) + tuple(nn.input_layer))[np.newaxis]
 
     nn.output_layer.w += eta * (delta_k * hidden_layer_out.T).T
-    nn.hidden_layer.w += eta * (delta_j * input_layer_out.T).T
+    nn.hidden_layer.w += eta * (delta_j * input__layer_out.T).T
 
 
 class ErrorTypes(Enum):
