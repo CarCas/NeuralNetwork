@@ -126,9 +126,9 @@ class NeuralNetwork:
     def _train_on_patterns(
         self,
         in_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
         in_eta: number = 0.5,
-    ) -> (number, number):
+    ) -> Tuple[number, number]:
         for x, d in in_patterns:
             self(*x)
             self.learning_algorithm(d, in_eta, self)
@@ -144,12 +144,12 @@ class NeuralNetwork:
             self.training_errors.append(error)
             # needed for constructing the learning curve relative to the testing errors
             self.testing_errors.append(self.test(test_patterns))
-            return error, None
+            return error, 0
 
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
         eta: number = 0.5,
     ) -> None:
         if self.early_stopping > 0 and self.epsilon > 0:
