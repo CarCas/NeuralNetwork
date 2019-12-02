@@ -8,7 +8,6 @@ pipenv install -e .
 
 ## Test
 ```
+cd nn/tests
 pytest
 ```
-
-#### ciao
