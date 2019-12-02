@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Sequence, Callable, Tuple, List
+from typing import Sequence, Callable, Tuple, List, Optional
 import numpy as np
 
 from nn.activation_function import ActivationFunction
@@ -133,7 +133,7 @@ class NeuralNetwork:
     def _train_on_patterns(
         self,
         in_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
+        test_patterns: Optional[Sequence[Tuple[Sequence[number], Sequence[number]]]] = None,
         in_eta: number = 0.5,
     ) -> Tuple[number, number]:
         for x, d in in_patterns:
@@ -145,18 +145,20 @@ class NeuralNetwork:
             self.loss_errors.append(loss)
             self.training_errors.append(error)
             # needed for constructing the learning curve relative to the testing errors
-            self.testing_errors.append(self.test(test_patterns))
+            if test_patterns is not None:
+                self.testing_errors.append(self.test(test_patterns))
             return error, loss
         else:
             self.training_errors.append(error)
             # needed for constructing the learning curve relative to the testing errors
-            self.testing_errors.append(self.test(test_patterns))
+            if test_patterns is not None:
+                self.testing_errors.append(self.test(test_patterns))
             return error, 0
 
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
+        test_patterns: Optional[Sequence[Tuple[Sequence[number], Sequence[number]]]] = None,
         eta: number = 0.5,
     ) -> None:
         if self.early_stopping > 0 and self.epsilon > 0:
