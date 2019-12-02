@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Sequence, Optional, Callable, Tuple, List
+from typing import Sequence, Callable, Tuple, List
 import numpy as np
 
 from nn.activation_function import ActivationFunction
@@ -46,23 +46,16 @@ class ErrorComputation:
             return self.mean_absolute_error(d, out)
 
     @staticmethod
-    def mean_square_error(d, out):
-        error = 0
-        for i in range(len(d)):
-            error += 0.5 * (d[i] - out[i]) ** 2
-        return error
+    def mean_square_error(d: Sequence[number], out: Sequence[number]):
+        return np.true_divide(np.sum(np.square(np.subtract(d, out))), len(d))
 
     @staticmethod
-    def mean_euclidean_error(d, out):
-        error = 0
-        # TODO to implement
-        return error
+    def mean_euclidean_error(d: Sequence[number], out: Sequence[number]):
+        return np.true_divide(np.sqrt(np.sum(np.square(np.subtract(d, out)))), len(d))
 
     @staticmethod
     def mean_absolute_error(d, out):
-        error = 0
-        # TODO to implement
-        return error
+        return np.true_divide(np.sum(np.abs(np.subtract(d, out))), len(d))
 
 
 class NeuralNetwork:
@@ -72,6 +65,7 @@ class NeuralNetwork:
         architecture: Architecture,
         early_stopping: int = 0,
         epsilon: number = 0,
+        penalty: number = 0.01,
         learning_algorithm: Callable = back_propagation
     ):
 
@@ -90,10 +84,12 @@ class NeuralNetwork:
 
         self.training_errors: List[number] = []
         self.testing_errors: List[number] = []
+        self.loss_errors: List[number] = []
 
         self.error: ErrorTypes = ErrorTypes.MSE
         self.early_stopping = early_stopping
         self.epsilon = epsilon
+        self.penalty = penalty
 
     # feed-forward
     def __call__(
@@ -115,34 +111,59 @@ class NeuralNetwork:
             error += ec(d, self.out)
         return error
 
-    def _train_on_patterns(self, in_patterns, in_eta, test_patterns):
+    def compute_error_with_regularization(
+        self,
+        starting_error
+    ) -> number:
+        penalty_norm: number = 0
+        for weights in self.output_layer.w:
+            penalty_norm += np.linalg.norm(weights)
+        for weights in self.hidden_layer.w:
+            penalty_norm += np.linalg.norm(weights)
+        error = starting_error + np.square(penalty_norm) * self.penalty
+        return error
+
+    def _train_on_patterns(
+        self,
+        in_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
+        in_eta: number = 0.5,
+    ) -> Tuple[number, number]:
         for x, d in in_patterns:
             self(*x)
             self.learning_algorithm(d, in_eta, self)
-        in_error = self.compute_error(in_patterns)
-        self.training_errors.append(in_error)
-        # needed for constructing the learning curve relative to the testing errors
-        self.testing_errors.append(self.test(test_patterns))
-        return in_error
+        error = self.compute_error(in_patterns)
+        if self.penalty != 0:
+            loss = self.compute_error_with_regularization(error)
+            self.loss_errors.append(loss)
+            self.training_errors.append(error)
+            # needed for constructing the learning curve relative to the testing errors
+            self.testing_errors.append(self.test(test_patterns))
+            return error, loss
+        else:
+            self.training_errors.append(error)
+            # needed for constructing the learning curve relative to the testing errors
+            self.testing_errors.append(self.test(test_patterns))
+            return error, 0
 
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
         test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
-        eta: number = 0.5
+        eta: number = 0.5,
     ) -> None:
         if self.early_stopping > 0 and self.epsilon > 0:
             for _ in range(self.early_stopping):
-                if self._train_on_patterns(patterns, eta, test_patterns) < self.epsilon:
+                if self._train_on_patterns(patterns, test_patterns, eta)[1] < self.epsilon:
                     break
         elif self.early_stopping > 0:
             for _ in range(self.early_stopping):
-                self._train_on_patterns(patterns, eta, test_patterns)
+                self._train_on_patterns(patterns, test_patterns, eta)
         elif self.epsilon > 0:
-            while self._train_on_patterns(patterns, eta, test_patterns) >= self.epsilon:
+            while self._train_on_patterns(patterns, test_patterns, eta)[1] >= self.epsilon:
                 pass
         else:
-            self._train_on_patterns(patterns, eta, test_patterns)
+            self._train_on_patterns(patterns, test_patterns, eta)
 
     def test(
         self,
@@ -164,6 +185,7 @@ class NeuralNetwork:
     #           add training error on list of training errors computed on the train set
     #           add testing error on list of testing errors computed on the test set
     # The function needs to take into account also the early stopping hyper-parameter.
+    """
     def fill_error_lists(
         self,
         train_set: Sequence[Tuple[Sequence[number], Sequence[number]]],
@@ -176,3 +198,6 @@ class NeuralNetwork:
         for ep in range(epoch_number):
             self.train(train_set, test_set, eta=eta)
             self.test(test_set)
+    """
+
+# PROVA PROVA SA SA
