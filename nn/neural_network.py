@@ -6,26 +6,9 @@ from nn.activation_function import ActivationFunction, sigmoidal
 from nn.neuron_layer import NeuronLayer
 from nn.number import number
 from nn.architecture import Architecture
+from nn.learning_algorithms import LeariningAlgorthm, Online
 
 from enum import Enum
-
-
-def back_propagation(
-    d: Sequence[number],
-    nn: NeuralNetwork,
-):
-    d = np.array(d)
-    output_layer_w = np.array(nn.output_layer.w)
-    output_layer_out = np.array(nn.output_layer.out)
-
-    delta_k = (d - output_layer_out) * nn.output_layer.fprime
-    delta_j = (output_layer_w.T[1:] @ delta_k) * nn.hidden_layer.fprime
-
-    hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
-    input__layer_out = np.array((1,) + tuple(nn.input_layer))[np.newaxis]
-
-    nn.output_layer.w += nn.eta * (delta_k * hidden_layer_out.T).T
-    nn.hidden_layer.w += nn.eta * (delta_j * input__layer_out.T).T
 
 
 class ErrorTypes(Enum):
@@ -84,7 +67,7 @@ class NeuralNetwork:
         penalty: number = 0,
         error_type: ErrorTypes = ErrorTypes.MSE,
         verbose: int = 0,
-        learning_algorithm: Callable = back_propagation,
+        learning_algorithm: LeariningAlgorthm = Online()
     ):
         self.activation_hidden: ActivationFunction = activation_hidden
         self.activation_output: ActivationFunction = activation_output
@@ -95,8 +78,8 @@ class NeuralNetwork:
         self.epsilon: number = epsilon
         self.penalty: number = penalty
         self.error_type: ErrorTypes = error_type
-        self.learning_algorithm: Callable = learning_algorithm
         self.verbose: int = verbose
+        self.learning_algorithm: LeariningAlgorthm = learning_algorithm
 
         self.out: Sequence[number] = ()
 
@@ -173,15 +156,13 @@ class NeuralNetwork:
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = (),
         **kwargs: Any
     ) -> None:
         self.set(**kwargs)
 
         for _ in range(self.epoches):
-            for x, d in patterns:
-                self(*x)
-                self.learning_algorithm(d, self)
+            self.learning_algorithm(patterns, self)
 
             # needed for constructing the learning curve relative to the testing errors
             self.training_errors.append(self.compute_error(patterns))

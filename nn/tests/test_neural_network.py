@@ -8,7 +8,7 @@ from nn.activation_function import sigmoidal
 class TestNeuralNetwork(unittest.TestCase):
     def setUp(self):
         self.nn = NN(
-            activation_hidden=sigmoidal,
+            activation_output=sigmoidal,
             architecture=Architecture(
                 size_input_nodes=2,
                 size_output_nodes=2,
@@ -33,7 +33,7 @@ class TestNeuralNetwork(unittest.TestCase):
 
         # neural network expected after train
         ne = NN(
-            activation_hidden=sigmoidal,
+            activation_output=sigmoidal,
             architecture=Architecture(
                 size_input_nodes=2,
                 size_output_nodes=2,
@@ -51,13 +51,3 @@ class TestNeuralNetwork(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-    nn = NN(
-        activation_hidden=sigmoidal,
-        architecture=Architecture(
-            size_input_nodes=2,
-            size_output_nodes=2,
-            size_hidden_nodes=2,
-            output_weights=[[0.6, 0.4, 0.45], [0.6, 0.5, 0.55]],
-            hidden_weights=[[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]],
-        ))
