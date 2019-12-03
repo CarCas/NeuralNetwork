@@ -10,7 +10,7 @@ class TestMonk(unittest.TestCase):
         np.random.seed(3)
 
         nn = NN(
-            activation=sigmoidal,
+            activation_hidden=sigmoidal,
             architecture=Architecture(
                 size_input_nodes=6,
                 size_output_nodes=1,

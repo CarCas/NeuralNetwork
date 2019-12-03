@@ -10,7 +10,7 @@ class TestNNBoolFunc(unittest.TestCase):
         np.random.seed(1)
 
         self.nn = NN(
-            activation=sigmoidal,
+            activation_hidden=sigmoidal,
             architecture=Architecture(
                 size_input_nodes=2,
                 size_output_nodes=1,

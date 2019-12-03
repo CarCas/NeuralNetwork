@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Sequence, Callable, Tuple, List, Optional, Any
 import numpy as np
 
-from nn.activation_function import ActivationFunction
+from nn.activation_function import ActivationFunction, sigmoidal
 from nn.neuron_layer import NeuronLayer
 from nn.number import number
 from nn.architecture import Architecture
@@ -71,11 +71,13 @@ class ErrorComputation:
         return 0 if np.equal(d, np.round(out)).all() else 1
 
 
+
 class NeuralNetwork:
     def __init__(
         self,
-        activation: ActivationFunction,
         architecture: Architecture,
+        activation_output: ActivationFunction,
+        activation_hidden: ActivationFunction = sigmoidal,
         eta: number = 0.5,
         epoches: int = 1,
         epsilon: number = 0,
@@ -84,7 +86,8 @@ class NeuralNetwork:
         verbose: int = 0,
         learning_algorithm: Callable = back_propagation,
     ):
-        self.activation: ActivationFunction = activation
+        self.activation_hidden: ActivationFunction = activation_hidden
+        self.activation_output: ActivationFunction = activation_output
         self.architecture: Architecture = architecture
 
         self.eta: number = eta
@@ -95,14 +98,14 @@ class NeuralNetwork:
         self.learning_algorithm: Callable = learning_algorithm
         self.verbose: int = verbose
 
-        self.out: Sequence[number]
+        self.out: Sequence[number] = ()
 
-        self.training_errors: List[number]
-        self.testing_errors: List[number]
+        self.training_errors: List[number] = []
+        self.testing_errors: List[number] = []
 
-        self.hidden_layer: NeuronLayer
-        self.output_layer: NeuronLayer
-        self.input_layer: Sequence[number]
+        self.hidden_layer: NeuronLayer = NeuronLayer((), self.activation_hidden)
+        self.output_layer: NeuronLayer = NeuronLayer((), self.activation_output)
+        self.input_layer: Sequence[number] = ()
 
         self.init()
 
@@ -114,15 +117,13 @@ class NeuralNetwork:
         self.set(**kwargs)
 
         self.out = []
-
         self.hidden_layer = NeuronLayer(
-                activation=self.activation,
+                activation=self.activation_hidden,
                 weights=self.architecture.hidden_weights)
         self.output_layer = NeuronLayer(
-                activation=self.activation,
+                activation=self.activation_output,
                 weights=self.architecture.output_weights)
         self.input_layer: Sequence[number] = np.zeros(self.architecture.size_input_nodes)
-
         self.training_errors = []
         self.testing_errors = []
 
@@ -236,5 +237,4 @@ class NeuralNetwork:
             self.train(train_set, test_set, eta=eta)
             self.test(test_set)
     """
-
 # PROVA PROVA SA SA

@@ -14,7 +14,7 @@ class TestMonk(unittest.TestCase):
     def test_monk1(self):
         np.random.seed(3)
         nn = NN(
-            activation=sigmoidal,
+            activation_hidden=sigmoidal,
             early_stopping=71,
             epsilon=1e-3,
             architecture=Architecture(
