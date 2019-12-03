@@ -1,8 +1,10 @@
 from nn.architecture import Architecture
 import unittest
-from nn import NeuralNetwork as NN, Architecture
+from nn import NeuralNetwork as NN, Architecture, Batch
 from nn.activation_function import sigmoidal
 import numpy as np
+from nn.tests.monk import train_data, test_data
+import matplotlib.pyplot as plt
 
 
 # monks-1: con threshold > #inputs, range_weights = (0.35, 0.60] ---> Test passed
@@ -14,8 +16,8 @@ class TestMonk(unittest.TestCase):
     def test_monk1(self):
         np.random.seed(3)
         nn = NN(
-            activation=sigmoidal,
-            early_stopping=71,
+            activation_output=sigmoidal,
+            epoches=71,
             epsilon=1e-3,
             architecture=Architecture(
                 size_input_nodes=6,
@@ -24,23 +26,6 @@ class TestMonk(unittest.TestCase):
                 range_weights=.2,
                 threshold=4,
             ))
-        with open('../../monks/monks-1.train') as f:
-            train_data = f.readlines()
-        train_data = [line.split(' ') for line in train_data]
-        train_data = tuple(map(
-            lambda el: (
-                tuple(map(lambda lx: float(lx), el[2:-1])),
-                [float(el[1])]),
-            train_data))
-
-        with open('../../monks/monks-1.test') as f:
-            test_data = f.readlines()
-        test_data = [line.split(' ') for line in test_data]
-        test_data = tuple(map(
-            lambda el: (
-                tuple(map(lambda x: float(x), el[2:-1])),
-                [float(el[1])]),
-            test_data))
 
         # nn.fill_error_lists(train_data, test_data, 0.5, epoch_number=100)  # 127 --> passa i test gia' con 100
         # nn.fill_error_lists(train_data, test_data, 0.5)  # 127 --> passa i test gia' con 100

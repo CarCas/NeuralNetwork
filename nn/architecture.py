@@ -24,18 +24,20 @@ class Architecture:
         self.threshold: Optional[int] = threshold
         self.range_weights: Optional[number] = range_weights
 
-        self.hidden_weights: Sequence[Sequence[number]]
-        self.output_weights: Sequence[Sequence[number]]
+        self._hidden_weights = hidden_weights
+        self._output_weights = output_weights
 
-        if hidden_weights is None:
-            self.hidden_weights = self.generate_random_layer(self.size_hidden_nodes, self.size_input_nodes)
-        else:
-            self.hidden_weights = hidden_weights
+    @property
+    def hidden_weights(self) -> Sequence[Sequence[number]]:
+        if self._hidden_weights is not None:
+            return self._hidden_weights
+        return self.generate_random_layer(self.size_hidden_nodes, self.size_input_nodes)
 
-        if output_weights is None:
-            self.output_weights = self.generate_random_layer(self.size_output_nodes, self.size_hidden_nodes)
-        else:
-            self.output_weights = output_weights
+    @property
+    def output_weights(self) -> Sequence[Sequence[number]]:
+        if self._output_weights is not None:
+            return self._output_weights
+        return self.generate_random_layer(self.size_output_nodes, self.size_hidden_nodes)
 
     def generate_random_layer(self, number_nodes: int, size_weights: int) -> Sequence[Sequence[number]]:
         if self.range_weights is None:

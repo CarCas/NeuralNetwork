@@ -9,7 +9,7 @@ class TestGlorotBengio(unittest.TestCase):
         np.random.seed(1)
 
         self.nn = NN(
-            activation=sigmoidal,
+            activation_output=sigmoidal,
             architecture=Architecture(
                 size_input_nodes=200,
                 size_output_nodes=500,

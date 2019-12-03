@@ -1,3 +1,4 @@
+from nn.neural_network import ErrorTypes
 import unittest
 from nn import NeuralNetwork as NN, Architecture
 from nn.activation_function import sigmoidal
@@ -7,7 +8,14 @@ import numpy as np
 class TestNNBoolFunc(unittest.TestCase):
     def setUp(self):
         np.random.seed(1)
-        pass
+
+        self.nn = NN(
+            activation_output=sigmoidal,
+            architecture=Architecture(
+                size_input_nodes=2,
+                size_output_nodes=1,
+                size_hidden_nodes=5
+            ))
 
     def test_and(self):
         self.try_data([
@@ -34,24 +42,9 @@ class TestNNBoolFunc(unittest.TestCase):
         ])
 
     def try_data(self, data):
-        nn = NN(
-            activation=sigmoidal,
-            architecture=Architecture(
-                size_input_nodes=2,
-                size_output_nodes=1,
-                size_hidden_nodes=5
-            ))
+        self.nn().train(data, error_type=ErrorTypes.MIS, eta=0.75, epoches=1000)
 
-        error = 1
-        while(error):
-            nn.train(data)
-            error = 0
-            for x, d in data:
-                error += (round(nn(*x)[0]) - d[0])**2
-
-            print(nn.test(data), error)
-
-        self.assertEqual(error, 0)
+        self.assertEqual(self.nn.compute_error(data), 0)
 
 
 if __name__ == '__main__':
