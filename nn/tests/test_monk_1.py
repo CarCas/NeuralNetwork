@@ -48,7 +48,7 @@ class TestMonk(unittest.TestCase):
             for x, d in data:
                 error += (round(nn(*x)[0]) - d[0])**2
 
-            print(nn.test(train_data), error)
+            print(nn.compute_error(train_data), error)
 
         print('counter', counter)
         self.assertEqual(error, 0)

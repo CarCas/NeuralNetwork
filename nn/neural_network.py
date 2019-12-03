@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Sequence, Callable, Tuple, List, Optional
+from typing import Sequence, Callable, Tuple, List, Optional, Any
 import numpy as np
 
 from nn.activation_function import ActivationFunction
@@ -12,7 +12,6 @@ from enum import Enum
 
 def back_propagation(
     d: Sequence[number],
-    eta: number,
     nn: NeuralNetwork,
 ):
     d = np.array(d)
@@ -25,14 +24,15 @@ def back_propagation(
     hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
     input__layer_out = np.array((1,) + tuple(nn.input_layer))[np.newaxis]
 
-    nn.output_layer.w += eta * (delta_k * hidden_layer_out.T).T
-    nn.hidden_layer.w += eta * (delta_j * input__layer_out.T).T
+    nn.output_layer.w += nn.eta * (delta_k * hidden_layer_out.T).T
+    nn.hidden_layer.w += nn.eta * (delta_j * input__layer_out.T).T
 
 
 class ErrorTypes(Enum):
     MEE = 1
     MAE = 2
     MSE = 3
+    MIS = 4
 
 
 class ErrorComputation:
@@ -51,6 +51,8 @@ class ErrorComputation:
             return self.mean_euclidean_error(d, out)
         elif self.identifier == ErrorTypes.MAE:
             return self.mean_absolute_error(d, out)
+        elif self.identifier == ErrorTypes.MIS:
+            return self.mismatch_error(d, out)
 
     @staticmethod
     def mean_square_error(d: Sequence[number], out: Sequence[number]):
@@ -64,60 +66,97 @@ class ErrorComputation:
     def mean_absolute_error(d, out):
         return np.true_divide(np.sum(np.abs(np.subtract(d, out))), len(d))
 
+    @staticmethod
+    def mismatch_error(d, out):
+        return 0 if np.equal(d, np.round(out)).all() else 1
+
 
 class NeuralNetwork:
     def __init__(
         self,
         activation: ActivationFunction,
         architecture: Architecture,
-        early_stopping: int = 0,
+        eta: number = 0.5,
+        epoches: int = 1,
         epsilon: number = 0,
-        penalty: number = 0.01,
-        learning_algorithm: Callable = back_propagation
+        penalty: number = 0,
+        error_type: ErrorTypes = ErrorTypes.MSE,
+        verbose: int = 0,
+        learning_algorithm: Callable = back_propagation,
     ):
+        self.activation: ActivationFunction = activation
+        self.architecture: Architecture = architecture
 
-        self.activation = activation
-        self.learning_algorithm = learning_algorithm
+        self.eta: number = eta
+        self.epoches: int = epoches
+        self.epsilon: number = epsilon
+        self.penalty: number = penalty
+        self.error_type: ErrorTypes = error_type
+        self.learning_algorithm: Callable = learning_algorithm
+        self.verbose: int = verbose
 
-        self.hidden_layer = NeuronLayer(
-                activation=activation,
-                weights=architecture.hidden_weights)
-        self.output_layer = NeuronLayer(
-                activation=activation,
-                weights=architecture.output_weights)
-
-        self.input_layer: Sequence[number] = np.zeros(architecture.size_input_nodes)
         self.out: Sequence[number]
 
-        self.training_errors: List[number] = []
-        self.testing_errors: List[number] = []
-        self.loss_errors: List[number] = []
+        self.training_errors: List[number]
+        self.testing_errors: List[number]
 
-        self.error: ErrorTypes = ErrorTypes.MSE
-        self.early_stopping = early_stopping
-        self.epsilon = epsilon
-        self.penalty = penalty
+        self.hidden_layer: NeuronLayer
+        self.output_layer: NeuronLayer
+        self.input_layer: Sequence[number]
 
-    # feed-forward
-    def __call__(
-        self,
-        *args: number
-    ) -> Sequence[number]:
+        self.init()
+
+    def set(self, **kwargs) -> NeuralNetwork:
+        self.__dict__.update(**kwargs)
+        return self
+
+    def init(self, **kwargs) -> NeuralNetwork:
+        self.set(**kwargs)
+
+        self.out = []
+
+        self.hidden_layer = NeuronLayer(
+                activation=self.activation,
+                weights=self.architecture.hidden_weights)
+        self.output_layer = NeuronLayer(
+                activation=self.activation,
+                weights=self.architecture.output_weights)
+        self.input_layer: Sequence[number] = np.zeros(self.architecture.size_input_nodes)
+
+        self.training_errors = []
+        self.testing_errors = []
+
+        return self
+
+    def feed_forward(self, *args: number) -> Sequence[number]:
         self.input_layer = args
         self.out = self.output_layer(*self.hidden_layer(*self.input_layer))
         return self.out
 
+    # feed-forward or init
+    def __call__(self, *args: number, **kwargs: Any) -> NeuralNetwork:
+        if len(args):
+            self.feed_forward(*args)
+        else:
+            self.init(**kwargs)
+        return self
+
     def compute_error(
         self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
+        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        error_type: Optional[ErrorTypes] = None
     ) -> number:
+        if error_type is None:
+            error = self.error_type
+
         error = 0
-        ec: ErrorComputation = ErrorComputation(self.error)
+        ec: ErrorComputation = ErrorComputation(self.error_type)
         for x, d in patterns:
             self(*x)
             error += ec(d, self.out)
         return error
 
+    # TODO applicare regularization al learning
     def compute_error_with_regularization(
         self,
         starting_error
@@ -130,63 +169,52 @@ class NeuralNetwork:
         error = starting_error + np.square(penalty_norm) * self.penalty
         return error
 
-    def _train_on_patterns(
-        self,
-        in_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Optional[Sequence[Tuple[Sequence[number], Sequence[number]]]] = None,
-        in_eta: number = 0.5,
-    ) -> Tuple[number, number]:
-        for x, d in in_patterns:
-            self(*x)
-            self.learning_algorithm(d, in_eta, self)
-        error = self.compute_error(in_patterns)
-        if self.penalty != 0:
-            loss = self.compute_error_with_regularization(error)
-            self.loss_errors.append(loss)
-            self.training_errors.append(error)
-            # needed for constructing the learning curve relative to the testing errors
-            if test_patterns is not None:
-                self.testing_errors.append(self.test(test_patterns))
-            return error, loss
-        else:
-            self.training_errors.append(error)
-            # needed for constructing the learning curve relative to the testing errors
-            if test_patterns is not None:
-                self.testing_errors.append(self.test(test_patterns))
-            return error, 0
-
     def train(
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_patterns: Optional[Sequence[Tuple[Sequence[number], Sequence[number]]]] = None,
-        eta: number = 0.5,
+        test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = [],
+        **kwargs: Any
     ) -> None:
-        if self.early_stopping > 0 and self.epsilon > 0:
-            for _ in range(self.early_stopping):
-                if self._train_on_patterns(patterns, test_patterns, eta)[1] < self.epsilon:
-                    break
-        elif self.early_stopping > 0:
-            for _ in range(self.early_stopping):
-                self._train_on_patterns(patterns, test_patterns, eta)
-        elif self.epsilon > 0:
-            while self._train_on_patterns(patterns, test_patterns, eta)[1] >= self.epsilon:
-                pass
-        else:
-            self._train_on_patterns(patterns, test_patterns, eta)
+        self.set(**kwargs)
 
-    def test(
-        self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
-    ) -> number:
-        error = self.compute_error(patterns)
-        self.testing_errors.append(error)
-        return error
+        for _ in range(self.epoches):
+            for x, d in patterns:
+                self(*x)
+                self.learning_algorithm(d, self)
+
+            # needed for constructing the learning curve relative to the testing errors
+            self.training_errors.append(self.compute_error(patterns))
+            self.testing_errors.append(self.compute_error(test_patterns))
+
+            if self.verbose > 0:
+                print(self.training_errors[-1])
+
+            if self.training_errors[-1] <= self.epsilon:
+                break
 
     def get_training_errors(self):
         return self.training_errors
 
     def get_testing_errors(self):
         return self.testing_errors
+
+    def __len__(self):
+        return len(self.out)
+
+    def __getitem__(self, index: int):
+        return self.out[index]
+
+    def __iter__(self):
+        self._index = 0
+        return self
+
+    def __next__(self):
+        if self._index < len(self):
+            result = self[self._index]
+            self._index += 1
+            return result
+        else:
+            raise StopIteration
 
     # To obtain the learning curve of both the training and testing set we need to create a function f such that:
     # f(training_set, testing_set) =
@@ -203,7 +231,7 @@ class NeuralNetwork:
         epoch_number: int = 0
     ) -> None:
         epoch_number = len(self.training_errors) if epoch_number == 0 else \
-            (len(self.training_errors) if 0 < self.early_stopping < epoch_number else epoch_number)
+            (len(self.training_errors) if 0 < self.epoches < epoch_number else epoch_number)
         for ep in range(epoch_number):
             self.train(train_set, test_set, eta=eta)
             self.test(test_set)

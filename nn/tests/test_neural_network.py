@@ -29,7 +29,7 @@ class TestNeuralNetwork(unittest.TestCase):
 
     def test_backpropagation(self):
         nn = self.nn
-        nn.train([([1, 1], [1, 1])], [], 0.5)
+        nn.train([([1, 1], [1, 1])], [], eta=0.5)
 
         # neural network expected after train
         ne = NN(
