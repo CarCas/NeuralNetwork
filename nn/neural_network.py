@@ -54,7 +54,6 @@ class ErrorComputation:
         return 0 if np.equal(d, np.round(out)).all() else 1
 
 
-
 class NeuralNetwork:
     def __init__(
         self,
