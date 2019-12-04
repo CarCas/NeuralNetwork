@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Sequence, Callable, Tuple, List, Optional, Any
+from typing import Sequence, Callable, MutableSequence, Tuple, List, Optional, Any
 import numpy as np
 
 from nn.activation_function import ActivationFunction, sigmoidal
@@ -16,42 +16,50 @@ class ErrorTypes(Enum):
     MAE = 2
     MSE = 3
     MIS = 4
+    ACC = 5
 
 
 class ErrorComputation:
+    def __init__(self, identifier: ErrorTypes):
+        self.identifier: ErrorTypes = identifier
 
-    def __init__(self, identifier):
-        self.identifier = identifier
-
-    def __call__(
-            self,
-            d: Sequence[number],
-            out: Sequence[number]
-    ):
+    def __call__(self, d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
         if self.identifier == ErrorTypes.MSE:
-            return self.mean_square_error(d, out)
+            return np.array(self.mean_square_error(d, out))
         elif self.identifier == ErrorTypes.MEE:
-            return self.mean_euclidean_error(d, out)
+            return np.array(self.mean_euclidean_error(d, out))
         elif self.identifier == ErrorTypes.MAE:
-            return self.mean_absolute_error(d, out)
+            return np.array(self.mean_absolute_error(d, out))
         elif self.identifier == ErrorTypes.MIS:
-            return self.mismatch_error(d, out)
+            return np.array(self.mismatch_error(d, out))
+        elif self.identifier == ErrorTypes.ACC:
+            return self.accuracy(d, out)
+        return np.array(-1)
+
+    def post(self, error: Sequence[number], len: int) -> Sequence[number]:
+        if self.identifier == ErrorTypes.MEE:
+            error = np.sqrt(error)
+        return np.true_divide(error, len)
 
     @staticmethod
-    def mean_square_error(d: Sequence[number], out: Sequence[number]):
-        return np.true_divide(np.sum(np.square(np.subtract(d, out))), len(d))
+    def mean_square_error(d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
+        return np.square(np.subtract(d, out))
 
     @staticmethod
-    def mean_euclidean_error(d: Sequence[number], out: Sequence[number]):
-        return np.true_divide(np.sqrt(np.sum(np.square(np.subtract(d, out)))), len(d))
+    def mean_euclidean_error(d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
+        return np.square(np.subtract(d, out))
 
     @staticmethod
-    def mean_absolute_error(d, out):
-        return np.true_divide(np.sum(np.abs(np.subtract(d, out))), len(d))
+    def mean_absolute_error(d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
+        return np.abs(np.subtract(d, out))
 
     @staticmethod
-    def mismatch_error(d, out):
-        return 0 if np.equal(d, np.round(out)).all() else 1
+    def mismatch_error(d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
+        return np.not_equal(d, np.round(out)).astype(float)
+
+    @staticmethod
+    def accuracy(d: Sequence[number], out: Sequence[number]) -> Sequence[number]:
+        return np.equal(d, np.round(out)).astype(float)
 
 
 class NeuralNetwork:
@@ -61,20 +69,26 @@ class NeuralNetwork:
         activation_output: ActivationFunction,
         activation_hidden: ActivationFunction = sigmoidal,
         eta: number = 0.5,
-        max_epochs: int = 1,
+        epochs_limit: int = 1,
         epsilon: number = 0,
+        epsilon_relative: number = -1,
         penalty: number = 0,
         error_type: ErrorTypes = ErrorTypes.MSE,
         verbose: int = 0,
-        learning_algorithm: LeariningAlgorthm = Online()
+        learning_algorithm: LeariningAlgorthm = Online(),
+        seed: Optional[int] = None
     ):
+        if seed:
+            np.random.seed(seed)
+
         self.activation_hidden: ActivationFunction = activation_hidden
         self.activation_output: ActivationFunction = activation_output
         self.architecture: Architecture = architecture
 
         self.eta: number = eta
-        self.max_epochs: int = max_epochs
+        self.epochs_limit: int = epochs_limit
         self.epsilon: number = epsilon
+        self.epsilon_relative: number = epsilon_relative
         self.penalty: number = penalty
         self.error_type: ErrorTypes = error_type
         self.verbose: int = verbose
@@ -82,8 +96,8 @@ class NeuralNetwork:
 
         self.out: Sequence[number] = ()
 
-        self.training_errors: List[number] = []
-        self.testing_errors: List[number] = []
+        self.training_errors: MutableSequence[Sequence[number]] = []
+        self.testing_errors: MutableSequence[Sequence[number]] = []
 
         self.hidden_layer: NeuronLayer = NeuronLayer((), self.activation_hidden)
         self.output_layer: NeuronLayer = NeuronLayer((), self.activation_output)
@@ -128,16 +142,16 @@ class NeuralNetwork:
         self,
         patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
         error_type: Optional[ErrorTypes] = None
-    ) -> number:
+    ) -> Sequence[number]:
         if error_type is None:
-            error = self.error_type
+            error_type = self.error_type
 
-        error = 0
-        ec: ErrorComputation = ErrorComputation(self.error_type)
+        error = np.array(0)
+        ec: ErrorComputation = ErrorComputation(error_type)
         for x, d in patterns:
             self(*x)
-            error += ec(d, self.out)
-        return error
+            error = np.add(error, ec(d, self.out))
+        return ec.post(error, len(patterns))
 
     # TODO applicare regularization al learning
     def compute_error_with_regularization(
@@ -160,7 +174,7 @@ class NeuralNetwork:
     ) -> None:
         self.set(**kwargs)
 
-        for _ in range(self.max_epochs):
+        for _ in range(self.epochs_limit):
             self.learning_algorithm(patterns, self)
 
             # needed for constructing the learning curve relative to the testing errors
@@ -170,8 +184,21 @@ class NeuralNetwork:
             if self.verbose > 0:
                 print(self.training_errors[-1])
 
-            if self.training_errors[-1] <= self.epsilon:
+            if self._check_epsilon():
                 break
+
+    def _check_epsilon(self) -> bool:
+        if np.less_equal(self.training_errors[-1], self.epsilon).all():
+            return True
+
+        if len(self.training_errors) > 10:
+            present = self.training_errors[-1]
+            past = np.mean(self.training_errors[-10:-2], axis=0)
+            variation = np.abs(np.subtract(1, np.divide(present, past)))
+
+            return np.less_equal(variation, self.epsilon_relative).all()
+
+        return False
 
     def get_training_errors(self):
         return self.training_errors
