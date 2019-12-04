@@ -14,7 +14,7 @@ class TestNNBoolFunc(unittest.TestCase):
             activation_output=sigmoidal,
             learning_algorithm=Batch(),
             eta=0.9,
-            max_epochs=10000,
+            epochs_limit=10000,
             architecture=Architecture(
                 size_input_nodes=2,
                 size_output_nodes=1,

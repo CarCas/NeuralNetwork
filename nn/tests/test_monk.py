@@ -1,10 +1,10 @@
+from nn.neural_network import ErrorTypes
 from nn.architecture import Architecture
 import unittest
 from nn import NeuralNetwork as NN, Architecture, Batch
 from nn.activation_function import sigmoidal
 import numpy as np
-from nn.tests.monk_1 import train_data, test_data
-import matplotlib.pyplot as plt
+from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data
 
 
 # monks-1: con threshold > #inputs, range_weights = (0.35, 0.60] ---> Test passed
@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 # e quindi fallisce perchè è maggiore di 0.6
 class TestMonk(unittest.TestCase):
     def test_monk1(self):
-        np.random.seed(3)
         nn = NN(
+            seed=3,
             activation_output=sigmoidal,
-            max_epochs=71,
+            epochs_limit=71,
             epsilon=1e-3,
             architecture=Architecture(
                 size_input_nodes=6,
@@ -63,6 +63,9 @@ class TestMonk(unittest.TestCase):
 
         self.assertEqual(error_train, 0)
         self.assertEqual(error_test, 0)
+
+        self.assertEqual(nn.compute_error(train_data, ErrorTypes.MIS), 0)
+        self.assertEqual(nn.compute_error(test_data, ErrorTypes.MIS), 0)
 
 
 if __name__ == '__main__':
