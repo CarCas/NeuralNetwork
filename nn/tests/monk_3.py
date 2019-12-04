@@ -1,4 +1,6 @@
-with open('../../monks/monks-1.train') as f:
+_monk_name = 'monks-3'
+
+with open('../../monks/' + _monk_name + '.train') as f:
     train_data = f.readlines()
 train_data = [line.split(' ') for line in train_data]
 train_data = tuple(map(
@@ -7,7 +9,7 @@ train_data = tuple(map(
         [float(el[1])]),
     train_data))
 
-with open('../../monks/monks-1.test') as f:
+with open('../../monks/' + _monk_name + '.test') as f:
     test_data = f.readlines()
 test_data = [line.split(' ') for line in test_data]
 test_data = tuple(map(

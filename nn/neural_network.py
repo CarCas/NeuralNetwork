@@ -61,7 +61,7 @@ class NeuralNetwork:
         activation_output: ActivationFunction,
         activation_hidden: ActivationFunction = sigmoidal,
         eta: number = 0.5,
-        epoches: int = 1,
+        max_epochs: int = 1,
         epsilon: number = 0,
         penalty: number = 0,
         error_type: ErrorTypes = ErrorTypes.MSE,
@@ -73,7 +73,7 @@ class NeuralNetwork:
         self.architecture: Architecture = architecture
 
         self.eta: number = eta
-        self.epoches: int = epoches
+        self.max_epochs: int = max_epochs
         self.epsilon: number = epsilon
         self.penalty: number = penalty
         self.error_type: ErrorTypes = error_type
@@ -160,7 +160,7 @@ class NeuralNetwork:
     ) -> None:
         self.set(**kwargs)
 
-        for _ in range(self.epoches):
+        for _ in range(self.max_epochs):
             self.learning_algorithm(patterns, self)
 
             # needed for constructing the learning curve relative to the testing errors
@@ -196,25 +196,3 @@ class NeuralNetwork:
             return result
         else:
             raise StopIteration
-
-    # To obtain the learning curve of both the training and testing set we need to create a function f such that:
-    # f(training_set, testing_set) =
-    #       for all epoch in epochs
-    #           add training error on list of training errors computed on the train set
-    #           add testing error on list of testing errors computed on the test set
-    # The function needs to take into account also the early stopping hyper-parameter.
-    """
-    def fill_error_lists(
-        self,
-        train_set: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        test_set: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        eta: number,
-        epoch_number: int = 0
-    ) -> None:
-        epoch_number = len(self.training_errors) if epoch_number == 0 else \
-            (len(self.training_errors) if 0 < self.epoches < epoch_number else epoch_number)
-        for ep in range(epoch_number):
-            self.train(train_set, test_set, eta=eta)
-            self.test(test_set)
-    """
-# PROVA PROVA SA SA

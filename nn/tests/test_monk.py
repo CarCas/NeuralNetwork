@@ -3,7 +3,7 @@ import unittest
 from nn import NeuralNetwork as NN, Architecture, Batch
 from nn.activation_function import sigmoidal
 import numpy as np
-from nn.tests.monk import train_data, test_data
+from nn.tests.monk_1 import train_data, test_data
 import matplotlib.pyplot as plt
 
 
@@ -17,7 +17,7 @@ class TestMonk(unittest.TestCase):
         np.random.seed(3)
         nn = NN(
             activation_output=sigmoidal,
-            epoches=71,
+            max_epochs=71,
             epsilon=1e-3,
             architecture=Architecture(
                 size_input_nodes=6,
