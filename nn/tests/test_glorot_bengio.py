@@ -27,16 +27,16 @@ class TestGlorotBengio(unittest.TestCase):
         self.assertFalse((self.output_w > 0.1+-1/np.sqrt(len(self.nn.hidden_layer.w))).all())
 
     def test_min_value_hidden(self):
-        self.assertTrue((self.hidden_w > -1/np.sqrt(len(self.nn.input_layer))).all())
-        self.assertFalse((self.hidden_w > 0.1+-1/np.sqrt(len(self.nn.input_layer))).all())
+        self.assertTrue((self.hidden_w > -1/np.sqrt(len(self.nn.input))).all())
+        self.assertFalse((self.hidden_w > 0.1+-1/np.sqrt(len(self.nn.input))).all())
 
     def test_max_value_output(self):
         self.assertTrue((self.output_w < 1/np.sqrt(len(self.nn.hidden_layer.w))).all())
         self.assertFalse((self.output_w < -0.1+1/np.sqrt(len(self.nn.hidden_layer.w))).all())
 
     def test_max_value_hidden(self):
-        self.assertTrue((self.hidden_w < 1/np.sqrt(len(self.nn.input_layer))).all())
-        self.assertFalse((self.hidden_w < -0.1+1/np.sqrt(len(self.nn.input_layer))).all())
+        self.assertTrue((self.hidden_w < 1/np.sqrt(len(self.nn.input))).all())
+        self.assertFalse((self.hidden_w < -0.1+1/np.sqrt(len(self.nn.input))).all())
 
 
 if __name__ == '__main__':

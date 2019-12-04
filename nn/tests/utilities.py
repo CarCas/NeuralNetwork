@@ -1,9 +1,11 @@
+from nn.neural_network import NeuralNetwork
 import matplotlib.pyplot as plt
 
 
-def plot(training_errors, testing_errors):
-    plt.plot(training_errors, label='training', linestyle='-')
-    plt.plot(testing_errors, label='testing', linestyle='--')
+def plot(nn: NeuralNetwork):
+    for error_type in nn.error_types:
+        plt.plot(nn.training_errors[error_type], label='training_'+error_type.name, linestyle='-')
+        plt.plot(nn.testing_errors[error_type], label='testing_'+error_type.name, linestyle='--')
     plt.legend()
     plt.show()
 

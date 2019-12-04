@@ -15,7 +15,7 @@ class LeariningAlgorthm(abc.ABC):
         output_layer_w = np.array(nn.output_layer.w)
         output_layer_out = np.array(nn)
         hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
-        input__layer_out = np.array((1,) + tuple(nn.input_layer))[np.newaxis]
+        input__layer_out = np.array((1,) + tuple(nn.input))[np.newaxis]
 
         delta_output = (d - output_layer_out) * nn.output_layer.fprime
         delta_hidden = (output_layer_w.T[1:] @ delta_output) * nn.hidden_layer.fprime
