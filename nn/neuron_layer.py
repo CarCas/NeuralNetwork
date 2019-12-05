@@ -28,7 +28,7 @@ class NeuronLayer:
         return np.array([n.w for n in self.neurons])
 
     @w.setter
-    def w(self, w):
+    def w(self, w: Sequence[Sequence[number]]) -> None:
         for i, n in enumerate(self.neurons):
             n.w = w[i]
 
