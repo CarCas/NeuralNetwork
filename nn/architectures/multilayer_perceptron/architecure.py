@@ -39,7 +39,6 @@ class MultilayerPerceptron(BaseArchitecure):
         learining_algorthm: LeariningAlgorthm = Batch(),
 
         range_weights: Optional[float] = None,
-        threshold: Optional[int] = None,
 
         hidden_weights: Optional[Sequence[Sequence[float]]] = None,
         output_weights: Optional[Sequence[Sequence[float]]] = None,
