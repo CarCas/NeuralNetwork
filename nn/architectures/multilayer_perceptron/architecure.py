@@ -14,7 +14,7 @@ from nn.architectures.multilayer_perceptron.learning_algorithms import (
 from nn.architectures.multilayer_perceptron.neural_network import NeuralNetwork
 
 
-class Architecure(BaseArchitecure):
+class MultilayerPerceptron(BaseArchitecure):
     '''
     size_input_nodes: number of inputs
     size_hidden_nodes: number of hidden nodes
