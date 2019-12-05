@@ -3,7 +3,6 @@ from nn.architecture import Architecture
 import unittest
 from nn import NeuralNetwork as NN, Architecture, Batch
 from nn.activation_function import sigmoidal
-import numpy as np
 from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data
 
 

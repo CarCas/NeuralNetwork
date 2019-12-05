@@ -2,14 +2,12 @@ from nn.neural_network import ErrorTypes
 import unittest
 from nn import NeuralNetwork as NN, Architecture, Online, Batch
 from nn.activation_function import sigmoidal
-import numpy as np
 
 
 class TestNNBoolFunc(unittest.TestCase):
     def setUp(self):
-        np.random.seed(1)
-
         self.nn = NN(
+            seed=1,
             activation_output=sigmoidal,
             learning_algorithm=Batch(),
             eta=0.9,
@@ -49,7 +47,7 @@ class TestNNBoolFunc(unittest.TestCase):
         ])
 
     def try_data(self, data):
-        self.nn().train(data)
+        self.nn.set().train(data)
 
         self.assertEqual(self.nn.compute_error(data), 0)
 

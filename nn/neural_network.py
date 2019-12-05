@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import Sequence, MutableSequence, Tuple, Dict, Optional, Any
+from typing import Sequence, MutableSequence, Tuple, List, Optional, Any
 import numpy as np
 from collections import defaultdict
+from copy import deepcopy
 
 from nn.activation_function import ActivationFunction, sigmoidal
 from nn.neuron_layer import NeuronLayer
@@ -25,6 +26,7 @@ class NeuralNetwork:
     epsilon_relative: ealy stopping condition, if error decrease too slow stop (wrt mean of last 10 measures)
     penality: TODO
     error_types: Sequence of error types of learning to curve to save during training
+    n_init: number to different initialization of the network during training, the best one is choose
 
     Just params
     ----------------------------------------
@@ -50,6 +52,10 @@ class NeuralNetwork:
     train: train the network
     compute_error: compute the error for the patterns given and the specified error_type (defaut is self.error_types[0])
 
+    Public properties
+    ----------------------------------------
+    current_training_error: return the last computed error on training for self.error_types[0]
+
     '''
     def __init__(
         self,
@@ -63,9 +69,11 @@ class NeuralNetwork:
         epsilon_relative: number = -1,
         penalty: number = 0,
         error_types: Sequence[ErrorTypes] = (ErrorTypes.MSE,),
+        n_init: int = 1,
         seed: Optional[int] = None,
         verbose: int = 0,
-    ):
+        **kwargs
+    ) -> None:
         if seed:
             np.random.seed(seed)
 
@@ -81,45 +89,32 @@ class NeuralNetwork:
         self.error_types: MutableSequence[ErrorTypes] = list(error_types)
         self.verbose: int = verbose
         self.learning_algorithm: LeariningAlgorthm = learning_algorithm
+        self.n_init: int = n_init
 
-        self.out: Sequence[number] = ()
+        self.out: Sequence[number] = []
 
-        self.training_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[number]]] = defaultdict(lambda: [])
-        self.testing_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[number]]] = defaultdict(lambda: [])
-
-        self.hidden_layer: NeuronLayer = NeuronLayer((), self.activation_hidden)
-        self.output_layer: NeuronLayer = NeuronLayer((), self.activation_output)
-        self.input: Sequence[number] = ()
-
-        self._init()
-
-    def set(self, **kwargs) -> NeuralNetwork:
-        self.__dict__.update(**kwargs)
-        return self
-
-    def _init(self, **kwargs) -> NeuralNetwork:
-        self.set(**kwargs)
-
-        self.out = []
         self.hidden_layer = NeuronLayer(
                 activation=self.activation_hidden,
                 weights=self.architecture.hidden_weights)
         self.output_layer = NeuronLayer(
                 activation=self.activation_output,
                 weights=self.architecture.output_weights)
+
         self.input: Sequence[number] = np.zeros(self.architecture.size_input_nodes)
-        self.training_errors = defaultdict(lambda: [])
-        self.testing_errors = defaultdict(lambda: [])
 
+        self.training_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[number]]] = defaultdict(lambda: [])
+        self.testing_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[number]]] = defaultdict(lambda: [])
+
+    def set(self, **kwargs) -> NeuralNetwork:
+        self.__dict__.update(**kwargs)
+        self.__init__(**self.__dict__)
         return self
 
-    # feed-forward or _init
-    def __call__(self, *args: number, **kwargs: Any) -> NeuralNetwork:
-        if len(args):
-            self.feed_forward(*args)
-        else:
-            self._init(**kwargs)
-        return self
+    # feed-forward
+    def __call__(self, *args: number) -> Sequence[number]:
+        self.input = args
+        self.out = self.output_layer(*self.hidden_layer(*self.input))
+        return self.out
 
     def train(
         self,
@@ -127,15 +122,28 @@ class NeuralNetwork:
         test_patterns: Sequence[Tuple[Sequence[number], Sequence[number]]] = (),
         **kwargs: Any
     ) -> None:
-        self.set(**kwargs)
+        container_choosen_nn: List[NeuralNetwork] = []
 
-        for _ in range(self.epochs_limit):
-            self.learning_algorithm(patterns, self)
+        for i_init in range(self.n_init):
+            for i_epoch in range(self.epochs_limit):
+                self.learning_algorithm(patterns, self)
 
-            self._append_learning_curve_errors(patterns, test_patterns)
+                self._append_learning_curve_errors(patterns, test_patterns)
 
-            if self._early_stopping():
-                break
+                self._log(2, 'train', [('init', i_init),
+                                       ('epoch', i_epoch),
+                                       ('error', self.current_training_error)])
+
+                if self._early_stopping():
+                    break
+
+            self._log(1, 'train', [('init', i_init),
+                                   ('error', self.current_training_error)])
+
+            self._choose_nn(container_choosen_nn)
+            self.set()
+
+        self._copy(container_choosen_nn)
 
     def compute_error(
         self,
@@ -165,23 +173,22 @@ class NeuralNetwork:
         error = starting_error + np.square(penalty_norm) * self.penalty
         return error
 
-    def feed_forward(self, *args: number) -> Sequence[number]:
-        self.input = args
-        self.out = self.output_layer(*self.hidden_layer(*self.input))
-        return self.out
+    @property
+    def current_training_error(self) -> Sequence[number]:
+        return self.training_errors[self.error_types[0]][-1]
 
     def _early_stopping(self) -> bool:
-        if np.less_equal(self.training_errors[self.error_types[0]][-1], self.epsilon).all():
-            self._log('early stop', 'error < epsilon')
+        if np.less_equal(self.current_training_error, self.epsilon).all():
+            self._log(1, 'early_stopping', [('early stop', 'error < epsilon')])
             return True
 
         if len(self.training_errors) > 10:
-            present = self.training_errors[self.error_types[0]][-1]
+            present = self.current_training_error
             past = np.mean(self.training_errors[self.error_types[0]][-10:-2], axis=0)
-            variation = np.abs(np.subtract(1, np.divide(present, past)))
+            variation = np.mean(np.abs(np.subtract(1, np.divide(present, past))))
 
-            if np.less_equal(variation, self.epsilon_relative).all():
-                self._log('early stop', 'error decreasing too slow')
+            if variation < self.epsilon_relative:
+                self._log(1, 'early_stopping', [('early stop', 'error decreasing too slow')])
                 return True
 
         return False
@@ -196,11 +203,30 @@ class NeuralNetwork:
             self.training_errors[error_type].append(self.compute_error(patterns, error_type))
             self.testing_errors[error_type].append(self.compute_error(test_patterns, error_type))
 
-        self._log(self.training_errors[self.error_types[0]][-1])
+    def _choose_nn(self, nn_container: List[NeuralNetwork]) -> None:
+        if not len(nn_container):
+            nn_container.append(deepcopy(self))
 
-    def _log(self, *args: Any) -> None:
-        if self.verbose > 0:
-            print(*args)
+        elif np.mean(self.current_training_error) < np.mean(nn_container[0].current_training_error):
+            nn_container[0] = deepcopy(self)
+
+    def _copy(self, nn_container: List[NeuralNetwork]) -> None:
+        if len(nn_container):
+            self.__dict__.update(**(nn_container[0].__dict__))
+
+    def _log(
+        self,
+        verbose: int = 10,
+        method_name: Optional[str] = None,
+        info: Sequence[Tuple[str, Any]] = (),
+    ) -> None:
+        if verbose <= self.verbose:
+            result: MutableSequence[str] = [str(verbose)]
+            if method_name is not None:
+                result.append(method_name)
+            for key, value in info:
+                result.append(key + ': ' + str(value))
+            print(' - '.join(result))
 
     def get_training_errors(self):
         return self.training_errors
