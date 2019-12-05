@@ -6,7 +6,7 @@ from nn.activation_function import ActivationFunction
 Pattern = Tuple[Sequence[float], Sequence[float]]
 
 
-class NeuralNetwork(abc.ABC):
+class BaseNeuralNetwork(abc.ABC):
     @abc.abstractmethod
     def __call__(self, *args: float) -> Sequence[float]:
         pass
@@ -33,5 +33,5 @@ class Architecture(abc.ABC):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
-    ) -> NeuralNetwork:
+    ) -> BaseNeuralNetwork:
         pass

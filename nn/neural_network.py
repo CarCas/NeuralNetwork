@@ -8,7 +8,7 @@ from nn.config import DEFAULT_ETA
 
 from nn.activation_function import ActivationFunction, sigmoid
 from nn.error_types import ErrorTypes, ErrorComputation
-from nn.types import Pattern, Architecture, NeuralNetwork as BaseNeuralNetwork
+from nn.types import Pattern, Architecture, BaseNeuralNetwork
 
 
 class NeuralNetwork:

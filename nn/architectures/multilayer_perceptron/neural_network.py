@@ -7,10 +7,10 @@ from nn.activation_function import ActivationFunction
 from nn.architectures.multilayer_perceptron.weights_generator import WeightsGenerator
 from nn.architectures.multilayer_perceptron.neuron_layer import NeuronLayer
 from nn.architectures.multilayer_perceptron.learning_algorithms import LeariningAlgorthm
-from nn.architectures.multilayer_perceptron.types import NeuralNetwork as BaseNeuralNetwork
+from nn.architectures.multilayer_perceptron.types import MLPBaseNeuralNetwork
 
 
-class NeuralNetwork(BaseNeuralNetwork):
+class MLPNeuralNetwork(MLPBaseNeuralNetwork):
     '''
     Instean of instantiate directly this class, use
     nn.architecures.multiplayer_perceptron.architecyre.Architecture

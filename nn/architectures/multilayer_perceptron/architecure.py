@@ -11,7 +11,7 @@ from nn.architectures.multilayer_perceptron.learning_algorithms import (
     Batch,
 )
 
-from nn.architectures.multilayer_perceptron.neural_network import NeuralNetwork
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
 
 
 class MultilayerPerceptron(BaseArchitecure):
@@ -60,8 +60,8 @@ class MultilayerPerceptron(BaseArchitecure):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction = sigmoid,
         eta: float = DEFAULT_ETA,
-    ) -> NeuralNetwork:
-        return NeuralNetwork(
+    ) -> MLPNeuralNetwork:
+        return MLPNeuralNetwork(
             activation=activation,
             activation_hidden=activation_hidden,
             eta=eta,

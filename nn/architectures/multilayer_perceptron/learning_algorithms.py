@@ -4,7 +4,7 @@ import numpy as np
 import abc
 
 from nn.types import Pattern
-from nn.architectures.multilayer_perceptron.types import NeuralNetwork
+from nn.architectures.multilayer_perceptron.types import MLPBaseNeuralNetwork
 
 
 class LeariningAlgorthm(abc.ABC):
@@ -35,11 +35,11 @@ class LeariningAlgorthm(abc.ABC):
     def __call__(
         self,
         patterns: Sequence[Pattern],
-        nn: NeuralNetwork,
+        nn: MLPBaseNeuralNetwork,
         eta: float,
     ):
         self.eta: float = eta
-        self.nn: NeuralNetwork = nn
+        self.nn: MLPBaseNeuralNetwork = nn
         self.delta_output: np.array = 0
         self.delta_hidden: np.array = 0
 
