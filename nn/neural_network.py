@@ -99,8 +99,8 @@ class NeuralNetwork:
 
         self.out: Sequence[float] = []
 
-        self.training_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[float]]] = defaultdict(lambda: [])
-        self.testing_errors: defaultdict[ErrorTypes, MutableSequence[Sequence[float]]] = defaultdict(lambda: [])
+        self.training_errors: defaultdict[ErrorTypes, MutableSequence[float]] = defaultdict(lambda: [])
+        self.testing_errors: defaultdict[ErrorTypes, MutableSequence[float]] = defaultdict(lambda: [])
 
     def set(self, **kwargs) -> NeuralNetwork:
         self.__dict__.update(**kwargs)
@@ -143,9 +143,9 @@ class NeuralNetwork:
         self,
         patterns: Sequence[Pattern],
         error_type: Optional[ErrorTypes] = None
-    ) -> Sequence[float]:
+    ) -> float:
         if not len(patterns):
-            return []
+            return np.nan
 
         if error_type is None:
             error_type = self.error_types[0]
@@ -171,7 +171,7 @@ class NeuralNetwork:
     #     return error
 
     @property
-    def current_training_error(self) -> Sequence[float]:
+    def current_training_error(self) -> float:
         return self.training_errors[self.error_types[0]][-1]
 
     def _early_stopping(self) -> bool:
