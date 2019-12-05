@@ -65,7 +65,7 @@ class NeuralNetwork:
         activation_hidden: ActivationFunction = sigmoid,
         eta: float = DEFAULT_ETA,
         epochs_limit: int = 1,
-        epsilon: float = 0,
+        epsilon: float = -1,
         epsilon_relative: float = -1,
         penalty: float = 0,
         error_types: Sequence[ErrorTypes] = (ErrorTypes.MSE,),
@@ -175,11 +175,11 @@ class NeuralNetwork:
         return self.training_errors[self.error_types[0]][-1]
 
     def _early_stopping(self) -> bool:
-        if np.less_equal(self.current_training_error, self.epsilon).all():
+        if self.epsilon != -1 and np.less_equal(self.current_training_error, self.epsilon).all():
             self._log(1, 'early_stopping', [('early stop', 'error < epsilon')])
             return True
 
-        if len(self.training_errors) > 10:
+        if self.epsilon_relative != -1 and len(self.training_errors) > 10:
             present = self.current_training_error
             past = np.mean(self.training_errors[self.error_types[0]][-10:-2], axis=0)
             variation = np.mean(np.abs(np.subtract(1, np.true_divide(present, past))))

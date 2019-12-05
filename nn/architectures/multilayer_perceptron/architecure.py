@@ -5,6 +5,7 @@ from nn.activation_function import ActivationFunction, sigmoid
 
 from nn.config import DEFAULT_ETA
 
+from nn.architectures.multilayer_perceptron.types import LayerWeights
 from nn.architectures.multilayer_perceptron.weights_generator import WeightsGenerator
 from nn.architectures.multilayer_perceptron.learning_algorithms import (
     LeariningAlgorthm,
@@ -16,9 +17,10 @@ from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwo
 
 class MultilayerPerceptron(BaseArchitecure):
     '''
-    size_input_nodes: number of inputs
-    size_hidden_nodes: number of hidden nodes
-    size_output_nodes: number of output nodes
+    size_input_layer: number of inputs
+    sizes_hidden_layers: sequence containing the number of each hidden nodes;
+                         e.g.: for a single hidden layer use a list with just one int
+    size_output_layer: number of output nodes
 
     learning_algorithm: batch or online (from nn import Online, Batch)
 
@@ -32,23 +34,23 @@ class MultilayerPerceptron(BaseArchitecure):
     '''
     def __init__(
         self,
-        size_input_nodes: int,
-        size_hidden_nodes: int,
-        size_output_nodes: int,
+        size_input_layer: int,
+        sizes_hidden_layers: Sequence[int],
+        size_output_layer: int,
 
-        learining_algorthm: LeariningAlgorthm = Batch(),
+        learning_algorithm: LeariningAlgorthm = Batch(),
 
         range_weights: Optional[float] = None,
 
-        hidden_weights: Optional[Sequence[Sequence[float]]] = None,
-        output_weights: Optional[Sequence[Sequence[float]]] = None,
+        hidden_weights: Optional[Sequence[LayerWeights]] = None,
+        output_weights: Optional[LayerWeights] = None,
     ):
-        self.learining_algorthm: LeariningAlgorthm = learining_algorthm
+        self.learning_algorithm: LeariningAlgorthm = learning_algorithm
 
         self.weights_generator: WeightsGenerator = WeightsGenerator(
-            size_input_nodes=size_input_nodes,
-            size_hidden_nodes=size_hidden_nodes,
-            size_output_nodes=size_output_nodes,
+            size_input_layer=size_input_layer,
+            sizes_hidden_layers=sizes_hidden_layers,
+            size_output_layer=size_output_layer,
             range_weights=range_weights,
             hidden_weights=hidden_weights,
             output_weights=output_weights,
@@ -64,6 +66,6 @@ class MultilayerPerceptron(BaseArchitecure):
             activation=activation,
             activation_hidden=activation_hidden,
             eta=eta,
-            learining_algorthm=self.learining_algorthm,
+            learning_algorithm=self.learning_algorithm,
             weights_generator=self.weights_generator,
         )

@@ -4,6 +4,7 @@ import abc
 from nn.activation_function import ActivationFunction
 
 Pattern = Tuple[Sequence[float], Sequence[float]]
+NeuronWeights = Sequence[float]
 
 
 class BaseNeuralNetwork(abc.ABC):

@@ -13,9 +13,9 @@ class TestNInit(unittest.TestCase):
             activation=sigmoid,
             epochs_limit=5,
             architecture=MultilayerPerceptron(
-                size_input_nodes=6,
-                size_output_nodes=1,
-                size_hidden_nodes=3,
+                size_input_layer=6,
+                size_output_layer=1,
+                sizes_hidden_layers=[3],
 
             ),
             error_types=[ErrorTypes.MSE],

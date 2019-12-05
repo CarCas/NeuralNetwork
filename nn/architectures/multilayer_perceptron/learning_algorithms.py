@@ -9,28 +9,42 @@ from nn.architectures.multilayer_perceptron.types import MLPBaseNeuralNetwork
 
 class LeariningAlgorthm(abc.ABC):
     def _compute_deltas(self, d: Sequence[float]):
-        nn = self.nn
+        nn: MLPBaseNeuralNetwork = self.nn
 
+        # SetUp
         d = np.array(d)
         output_layer_w = np.array(nn.output_layer.w)
+        hidden_layers_w = [layer.w for layer in nn.hidden_layers]
+
         output_layer_out = np.array(nn.output_layer.out)
-        hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
+        hidden_layers_out = [
+            np.array((1,) + tuple(layer.out))[np.newaxis]
+            for layer in nn.hidden_layers
+        ]
         input__layer_out = np.array((1,) + tuple(nn.input))[np.newaxis]
 
-        delta_output = (d - output_layer_out) * nn.output_layer.fprime
-        delta_hidden = (output_layer_w.T[1:] @ delta_output) * nn.hidden_layer.fprime
+        deltas_hidden = [0] * len(nn.hidden_layers)
 
-        self.delta_output += (delta_output * hidden_layer_out.T).T
-        self.delta_hidden += (delta_hidden * input__layer_out.T).T
+        # Gradient calculation
+        delta_output = (d - output_layer_out) * nn.output_layer.fprime
+        deltas_hidden[-1] = (output_layer_w.T[1:] @ delta_output) * nn.hidden_layers[-1].fprime
+        for i in range(0, len(hidden_layers_w)-1)[::-1]:
+            deltas_hidden[i] = ((np.array(hidden_layers_w[i+1]).T[1:] @ deltas_hidden[i+1]) * nn.hidden_layers[i].fprime)
+
+        self.gradients_hidden[0] += (deltas_hidden[0] * input__layer_out.T).T
+        for i in range(1, len(hidden_layers_out)):
+            self.gradients_hidden[i] += (deltas_hidden[i] * hidden_layers_out[i-1].T).T
+        self.gradient_output += (delta_output * hidden_layers_out[-1].T).T
 
     def _update_weights(self):
         nn = self.nn
 
-        nn.output_layer.w += self.eta * self.delta_output
-        nn.hidden_layer.w += self.eta * self.delta_hidden
+        nn.output_layer.w += self.eta * self.gradient_output
+        self.gradient_output = 0
 
-        self.delta_output: np.array = 0
-        self.delta_hidden: np.array = 0
+        for i in range(len(nn.hidden_layers)):
+            nn.hidden_layers[i].w += self.eta * self.gradients_hidden[i]
+            self.gradients_hidden[i] = 0
 
     def __call__(
         self,
@@ -40,8 +54,8 @@ class LeariningAlgorthm(abc.ABC):
     ):
         self.eta: float = eta
         self.nn: MLPBaseNeuralNetwork = nn
-        self.delta_output: np.array = 0
-        self.delta_hidden: np.array = 0
+        self.gradient_output: np.array = 0
+        self.gradients_hidden: np.array = [0] * len(nn.hidden_layers)
 
         self._apply(patterns)
 
@@ -69,14 +83,12 @@ class Batch(LeariningAlgorthm):
         self,
         patterns: Sequence[Pattern],
     ):
-        assert(self.delta_output == 0)
-        assert(self.delta_hidden == 0)
-
         for x, d in patterns:
             self.nn(*x)
             self._compute_deltas(d)
 
-        self.delta_output /= len(patterns)
-        self.delta_hidden /= len(patterns)
+        self.gradient_output /= len(patterns)
+        for i in range(len(self.gradients_hidden)):
+            self.gradients_hidden[i] /= len(patterns)
 
         self._update_weights()

@@ -10,10 +10,10 @@ class TestNeuralNetwork(unittest.TestCase):
         self.nn = NN(
             activation=sigmoid,
             architecture=MultilayerPerceptron(
-                size_input_nodes=2,
-                size_output_nodes=2,
-                size_hidden_nodes=2,
-                hidden_weights=[[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]],
+                size_input_layer=2,
+                size_output_layer=2,
+                sizes_hidden_layers=[2],
+                hidden_weights=[[[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]]],
                 output_weights=[[0.6, 0.4, 0.45], [0.6, 0.5, 0.55]]
             ))
 
@@ -35,13 +35,13 @@ class TestNeuralNetwork(unittest.TestCase):
         ne = NN(
             activation=sigmoid,
             architecture=MultilayerPerceptron(
-                size_input_nodes=2,
-                size_output_nodes=2,
-                size_hidden_nodes=2,
+                size_input_layer=2,
+                size_output_layer=2,
+                sizes_hidden_layers=[2],
                 output_weights=[[0.62093506, 0.41398855, 0.46488377],
                                 [0.61741495, 0.51163646, 0.56238115]],
-                hidden_weights=[[0.35378719, 0.15378719, 0.20378719],
-                                [0.3539043, 0.2539043, 0.3039043]],
+                hidden_weights=[[[0.35378719, 0.15378719, 0.20378719],
+                                 [0.3539043, 0.2539043, 0.3039043]]],
             ))
 
         self.assertTrue(np.isclose(nn(1, 1), ne(1, 1)).all())

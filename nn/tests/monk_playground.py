@@ -1,7 +1,6 @@
 from unittest.util import three_way_cmp
-from nn.architecture import Architecture
 
-from nn import NeuralNetwork as NN, Architecture, sigmoid, Online, Batch, ErrorTypes
+from nn import NeuralNetwork as NN, MultilayerPerceptron, sigmoid, Online, Batch, ErrorTypes
 from nn.tests.utilities import (
     monk1_train as train_data,
     monk1_test as test_data,
@@ -12,32 +11,31 @@ from nn.tests.utilities import (
 def test_monk():
     nn = NN(
         seed=4,
-        learning_algorithm=Batch(),
         activation=sigmoid,
-        epochs_limit=20,
-        architecture=Architecture(
-            size_input_nodes=6,
-            size_output_nodes=1,
-            size_hidden_nodes=10,
+        epochs_limit=1000,
+        eta=0.99,
+        architecture=MultilayerPerceptron(
+            learning_algorithm=Batch(),
+            size_input_layer=6,
+            size_output_layer=1,
+            sizes_hidden_layers=[10],
         ),
         error_types=[ErrorTypes.MSE],
-        n_init=3,
+        n_init=1,
         verbose=1,
     )
 
     nn.train(train_data, test_data)
-    print(0, 'train', nn.compute_error(train_data, ErrorTypes.MSE))
-    print(0, 'test', nn.compute_error(test_data, ErrorTypes.MSE))
+
+    print('training MSE:', nn.compute_error(train_data, ErrorTypes.MSE))
+    print('testing MSE:', nn.compute_error(test_data, ErrorTypes.MSE))
+
+    print(nn.current_training_error)
+
+    print('training MIS:', nn.compute_error(train_data, ErrorTypes.MIS))
+    print('testing MIS:', nn.compute_error(test_data, ErrorTypes.MIS))
 
     plot(nn)
-
-    # nn()
-    # nn.train(train_data, test_data)
-    # print(1, 'train', nn.compute_error(train_data, ErrorTypes.MSE))
-    # print(1, 'test', nn.compute_error(test_data, ErrorTypes.MSE))
-
-    # self.assertEqual(nn.compute_error(train_data, ErrorTypes.MIS), 0)
-    # self.assertEqual(nn.compute_error(test_data, ErrorTypes.MIS), 0)
 
 
 if __name__ == '__main__':

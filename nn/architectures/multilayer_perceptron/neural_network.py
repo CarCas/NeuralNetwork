@@ -20,31 +20,39 @@ class MLPNeuralNetwork(MLPBaseNeuralNetwork):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
-        learining_algorthm: LeariningAlgorthm,
+        learning_algorithm: LeariningAlgorthm,
         weights_generator: WeightsGenerator,
     ) -> None:
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
-        self.learining_algorthm: LeariningAlgorthm = learining_algorthm
+        self.learning_algorithm: LeariningAlgorthm = learning_algorithm
 
-        self._hidden_layer: NeuronLayer = NeuronLayer(
+        self._hidden_layers: Sequence[NeuronLayer] = [
+            NeuronLayer(
                 activation=activation_hidden,
-                weights=weights_generator.hidden_weights)
+                weights=layer_weights,
+            ) for layer_weights in weights_generator.hidden_weights]
         self._output_layer: NeuronLayer = NeuronLayer(
                 activation=activation,
                 weights=weights_generator.output_weights)
 
-        self._input: Sequence[float] = np.zeros(weights_generator.size_input_nodes)
+        self._input: Sequence[float] = np.zeros(weights_generator.size_input_layer)
         self._out: Sequence[float] = []
 
     def __call__(self, *args: float) -> Sequence[float]:
         self._input = args
-        self._out = self.output_layer(*self.hidden_layer(*self.input))
+
+        current = self.input
+        for hidden_layer in self.hidden_layers:
+            current = hidden_layer(*current)
+
+        self._out = self.output_layer(*current)
+
         return self._out
 
     def train(self, patterns: Sequence[Pattern]) -> None:
-        self.learining_algorthm(patterns, self, self.eta)
+        self.learning_algorithm(patterns, self, self.eta)
 
     @property
     def out(self) -> Sequence[float]:
@@ -59,5 +67,5 @@ class MLPNeuralNetwork(MLPBaseNeuralNetwork):
         return self._output_layer
 
     @property
-    def hidden_layer(self) -> NeuronLayer:
-        return self._hidden_layer
+    def hidden_layers(self) -> Sequence[NeuronLayer]:
+        return self._hidden_layers

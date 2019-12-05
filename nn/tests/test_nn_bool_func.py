@@ -10,14 +10,14 @@ class TestNNBoolFunc(unittest.TestCase):
             seed=1,
             activation=sigmoid,
             eta=0.9,
+            epsilon=0,
             epochs_limit=10000,
             error_types=[ErrorTypes.MIS],
             architecture=MultilayerPerceptron(
-                size_input_nodes=2,
-                size_output_nodes=1,
-                size_hidden_nodes=5,
+                size_input_layer=2,
+                size_output_layer=1,
+                sizes_hidden_layers=[5],
                 range_weights=0.5,
-                threshold=1
             ))
 
     def test_and(self):

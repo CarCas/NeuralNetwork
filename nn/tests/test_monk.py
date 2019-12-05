@@ -3,7 +3,7 @@ from nn.neural_network import ErrorTypes
 import unittest
 
 from nn import NeuralNetwork as NN, MultilayerPerceptron, Online, sigmoid
-from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data
+from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data, plot
 
 
 class TestMonk(unittest.TestCase):
@@ -14,12 +14,11 @@ class TestMonk(unittest.TestCase):
             epochs_limit=71,
             epsilon=1e-3,
             architecture=MultilayerPerceptron(
-                learining_algorthm=Online(),
-                size_input_nodes=6,
-                size_output_nodes=1,
-                size_hidden_nodes=5,
+                learning_algorithm=Online(),
+                size_input_layer=6,
+                size_output_layer=1,
+                sizes_hidden_layers=[5],
                 range_weights=.2,
-                threshold=4,
             ))
 
         nn.train(train_data, test_data)
