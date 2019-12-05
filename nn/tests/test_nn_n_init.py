@@ -1,8 +1,8 @@
-from nn.neural_network import ErrorTypes
-from nn.architecture import Architecture
 import unittest
-from nn import NeuralNetwork as NN, Architecture, Batch
-from nn.activation_function import sigmoidal
+
+from nn.neural_network import ErrorTypes
+from nn import NeuralNetwork as NN, sigmoid
+from nn.architectures.multilayer_perceptron import MultilayerPerceptron
 from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data
 
 
@@ -10,13 +10,13 @@ class TestNInit(unittest.TestCase):
     def test_n_init(self):
         nn = NN(
             seed=4,
-            learning_algorithm=Batch(),
-            activation_output=sigmoidal,
+            activation=sigmoid,
             epochs_limit=5,
-            architecture=Architecture(
+            architecture=MultilayerPerceptron(
                 size_input_nodes=6,
                 size_output_nodes=1,
                 size_hidden_nodes=3,
+
             ),
             error_types=[ErrorTypes.MSE],
             n_init=3,

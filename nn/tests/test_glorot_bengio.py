@@ -1,20 +1,19 @@
 import unittest
-from nn import NeuralNetwork as NN, Architecture
-from nn.activation_function import sigmoidal
 import numpy as np
+
+from nn import sigmoid, MultilayerPerceptron, Online
 
 
 class TestGlorotBengio(unittest.TestCase):
     def setUp(self):
         np.random.seed(1)
 
-        self.nn = NN(
-            activation_output=sigmoidal,
-            architecture=Architecture(
-                size_input_nodes=200,
-                size_output_nodes=500,
-                size_hidden_nodes=1000,
-            ))
+        self.nn = MultilayerPerceptron(
+            learining_algorthm=Online(),
+            size_input_nodes=200,
+            size_output_nodes=500,
+            size_hidden_nodes=1000,
+        )(activation=sigmoid)
 
         self.output_w = np.array(self.nn.output_layer.w).T[1:].T
         self.hidden_w = np.array(self.nn.hidden_layer.w).T[1:].T

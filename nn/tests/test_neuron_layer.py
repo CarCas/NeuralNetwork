@@ -1,6 +1,6 @@
-from nn.neuron_layer import NeuronLayer
 import unittest
 
+from nn.architectures.multilayer_perceptron.neuron_layer import NeuronLayer
 from nn.activation_function import sign
 
 

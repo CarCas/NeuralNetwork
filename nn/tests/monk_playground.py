@@ -1,7 +1,7 @@
 from unittest.util import three_way_cmp
 from nn.architecture import Architecture
 
-from nn import NeuralNetwork as NN, Architecture, sigmoidal, Online, Batch, ErrorTypes
+from nn import NeuralNetwork as NN, Architecture, sigmoid, Online, Batch, ErrorTypes
 from nn.tests.utilities import (
     monk1_train as train_data,
     monk1_test as test_data,
@@ -13,7 +13,7 @@ def test_monk():
     nn = NN(
         seed=4,
         learning_algorithm=Batch(),
-        activation_output=sigmoidal,
+        activation=sigmoid,
         epochs_limit=20,
         architecture=Architecture(
             size_input_nodes=6,

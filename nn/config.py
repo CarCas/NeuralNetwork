@@ -1,0 +1,1 @@
+DEFAULT_ETA = 0.5

@@ -3,26 +3,25 @@ from typing import Sequence
 import numpy as np
 
 from nn.activation_function import ActivationFunction
-from nn.number import number
 
 
 class Neuron:
     def __init__(
         self,
-        w: Sequence[number],
+        w: Sequence[float],
         activation: ActivationFunction,
     ):
         if not len(w):
             raise ValueError('w cannot be empty')
 
-        self.w: Sequence[number] = w
+        self.w: Sequence[float] = w
         self.activation: ActivationFunction = activation
 
-        self.net: number
-        self.out: number
-        self.fprime: number
+        self.net: float
+        self.out: float
+        self.fprime: float
 
-    def __call__(self, *args: number) -> number:
+    def __call__(self, *args: float) -> float:
         input_ = (1,) + tuple(args)
         self.net = np.dot(input_, self.w)
         self.out = self.activation(self.net)

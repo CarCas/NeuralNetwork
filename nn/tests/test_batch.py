@@ -1,11 +1,11 @@
 import unittest
 import numpy as np
 
-from nn import NeuralNetwork as NN, Architecture, Batch, Online
-from nn.activation_function import sigmoidal
+from nn import MultilayerPerceptron, NeuralNetwork as NN
+from nn.activation_function import sigmoid
 
 
-def sigmoidal_test(x):
+def sigmoid_test(x):
     return 1/(1 + np.exp(-x))
 
 
@@ -15,17 +15,13 @@ def derivate_test(x):
 
 class TestBatch(unittest.TestCase):
     def setUp(self):
-        self.kwargs = dict(
-            learning_algorithm=Batch(),
-            activation_output=sigmoidal,
-            eta=0.5,
-            architecture=Architecture(
+        self.architecture = MultilayerPerceptron(
                 size_input_nodes=2,
                 size_output_nodes=2,
                 size_hidden_nodes=2,
                 hidden_weights=[[0, 1.5, 2], [0, 3, 0.5]],
                 output_weights=[[0, -1.5, 1.5], [0, -0.5, 2]]
-            ))
+        )
 
         self.p0_delta_w_out_00 = -1
         self.p1_delta_w_out_00 = -1
@@ -53,21 +49,21 @@ class TestBatch(unittest.TestCase):
         self.p1_delta_w_hid_12 = -1
 
     def test_out(self):
-        nn = NN(**self.kwargs)
+        nn = self.architecture(sigmoid)
 
         nn(1, 1)
         self.assertTrue(np.dot([1, 1, 1], [0, 1.5, 2]) == nn.hidden_layer.neurons[0].net)
         self.assertTrue(np.dot([1, 1, 1], [0, 3, 0.5]) == nn.hidden_layer.neurons[1].net)
-        self.assertTrue(sigmoidal_test(nn.hidden_layer.neurons[0].net) == nn.hidden_layer.neurons[0].out)
-        self.assertTrue(sigmoidal_test(nn.hidden_layer.neurons[1].net) == nn.hidden_layer.neurons[1].out)
+        self.assertTrue(sigmoid_test(nn.hidden_layer.neurons[0].net) == nn.hidden_layer.neurons[0].out)
+        self.assertTrue(sigmoid_test(nn.hidden_layer.neurons[1].net) == nn.hidden_layer.neurons[1].out)
         np.isclose(derivate_test(nn.hidden_layer.neurons[0]), nn.hidden_layer.neurons[0].fprime)
         np.isclose(derivate_test(nn.hidden_layer.neurons[1]), nn.hidden_layer.neurons[1].fprime)
 
         nn(2, 2)
         self.assertTrue(np.dot([1, 2, 2], [0, 1.5, 2]) == nn.hidden_layer.neurons[0].net)
         self.assertTrue(np.dot([1, 2, 2], [0, 3, 0.5]) == nn.hidden_layer.neurons[1].net)
-        self.assertTrue(sigmoidal_test(nn.hidden_layer.neurons[0].net) == nn.hidden_layer.neurons[0].out)
-        self.assertTrue(sigmoidal_test(nn.hidden_layer.neurons[1].net) == nn.hidden_layer.neurons[1].out)
+        self.assertTrue(sigmoid_test(nn.hidden_layer.neurons[0].net) == nn.hidden_layer.neurons[0].out)
+        self.assertTrue(sigmoid_test(nn.hidden_layer.neurons[1].net) == nn.hidden_layer.neurons[1].out)
         np.isclose(derivate_test(nn.output_layer.neurons[0]), nn.output_layer.neurons[0].fprime)
         np.isclose(derivate_test(nn.output_layer.neurons[1]), nn.output_layer.neurons[1].fprime)
 
@@ -77,7 +73,7 @@ class TestBatch(unittest.TestCase):
         self.train_batch()
 
     def single_train_p0(self):
-        nn = NN(**self.kwargs)
+        nn = self.architecture(sigmoid)
 
         nn(1, 1)
 
@@ -132,7 +128,7 @@ class TestBatch(unittest.TestCase):
         self.assertTrue(nn.output_layer.neurons[1].w[2] == new_w_out_12)
 
     def single_train_p1(self):
-        nn = NN(**self.kwargs)
+        nn = self.architecture(sigmoid)
 
         nn(2, 2)
 
@@ -212,7 +208,7 @@ class TestBatch(unittest.TestCase):
         self.assertTrue(self.p0_delta_w_hid_12 != -1)
         self.assertTrue(self.p1_delta_w_hid_12 != -1)
 
-        nn = NN(**self.kwargs)
+        nn = self.architecture(sigmoid)
 
         delta_w_out_00 = (self.p0_delta_w_out_00 + self.p1_delta_w_out_00) / 2
         delta_w_out_01 = (self.p0_delta_w_out_01 + self.p1_delta_w_out_01) / 2
@@ -256,17 +252,13 @@ class TestBatch(unittest.TestCase):
         self.assertTrue(new_w_hid_12 == nn.hidden_layer.neurons[1].w[2])
 
     def test_batch_explicit(self):
-        nn = NN(
-            learning_algorithm=Batch(),
-            activation_output=sigmoidal,
-            eta=0.5,
-            architecture=Architecture(
+        nn = MultilayerPerceptron(
                 size_input_nodes=2,
                 size_output_nodes=2,
                 size_hidden_nodes=2,
                 hidden_weights=[[0, 1.5, 2], [0, 3, 0.5]],
                 output_weights=[[0, -1.5, 1.5], [0, -0.5, 2]]
-            ))
+        )(sigmoid)
 
         nn.train([([1, 1], [0, 1]), ([2, 2], [1, 1])])
 

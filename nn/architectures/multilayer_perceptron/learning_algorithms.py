@@ -1,19 +1,19 @@
 from __future__ import annotations
-from typing import Sequence, Tuple
+from typing import Sequence
 import numpy as np
 import abc
 
-from nn.neural_network import *
-from nn.number import number
+from nn.types import Pattern
+from nn.architectures.multilayer_perceptron.types import NeuralNetwork
 
 
 class LeariningAlgorthm(abc.ABC):
-    def _compute_deltas(self, d: Sequence[number]):
+    def _compute_deltas(self, d: Sequence[float]):
         nn = self.nn
 
         d = np.array(d)
         output_layer_w = np.array(nn.output_layer.w)
-        output_layer_out = np.array(nn)
+        output_layer_out = np.array(nn.output_layer.out)
         hidden_layer_out = np.array((1,) + tuple(nn.hidden_layer.out))[np.newaxis]
         input__layer_out = np.array((1,) + tuple(nn.input))[np.newaxis]
 
@@ -26,17 +26,19 @@ class LeariningAlgorthm(abc.ABC):
     def _update_weights(self):
         nn = self.nn
 
-        nn.output_layer.w += nn.eta * self.delta_output
-        nn.hidden_layer.w += nn.eta * self.delta_hidden
+        nn.output_layer.w += self.eta * self.delta_output
+        nn.hidden_layer.w += self.eta * self.delta_hidden
 
         self.delta_output: np.array = 0
         self.delta_hidden: np.array = 0
 
     def __call__(
         self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
-        nn: NeuralNetwork
+        patterns: Sequence[Pattern],
+        nn: NeuralNetwork,
+        eta: float,
     ):
+        self.eta: float = eta
         self.nn: NeuralNetwork = nn
         self.delta_output: np.array = 0
         self.delta_hidden: np.array = 0
@@ -46,7 +48,7 @@ class LeariningAlgorthm(abc.ABC):
     @abc.abstractmethod
     def _apply(
         self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]]
+        patterns: Sequence[Pattern]
     ):
         pass
 
@@ -54,7 +56,7 @@ class LeariningAlgorthm(abc.ABC):
 class Online(LeariningAlgorthm):
     def _apply(
         self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        patterns: Sequence[Pattern],
     ):
         for x, d in patterns:
             self.nn(*x)
@@ -65,7 +67,7 @@ class Online(LeariningAlgorthm):
 class Batch(LeariningAlgorthm):
     def _apply(
         self,
-        patterns: Sequence[Tuple[Sequence[number], Sequence[number]]],
+        patterns: Sequence[Pattern],
     ):
         assert(self.delta_output == 0)
         assert(self.delta_hidden == 0)

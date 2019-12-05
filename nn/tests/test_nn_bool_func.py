@@ -1,26 +1,24 @@
 from nn.neural_network import ErrorTypes
 import unittest
-from nn import NeuralNetwork as NN, Architecture, Online, Batch
-from nn.activation_function import sigmoidal
+from nn import NeuralNetwork as NN, MultilayerPerceptron
+from nn.activation_function import sigmoid
 
 
 class TestNNBoolFunc(unittest.TestCase):
     def setUp(self):
         self.nn = NN(
             seed=1,
-            activation_output=sigmoidal,
-            learning_algorithm=Batch(),
+            activation=sigmoid,
             eta=0.9,
             epochs_limit=10000,
-            architecture=Architecture(
+            error_types=[ErrorTypes.MIS],
+            architecture=MultilayerPerceptron(
                 size_input_nodes=2,
                 size_output_nodes=1,
                 size_hidden_nodes=5,
                 range_weights=0.5,
                 threshold=1
-            ),
-            error_types=[ErrorTypes.MIS]
-        )
+            ))
 
     def test_and(self):
         self.try_data([

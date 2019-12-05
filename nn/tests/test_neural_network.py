@@ -1,15 +1,15 @@
 import unittest
 import numpy as np
 
-from nn import NeuralNetwork as NN, Architecture
-from nn.activation_function import sigmoidal
+from nn import NeuralNetwork as NN, MultilayerPerceptron
+from nn.activation_function import sigmoid
 
 
 class TestNeuralNetwork(unittest.TestCase):
     def setUp(self):
         self.nn = NN(
-            activation_output=sigmoidal,
-            architecture=Architecture(
+            activation=sigmoid,
+            architecture=MultilayerPerceptron(
                 size_input_nodes=2,
                 size_output_nodes=2,
                 size_hidden_nodes=2,
@@ -29,12 +29,12 @@ class TestNeuralNetwork(unittest.TestCase):
 
     def test_backpropagation(self):
         nn = self.nn
-        nn.train([([1, 1], [1, 1])], [], eta=0.5)
+        nn.train([([1, 1], [1, 1])])
 
         # neural network expected after train
         ne = NN(
-            activation_output=sigmoidal,
-            architecture=Architecture(
+            activation=sigmoid,
+            architecture=MultilayerPerceptron(
                 size_input_nodes=2,
                 size_output_nodes=2,
                 size_hidden_nodes=2,
