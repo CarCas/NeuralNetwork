@@ -1,7 +1,7 @@
 import unittest
 
 from nn.neuron import Neuron
-from nn.activation_function import identity, sign
+from nn.activation_functions import identity, sign
 import numpy as np
 
 

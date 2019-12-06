@@ -1,71 +1,64 @@
 from typing import Sequence
 import numpy as np
+from scipy.special import expit  # type: ignore
 
-from nn.types import Pattern
-from nn.activation_function import ActivationFunction
-
-from nn.architectures.multilayer_perceptron.weights_generator import WeightsGenerator
-from nn.architectures.multilayer_perceptron.neuron_layer import NeuronLayer
-from nn.architectures.multilayer_perceptron.learning_algorithms import LeariningAlgorthm
-from nn.architectures.multilayer_perceptron.types import MLPBaseNeuralNetwork
+from nn.types import BaseNeuralNetwork, Pattern, ActivationFunction
 
 
-class MLPNeuralNetwork(MLPBaseNeuralNetwork):
-    '''
-    Instean of instantiate directly this class, use
-    nn.architecures.multiplayer_perceptron.architecyre.Architecture
-    '''
+def generate_layer(size_layer: int, size_previous_layer: int):
+    range_weights = 1/np.sqrt(size_previous_layer)
+    nodes_rand = np.random.uniform(-range_weights, range_weights, (size_layer, size_previous_layer))
+    return np.insert(nodes_rand, 0, 0, 1)
+
+
+def fprime(out: float):
+    return out * (1 - out)
+
+
+class MLPMatrix(BaseNeuralNetwork):
     def __init__(
         self,
+        *layer_sizes: int,
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
-        eta: float,
-        learning_algorithm: LeariningAlgorthm,
-        weights_generator: WeightsGenerator,
-    ) -> None:
+        eta: float
+    ):
+        layers = []
+        for i in range(1, len(layer_sizes)):
+            layers.append(generate_layer(layer_sizes[i], layer_sizes[i-1]))
+        self.layers = np.array(layers)
+
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
-        self.learning_algorithm: LeariningAlgorthm = learning_algorithm
 
-        self._hidden_layers: Sequence[NeuronLayer] = [
-            NeuronLayer(
-                activation=activation_hidden,
-                weights=layer_weights,
-            ) for layer_weights in weights_generator.hidden_weights]
-        self._output_layer: NeuronLayer = NeuronLayer(
-                activation=activation,
-                weights=weights_generator.output_weights)
-
-        self._input: Sequence[float] = np.zeros(weights_generator.size_input_layer)
-        self._out: Sequence[float] = []
-
-    def __call__(self, *args: float) -> Sequence[float]:
-        self._input = args
-
-        current = self.input
-        for hidden_layer in self.hidden_layers:
-            current = hidden_layer(*current)
-
-        self._out = self.output_layer(*current)
-
-        return self._out
+    def __call__(self, *input: Sequence[float]) -> Sequence[Sequence[float]]:
+        self.inputs = [np.insert(input, 0, 1, 1)]
+        self.outputs = []
+        for layer in self.layers[:-1]:
+            self.outputs.append(self.activation_hidden(self.inputs[-1] @ layer.T))
+            self.inputs.append(np.insert(self.outputs[-1], 0, 1, 1))
+        self.outputs.append(self.activation(self.inputs[-1] @ self.layers[-1].T))
+        return self.outputs[-1]
 
     def train(self, patterns: Sequence[Pattern]) -> None:
-        self.learning_algorithm(patterns, self, self.eta)
+        x, d = zip(*patterns)
+        self(*x)
+
+        delta = [(d - self.outputs[-1]) * self.activation.derivative(self.outputs[-1])]
+        for i in range(len(self.layers))[::-1][1:]:
+            delta.insert(0, (
+                np.dot(self.layers[i+1].T[1:], delta[0].T).T * self.activation_hidden.derivative(self.outputs[i])))
+
+        self.gradients = []
+        for i in range(len(self.layers)):
+            self.gradients.append(np.mean((delta[i] * self.inputs[i][np.newaxis].T).T, axis=1))
+            self.layers[i] += self.eta * self.gradients[i]
 
     @property
     def out(self) -> Sequence[float]:
-        return self._out
+        return self.outputs[-1]
 
     @property
     def input(self) -> Sequence[float]:
-        return self._input
-
-    @property
-    def output_layer(self) -> NeuronLayer:
-        return self._output_layer
-
-    @property
-    def hidden_layers(self) -> Sequence[NeuronLayer]:
-        return self._hidden_layers
+        return self.inputs[0]

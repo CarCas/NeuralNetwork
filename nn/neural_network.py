@@ -4,11 +4,9 @@ import numpy as np
 from collections import defaultdict
 from copy import deepcopy
 
-from nn.config import DEFAULT_ETA
-
-from nn.activation_function import ActivationFunction, sigmoid
+from nn.types import Pattern, Architecture, BaseNeuralNetwork, ActivationFunction, LearningAlgorithm
 from nn.error_types import ErrorTypes, ErrorComputation
-from nn.types import Pattern, Architecture, BaseNeuralNetwork
+from nn.activation_functions import sigmoid
 
 
 class NeuralNetwork:
@@ -63,20 +61,21 @@ class NeuralNetwork:
         activation: ActivationFunction,
         architecture: Architecture,
         activation_hidden: ActivationFunction = sigmoid,
-        eta: float = DEFAULT_ETA,
+        eta: float = 0.5,
         epochs_limit: int = 1,
         epsilon: float = -1,
         epsilon_relative: float = -1,
         penalty: float = 0,
         error_types: Sequence[ErrorTypes] = (ErrorTypes.MSE,),
         n_init: int = 1,
+        learning_algorithm: LearningAlgorithm = LearningAlgorithm.BATCH,
 
         seed: Optional[int] = None,
         verbose: int = 0,
         **kwargs
     ) -> None:
         if seed is not None:
-            np.random.seed(seed)
+            np.random.seed(seed=seed)
 
         self.architecture = architecture
         self._nn: BaseNeuralNetwork = architecture(
@@ -96,8 +95,9 @@ class NeuralNetwork:
         self.error_types: MutableSequence[ErrorTypes] = list(error_types)
         self.verbose: int = verbose
         self.n_init: int = n_init
+        self.learning_algorithm: LearningAlgorithm = learning_algorithm
 
-        self.out: Sequence[float] = []
+        self.out: Sequence[Sequence[float]] = []
 
         self.training_errors: defaultdict[ErrorTypes, MutableSequence[float]] = defaultdict(lambda: [])
         self.testing_errors: defaultdict[ErrorTypes, MutableSequence[float]] = defaultdict(lambda: [])
@@ -108,7 +108,7 @@ class NeuralNetwork:
         return self
 
     # feed-forward
-    def __call__(self, *args: float) -> Sequence[float]:
+    def __call__(self, *args: Sequence[float]) -> Sequence[Sequence[float]]:
         return self._nn(*args)
 
     def train(
@@ -120,7 +120,12 @@ class NeuralNetwork:
 
         for i_init in range(self.n_init):
             for i_epoch in range(self.epochs_limit):
-                self._nn.train(patterns)
+                if self.learning_algorithm == LearningAlgorithm.BATCH:
+                    self._nn.train(patterns)
+
+                elif self.learning_algorithm == LearningAlgorithm.ONLINE:
+                    for pattern in patterns:
+                        self._nn.train([pattern])
 
                 self._append_learning_curve_errors(patterns, test_patterns)
 
@@ -153,8 +158,8 @@ class NeuralNetwork:
         error = np.array(0)
         ec: ErrorComputation = ErrorComputation(error_type)
         for x, d in patterns:
-            self(*x)
-            error = np.add(error, ec(d, self._nn.out))
+            self(x)
+            error = np.add(error, ec(d, self._nn.out[-1]))
         return ec.post(error, len(patterns))
 
     # # TODO applicare regularization al learning

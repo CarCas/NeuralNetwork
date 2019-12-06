@@ -1,15 +1,23 @@
-from typing import Sequence, Tuple, Sequence
+from typing import Sequence, Tuple, Sequence, Any
 import abc
-
-from nn.activation_function import ActivationFunction
+import enum
 
 Pattern = Tuple[Sequence[float], Sequence[float]]
-NeuronWeights = Sequence[float]
+
+
+class ActivationFunction(abc.ABC):
+    @abc.abstractmethod
+    def __call__(self, x: Any) -> Any:
+        pass
+
+    @abc.abstractmethod
+    def derivative(self, out: Any) -> Any:
+        pass
 
 
 class BaseNeuralNetwork(abc.ABC):
     @abc.abstractmethod
-    def __call__(self, *args: float) -> Sequence[float]:
+    def __call__(self, *args: Sequence[float]) -> Sequence[Sequence[float]]:
         pass
 
     @abc.abstractmethod
@@ -18,12 +26,12 @@ class BaseNeuralNetwork(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def out(self) -> Sequence[float]:
+    def out(self) -> Sequence[Sequence[float]]:
         pass
 
     @property
     @abc.abstractmethod
-    def input(self) -> Sequence[float]:
+    def input(self) -> Sequence[Sequence[float]]:
         pass
 
 
@@ -36,3 +44,8 @@ class Architecture(abc.ABC):
         eta: float,
     ) -> BaseNeuralNetwork:
         pass
+
+
+class LearningAlgorithm(enum.Enum):
+    ONLINE = enum.auto()
+    BATCH = enum.auto()

@@ -1,7 +1,7 @@
 from nn.neural_network import ErrorTypes
 import unittest
 from nn import NeuralNetwork as NN, MultilayerPerceptron
-from nn.activation_function import sigmoid
+from nn.activation_functions import sigmoid
 
 
 class TestNNBoolFunc(unittest.TestCase):
@@ -13,12 +13,7 @@ class TestNNBoolFunc(unittest.TestCase):
             epsilon=0,
             epochs_limit=10000,
             error_types=[ErrorTypes.MIS],
-            architecture=MultilayerPerceptron(
-                size_input_layer=2,
-                size_output_layer=1,
-                sizes_hidden_layers=[5],
-                range_weights=0.5,
-            ))
+            architecture=MultilayerPerceptron(2, 5, 1))
 
     def test_and(self):
         self.try_data([

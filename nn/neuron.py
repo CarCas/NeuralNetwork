@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Sequence
 import numpy as np
 
-from nn.activation_function import ActivationFunction
+from nn.types import ActivationFunction
 
 
 class Neuron:

@@ -9,7 +9,7 @@ pycodestyle = "*"
 
 [packages]
 nn = {editable = true,path = "."}
-numba = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.7"

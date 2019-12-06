@@ -1,7 +1,7 @@
 import unittest
 
-from nn.architectures.multilayer_perceptron.neuron_layer import NeuronLayer
-from nn.activation_function import sign
+from nn.neuron_layer import NeuronLayer
+from nn.activation_functions import sign
 
 
 class TestNeuronLayer(unittest.TestCase):

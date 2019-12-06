@@ -1,5 +1,2 @@
-from nn.architectures.multilayer_perceptron.architecure import MultilayerPerceptron
-from nn.architectures.multilayer_perceptron.learning_algorithms import (
-    Online,
-    Batch,
-)
+from nn.architectures.multilayer_perceptron.architecture import MultilayerPerceptron
+from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix

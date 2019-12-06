@@ -1,8 +1,7 @@
 from typing import Sequence
 import numpy as np
 
-from nn.neuron import Neuron
-from nn.activation_function import ActivationFunction
+from nn.neuron import Neuron, ActivationFunction
 
 
 class NeuronLayer:

@@ -1,25 +1,25 @@
-from nn.architectures.multilayer_perceptron.learning_algorithms import LeariningAlgorthm
 from nn.neural_network import ErrorTypes
 import unittest
 
-from nn import NeuralNetwork as NN, MultilayerPerceptron, Online, sigmoid
-from nn.tests.utilities import monk1_train as train_data, monk1_test as test_data, plot
+from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron
+from nn.types import LearningAlgorithm
+from utilities import read_monk_1_tr, read_monk_1_ts
 
 
 class TestMonk(unittest.TestCase):
     def test_monk1(self):
         nn = NN(
-            seed=3,
+            seed=4,
             activation=sigmoid,
-            epochs_limit=71,
-            epsilon=1e-3,
-            architecture=MultilayerPerceptron(
-                learning_algorithm=Online(),
-                size_input_layer=6,
-                size_output_layer=1,
-                sizes_hidden_layers=[5],
-                range_weights=.2,
-            ))
+            epochs_limit=80,
+            eta=0.65,
+            learning_algorithm=LearningAlgorithm.ONLINE,
+            error_types=[ErrorTypes.MIS],
+            architecture=MultilayerPerceptron(6, 4, 1)
+        )
+
+        train_data = read_monk_1_tr()
+        test_data = read_monk_1_ts()
 
         nn.train(train_data, test_data)
         train_errs = nn.get_training_errors()
@@ -34,11 +34,11 @@ class TestMonk(unittest.TestCase):
 
         error_train = 0
         for x, d in train_data:
-            error_train += (round(nn(*x)[0]) - d[0])**2
+            error_train += (round(nn(x)[0][-1]) - d[0])**2
 
         error_test = 0
         for x, d in test_data:
-            error_test += (round(nn(*x)[0]) - d[0])**2
+            error_test += (round(nn(x)[0][-1]) - d[0])**2
 
         print('train:',
               str(((len(train_data)-error_train)/len(train_data))*100) + '%')
