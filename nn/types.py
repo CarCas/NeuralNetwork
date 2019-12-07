@@ -1,6 +1,5 @@
 from typing import Sequence, Tuple, Sequence, Any
 import abc
-import enum
 
 Pattern = Tuple[Sequence[float], Sequence[float]]
 
@@ -24,16 +23,6 @@ class BaseNeuralNetwork(abc.ABC):
     def train(self, patterns: Sequence[Pattern]) -> None:
         pass
 
-    @property
-    @abc.abstractmethod
-    def out(self) -> Sequence[Sequence[float]]:
-        pass
-
-    @property
-    @abc.abstractmethod
-    def input(self) -> Sequence[Sequence[float]]:
-        pass
-
 
 class Architecture(abc.ABC):
     @abc.abstractmethod
@@ -44,8 +33,3 @@ class Architecture(abc.ABC):
         eta: float,
     ) -> BaseNeuralNetwork:
         pass
-
-
-class LearningAlgorithm(enum.Enum):
-    ONLINE = enum.auto()
-    BATCH = enum.auto()

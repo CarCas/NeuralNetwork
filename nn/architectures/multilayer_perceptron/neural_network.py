@@ -54,11 +54,3 @@ class MLPMatrix(BaseNeuralNetwork):
         for i in range(len(self.layers)):
             self.gradients.append(np.mean((delta[i] * self.inputs[i][np.newaxis].T).T, axis=1))
             self.layers[i] += self.eta * self.gradients[i]
-
-    @property
-    def out(self) -> Sequence[float]:
-        return self.outputs[-1]
-
-    @property
-    def input(self) -> Sequence[float]:
-        return self.inputs[0]

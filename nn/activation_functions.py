@@ -20,7 +20,3 @@ class SimpleActivationFunction(ActivationFunction):
 sign = SimpleActivationFunction(lambda x: float(x > 0), lambda _: 0)
 sigmoid = SimpleActivationFunction(expit, lambda out: out * (1 - out))
 identity = SimpleActivationFunction(lambda x: x, lambda _: 1)
-
-
-# sign = ActivationFunction('x>0')
-# sigmoid = ActivationFunction('1/(1+exp(-x))')

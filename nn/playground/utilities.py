@@ -1,15 +1,16 @@
-from typing import Sequence, Pattern
-from nn.neural_network import NeuralNetwork
+from typing import Sequence
 import matplotlib.pyplot as plt
 import csv
 
 
-def plot(nn: NeuralNetwork):
-    for error_type in nn.error_types:
-        plt.plot(nn.training_errors[error_type], label='training_'+error_type.name, linestyle='-')
-        plt.plot(nn.testing_errors[error_type], label='testing_'+error_type.name, linestyle='--')
-    plt.legend()
-    plt.show()
+def plot(training=[], testing=[], show=True):
+    if len(training):
+        plt.plot(training, label='training', linestyle='-')
+    if len(testing):
+        plt.plot(testing, label='testing', linestyle='--')
+    if show:
+        plt.legend()
+        plt.show()
 
 
 def read_file(path, size_target: Sequence[int] = []):

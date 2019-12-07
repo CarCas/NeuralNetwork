@@ -1,9 +1,9 @@
-from nn.neural_network import ErrorTypes
 import unittest
 
 from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron
-from nn.types import LearningAlgorithm
-from utilities import read_monk_1_tr, read_monk_1_ts
+from nn.learning_algorithm import LearningAlgorithm
+from nn.error_calculator import ErrorCalculator
+from nn.playground.utilities import read_monk_1_tr, read_monk_1_ts
 
 
 class TestMonk(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestMonk(unittest.TestCase):
             epochs_limit=80,
             eta=0.65,
             learning_algorithm=LearningAlgorithm.ONLINE,
-            error_types=[ErrorTypes.MIS],
+            error_calculator=ErrorCalculator.MIS,
             architecture=MultilayerPerceptron(6, 4, 1)
         )
 
@@ -22,12 +22,12 @@ class TestMonk(unittest.TestCase):
         test_data = read_monk_1_ts()
 
         nn.train(train_data, test_data)
-        train_errs = nn.get_training_errors()
+        train_errs = nn.compute_learning_curve(train_data)
         print("TRAINING ERRORS: ")
         for e in train_errs:
             print(e)
 
-        test_errs = nn.get_testing_errors()
+        test_errs = nn.compute_learning_curve(test_data)
         print("TESTING ERRORS:")
         for e in test_errs:
             print(e)
@@ -48,8 +48,9 @@ class TestMonk(unittest.TestCase):
         self.assertEqual(error_train, 0)
         self.assertEqual(error_test, 0)
 
-        self.assertEqual(nn.compute_error(train_data, ErrorTypes.MIS), 0)
-        self.assertEqual(nn.compute_error(test_data, ErrorTypes.MIS), 0)
+        nn.error_calculator = ErrorCalculator.MIS
+        self.assertEqual(nn.compute_error(train_data), 0)
+        self.assertEqual(nn.compute_error(test_data), 0)
 
 
 if __name__ == '__main__':
