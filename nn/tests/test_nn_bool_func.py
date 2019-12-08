@@ -1,6 +1,6 @@
 from nn.neural_network import ErrorCalculator
 import unittest
-from nn import NeuralNetwork as NN, MultilayerPerceptron, LearningAlgorithm
+from nn import NeuralNetwork as NN, MultilayerPerceptron, online
 from nn.activation_functions import sigmoid
 
 
@@ -10,7 +10,7 @@ class TestNNBoolFunc(unittest.TestCase):
             seed=0,
             activation=sigmoid,
             eta=0.99,
-            learning_algorithm=LearningAlgorithm.ONLINE,
+            learning_algorithm=online,
             error_calculator=ErrorCalculator.MIS,
             architecture=MultilayerPerceptron(2, 2, 1))
 

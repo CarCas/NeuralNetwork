@@ -4,7 +4,7 @@ import numpy as np
 from copy import deepcopy
 
 from nn.types import Pattern, Architecture, BaseNeuralNetwork, ActivationFunction
-from nn.learning_algorithm import LearningAlgorithm
+from nn.learning_algorithm import LearningAlgorithm, batch, online
 from nn.activation_functions import sigmoid
 from nn.error_calculator import ErrorCalculator
 
@@ -16,7 +16,7 @@ class NeuralNetwork(BaseNeuralNetwork):
     architecture: sizes of the network
     activation: activation function of output layer
     activation_hidden: activation function of hidden layers
-    learning_algorithm: LearningAlgorithm.Online, LearningAlgorithm.Batch
+    learning_algorithm: callable that train the network given network and patterns
     error_calculator: to specify witch kind of errors the nn produces
     eta: learning rate
     epochs_limit: max possible float of epoch during a train call
@@ -46,7 +46,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         architecture: Architecture,
         activation: ActivationFunction,
         activation_hidden: ActivationFunction = sigmoid,
-        learning_algorithm: LearningAlgorithm = LearningAlgorithm.BATCH,
+        learning_algorithm: LearningAlgorithm = batch,
         error_calculator: ErrorCalculator = ErrorCalculator.MSE,
 
         eta: float = 0.5,

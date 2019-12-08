@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron
+from nn import sigmoid
 from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
 
 

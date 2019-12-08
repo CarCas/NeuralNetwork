@@ -1,17 +1,15 @@
-from typing import Sequence
-from enum import Enum, auto
+from typing import Sequence, Callable
+from enum import Enum
 
 from nn.types import BaseNeuralNetwork, Pattern
 
+LearningAlgorithm = Callable[[BaseNeuralNetwork, Sequence[Pattern]], None]
 
-class LearningAlgorithm(Enum):
-    ONLINE = auto()
-    BATCH = auto()
 
-    def __call__(self, nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
-        if self is self.BATCH:
-            nn.train(patterns)
+def batch(nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
+    nn.train(patterns)
 
-        elif self is self.ONLINE:
-            for pattern in patterns:
-                nn.train([pattern])
+
+def online(nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
+    for pattern in patterns:
+        nn.train([pattern])

@@ -1,7 +1,7 @@
 import unittest
 
 from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron
-from nn.learning_algorithm import LearningAlgorithm
+from nn.learning_algorithm import online
 from nn.error_calculator import ErrorCalculator
 from nn.playground.utilities import read_monk_1_tr, read_monk_1_ts
 
@@ -13,7 +13,7 @@ class TestMonk(unittest.TestCase):
             activation=sigmoid,
             epochs_limit=80,
             eta=0.65,
-            learning_algorithm=LearningAlgorithm.ONLINE,
+            learning_algorithm=online,
             error_calculator=ErrorCalculator.MIS,
             architecture=MultilayerPerceptron(6, 4, 1)
         )

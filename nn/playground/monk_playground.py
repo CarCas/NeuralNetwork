@@ -1,4 +1,4 @@
-from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, LearningAlgorithm
+from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, online
 from nn import ErrorCalculator
 from nn.playground.utilities import read_monk_1_tr, read_monk_1_ts, plot
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
         activation=sigmoid,
         epochs_limit=500,
         eta=0.4,
-        learning_algorithm=LearningAlgorithm.ONLINE,
+        learning_algorithm=online,
         architecture=MultilayerPerceptron(6, 3, 1),
         n_init=1,
     )
