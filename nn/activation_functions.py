@@ -17,6 +17,16 @@ class SimpleActivationFunction(ActivationFunction):
         return self.fprime(out)
 
 
-sign = SimpleActivationFunction(lambda x: float(x > 0), lambda _: 0)
-sigmoid = SimpleActivationFunction(expit, lambda out: out * (1 - out))
+class GenericSigmoid(ActivationFunction):
+    def __init__(self, a: float):
+        self.a = a
+
+    def __call__(self, x):
+        return expit(self.a*x)
+
+    def derivative(self, out):
+        return self.a * out * (1-out)
+
+
 identity = SimpleActivationFunction(lambda x: x, lambda _: 1)
+sigmoid = GenericSigmoid(a=1)
