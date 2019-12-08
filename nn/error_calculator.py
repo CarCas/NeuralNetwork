@@ -1,62 +1,25 @@
-from typing import Sequence
+from typing import Sequence, Callable
 import enum
 import numpy as np
 
 from nn.types import Pattern, BaseNeuralNetwork
+from collections import namedtuple
+
+
+f_container = namedtuple('f_container', ['f'])
 
 
 class ErrorCalculator(enum.Enum):
-    MEE = enum.auto()
-    MSE = enum.auto()
-    MIS = enum.auto()
-    ACC = enum.auto()
+    MSE = f_container(lambda d, out: np.mean(np.sum(np.square(np.subtract(d, out)), axis=1)))
+    MEE = f_container(lambda d, out: np.mean(np.linalg.norm(np.subtract(d, out), axis=1)))
+    MIS = f_container(lambda d, out: np.mean(np.not_equal(d, np.round(out)).astype(float)))
+    ACC = f_container(lambda d, out: np.mean(np.equal(d, np.round(out)).astype(float)))
 
     def __call__(
         self,
         learning_networks: Sequence[BaseNeuralNetwork],
         patterns: Sequence[Pattern]
     ) -> Sequence[float]:
-        if self is ErrorCalculator.MSE:
-            error_function = self.mean_square_error
-        elif self is ErrorCalculator.MEE:
-            error_function = self.mean_euclidean_error
-        elif self is ErrorCalculator.MIS:
-            error_function = self.mismatch_error
-        elif self is ErrorCalculator.ACC:
-            error_function = self.accuracy
-        else:
-            return []
-
-        results = []
-        for nn in learning_networks:
-            x, d = zip(*patterns)
-            results.append(error_function(d, nn(*x)))
-        return results
-
-    @staticmethod
-    def mean_square_error(
-        d: Sequence[float],
-        out: Sequence[Sequence[float]]
-    ) -> float:
-        return np.mean(np.sum(np.square(np.subtract(d, out)), axis=1))
-
-    @staticmethod
-    def mean_euclidean_error(
-        d: Sequence[float],
-        out: Sequence[Sequence[float]]
-    ) -> float:
-        return np.mean(np.linalg.norm(np.subtract(d, out), axis=1))
-
-    @staticmethod
-    def mismatch_error(
-        d: Sequence[float],
-        out: Sequence[Sequence[float]]
-    ) -> float:
-        return np.mean(np.not_equal(d, np.round(out)).astype(float))
-
-    @staticmethod
-    def accuracy(
-        d: Sequence[float],
-        out: Sequence[Sequence[float]]
-    ) -> float:
-        return np.mean(np.equal(d, np.round(out)).astype(float))
+        error_function = self.value.f
+        x, d = zip(*patterns)
+        return [error_function(d, nn(*x)) for nn in learning_networks]
