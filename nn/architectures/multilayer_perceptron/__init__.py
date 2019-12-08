@@ -1,2 +1,2 @@
 from nn.architectures.multilayer_perceptron.architecture import MultilayerPerceptron
-from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork

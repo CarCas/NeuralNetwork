@@ -13,15 +13,16 @@ class NeuralNetwork(BaseNeuralNetwork):
     '''
     Params and istance variables
     ----------------------------------------
-    architecture: sizes of the network
     activation: activation function of output layer
+    architecture: sizes of the network
+
     activation_hidden: activation function of hidden layers
-    learning_algorithm: callable that train the network given network and patterns
     error_calculator: to specify witch kind of errors the nn produces
+
+    learning_algorithm: callable that train the network given network and patterns
     eta: learning rate
     epochs_limit: max possible float of epoch during a train call
     epsilon: TODO
-    n_init: float to different initialization of the network during training, the best one is choose
 
     Istance variables
     ----------------------------------------
@@ -43,12 +44,13 @@ class NeuralNetwork(BaseNeuralNetwork):
     def __init__(
         self,
 
-        architecture: Architecture,
         activation: ActivationFunction,
+        architecture: Architecture,
+
         activation_hidden: ActivationFunction = sigmoid,
-        learning_algorithm: LearningAlgorithm = batch,
         error_calculator: ErrorCalculator = ErrorCalculator.MSE,
 
+        learning_algorithm: LearningAlgorithm = batch,
         eta: float = 0.5,
         epochs_limit: int = 1,
         epsilon: float = -1,

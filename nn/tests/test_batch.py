@@ -1,9 +1,7 @@
 import unittest
 import numpy as np
 
-from nn.neural_network import NeuralNetwork
-from nn import MultilayerPerceptron, sigmoid, batch
-from nn.architectures.multilayer_perceptron import MLPMatrix
+from nn import sigmoid, MultilayerPerceptron
 
 
 def sigmoid_test(x):
@@ -16,15 +14,10 @@ def derivate_test(x):
 
 class TestBatch(unittest.TestCase):
     def test_batch_explicit(self):
-        nn = NeuralNetwork(
-            activation=sigmoid,
-            learning_algorithm=batch,
-            architecture=MultilayerPerceptron(2, 2, 2)
-        )
-        nn = MLPMatrix(2, 2, 2, eta=0.5, activation=sigmoid, activation_hidden=sigmoid)
-
-        nn.layers[0] = np.array([[[0, 1.5, 2], [0, 3, 0.5]]])
-        nn.layers[1] = np.array([[0, -1.5, 1.5], [0, -0.5, 2]])
+        nn = MultilayerPerceptron(
+            layers=[[[0, 1.5, 2], [0, 3, 0.5]],
+                    [[0, -1.5, 1.5], [0, -0.5, 2]]]
+        )(eta=0.5, activation=sigmoid, activation_hidden=sigmoid)
 
         nn.train([([1, 1], [0, 1]), ([2, 2], [1, 1])])
 

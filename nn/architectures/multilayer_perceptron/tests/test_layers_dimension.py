@@ -3,14 +3,15 @@ import unittest
 import numpy as np
 
 from nn import sigmoid, identity
-from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
+from nn.architectures.multilayer_perceptron.architecture import MultilayerPerceptron
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
 
 
 class TestLayersDimension(unittest.TestCase):
     def test_layers_dimension(self):
         np.random.seed(seed=0)
 
-        nn = MLPMatrix(3, 1, 4, 10, activation=identity, activation_hidden=sigmoid, eta=0.5)
+        nn = MultilayerPerceptron(3, 1, 4, 10)(activation=identity, activation_hidden=sigmoid, eta=0.5)
         np.testing.assert_equal(len(nn.layers), 3)
 
         np.testing.assert_equal(len(nn.layers[0]), 1)

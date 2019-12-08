@@ -1,17 +1,17 @@
 import unittest
 import numpy as np
 
-from nn import sigmoid
-from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
+from nn import sigmoid, MultilayerPerceptron
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
 
 
 class TestMultilayerPerceptronWithMoreHiddenLayer(unittest.TestCase):
     def setUp(self):
-        self.nn: MLPMatrix = MLPMatrix(
-            2, 2, 3, 2,
+        self.nn: MLPNeuralNetwork = MultilayerPerceptron(2, 2, 3, 2)(
             eta=0.5,
             activation=sigmoid,
-            activation_hidden=sigmoid)
+            activation_hidden=sigmoid
+        )
 
         self.nn.layers[0] = np.array([[0.3, 0.1, 0.4], [0.45, 0.2, 0.2], [0.7, 0.2, 0.3]])
         self.nn.layers[1] = np.array([[0.35, 0.15, 0.2, 0.12], [0.3, 0.25, 0.3, 0.4]])

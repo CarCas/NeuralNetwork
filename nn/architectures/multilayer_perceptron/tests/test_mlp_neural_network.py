@@ -2,12 +2,13 @@ import unittest
 import numpy as np
 
 from nn import sigmoid, identity
-from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
+from nn.architectures.multilayer_perceptron.architecture import MultilayerPerceptron
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
 
 
 class TestNeuralNetwork(unittest.TestCase):
     def setUp(self):
-        self.nn = MLPMatrix(2, 2, 2, eta=0.5, activation=identity, activation_hidden=sigmoid)
+        self.nn = MultilayerPerceptron(2, 2, 2)(eta=0.5, activation=identity, activation_hidden=sigmoid)
         self.nn.layers[0] = np.array([[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]])
         self.nn.layers[1] = np.array([[0.6, 0.4, 0.45], [0.6, 0.5, 0.55]])
 

@@ -3,14 +3,14 @@ import unittest
 import numpy as np
 
 from nn import MultilayerPerceptron, sigmoid
-from nn.architectures.multilayer_perceptron.neural_network import MLPMatrix
+from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
 
 
 class TestGlorotBengio(unittest.TestCase):
     def setUp(self):
         np.random.seed(seed=1)
 
-        self.nn: MLPMatrix = MultilayerPerceptron(200, 1000, 500)(sigmoid, sigmoid, eta=0.5)
+        self.nn: MLPNeuralNetwork = MultilayerPerceptron(200, 1000, 500)(sigmoid, sigmoid, eta=0.5)
         output_layer = self.nn.layers[-1]
         self.hidden_layer = self.nn.layers[0]
 

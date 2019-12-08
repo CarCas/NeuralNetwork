@@ -5,29 +5,15 @@ from scipy.special import expit  # type: ignore
 from nn.types import BaseNeuralNetwork, Pattern, ActivationFunction
 
 
-def generate_layer(size_layer: int, size_previous_layer: int):
-    range_weights = 1/np.sqrt(size_previous_layer)
-    nodes_rand = np.random.uniform(-range_weights, range_weights, (size_layer, size_previous_layer))
-    return np.insert(nodes_rand, 0, 0, 1)
-
-
-def fprime(out: float):
-    return out * (1 - out)
-
-
-class MLPMatrix(BaseNeuralNetwork):
+class MLPNeuralNetwork(BaseNeuralNetwork):
     def __init__(
         self,
-        *layer_sizes: int,
+        layers: Sequence[Sequence[Sequence[float]]],
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float
     ):
-        layers = []
-        for i in range(1, len(layer_sizes)):
-            layers.append(generate_layer(layer_sizes[i], layer_sizes[i-1]))
-        self.layers = np.array(layers)
-
+        self.layers = [np.array(layer) for layer in layers]
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
