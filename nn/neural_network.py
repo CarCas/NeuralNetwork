@@ -96,9 +96,8 @@ class NeuralNetwork(BaseNeuralNetwork):
         for _ in range(self.epochs_limit):
             self.learning_algorithm(self.internal_network, patterns)
             self._update_training_networks()
-
-            # if self._early_stopping():
-            #     break
+            if self._early_stopping():
+                break
 
     def compute_error(self, patterns: Sequence[Pattern]) -> float:
         return self.error_calculator([self], patterns)[0]
@@ -108,3 +107,25 @@ class NeuralNetwork(BaseNeuralNetwork):
 
     def _update_training_networks(self) -> None:
         return self.learning_networks.append(deepcopy(self.internal_network))
+
+    def _early_stopping(self) -> bool:
+        if self.epsilon >= 0:
+            l2_gradient = np.sqrt(np.sum([np.sum(np.square(x)) for x in self.internal_network.gradients]))
+            return l2_gradient <= self.epsilon
+        return False
+
+    @property
+    def weights(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self.internal_network.weights
+
+    @property
+    def inputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self.internal_network.inputs
+
+    @property
+    def outputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self.internal_network.outputs
+
+    @property
+    def gradients(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self.internal_network.gradients

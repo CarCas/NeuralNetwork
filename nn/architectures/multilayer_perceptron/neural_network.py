@@ -19,16 +19,17 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         self.eta: float = eta
 
         self.len_layers = len(layers)
-        self.inputs = [np.array(0)] * self.len_layers
-        self.outputs = [np.array(0)] * self.len_layers
 
-        self.deltas = [np.array(0)] * self.len_layers
-        self.gradients = [np.array(0)] * self.len_layers
+        self._inputs = [np.array(0)] * self.len_layers
+        self._outputs = [np.array(0)] * self.len_layers
+
+        self._deltas = [np.array(0)] * self.len_layers
+        self._gradients = [np.array(0)] * self.len_layers
 
     def __call__(self, *input: Sequence[float]) -> Sequence[Sequence[float]]:
         layers = self.layers
-        inputs = self.inputs
-        outputs = self.outputs
+        inputs = self._inputs
+        outputs = self._outputs
         len_layers = self.len_layers
         activation_hidden = self.activation_hidden
 
@@ -41,10 +42,10 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
 
     def train(self, patterns: Sequence[Pattern]) -> None:
         layers = self.layers
-        inputs = self.inputs
-        outputs = self.outputs
-        deltas = self.deltas
-        gradients = self.gradients
+        inputs = self._inputs
+        outputs = self._outputs
+        deltas = self._deltas
+        gradients = self._gradients
         activation_hidden = self.activation_hidden
         eta = self.eta
 
@@ -60,3 +61,19 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         for i in range(self.len_layers):
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
             layers[i] += eta * gradients[i]
+
+    @property
+    def weights(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self.layers
+
+    @property
+    def inputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self._inputs
+
+    @property
+    def outputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self._outputs
+
+    @property
+    def gradients(self) -> Sequence[Sequence[Sequence[float]]]:
+        return self._gradients

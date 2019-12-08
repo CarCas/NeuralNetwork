@@ -23,6 +23,26 @@ class BaseNeuralNetwork(abc.ABC):
     def train(self, patterns: Sequence[Pattern]) -> None:
         pass
 
+    @property
+    @abc.abstractmethod
+    def weights(self) -> Sequence[Sequence[Sequence[float]]]:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def inputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def outputs(self) -> Sequence[Sequence[Sequence[float]]]:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def gradients(self) -> Sequence[Sequence[Sequence[float]]]:
+        pass
+
 
 class Architecture(abc.ABC):
     @abc.abstractmethod
