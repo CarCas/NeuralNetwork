@@ -22,7 +22,7 @@ class GenericSigmoid(ActivationFunction):
         self.a = a
 
     def __call__(self, x):
-        return expit(self.a*x)
+        return 1/(1+np.exp(-x))
 
     def derivative(self, out):
         return self.a * out * (1-out)
