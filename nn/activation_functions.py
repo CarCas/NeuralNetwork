@@ -1,5 +1,4 @@
 from typing import Callable
-from scipy.special import expit  # type: ignore
 import numpy as np
 
 from nn.types import ActivationFunction

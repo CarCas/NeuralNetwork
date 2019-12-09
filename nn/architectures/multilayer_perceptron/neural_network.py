@@ -1,6 +1,5 @@
 from typing import Sequence
 import numpy as np
-from scipy.special import expit  # type: ignore
 
 from nn.types import BaseNeuralNetwork, Pattern, ActivationFunction
 

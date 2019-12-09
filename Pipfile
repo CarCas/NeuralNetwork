@@ -9,7 +9,6 @@ pycodestyle = "*"
 
 [packages]
 nn = {editable = true,path = "."}
-scipy = "*"
 numpy = "*"
 matplotlib = "*"
 pytest = "*"
