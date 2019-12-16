@@ -19,9 +19,10 @@ class Validation:
     def nn_calling(self, architecture: Architecture, activation: ActivationFunction,
                    activation_hidden: ActivationFunction, learning_algorithm: LearningAlgorithm,
                    error_calculator: ErrorCalculator, penalty: float, eta: float,
-                   epochs_limit: int, epsilon: float, seed: Optional[int]):
-        nn = NeuralNetwork(activation, architecture, activation_hidden, error_calculator, learning_algorithm,
-                           penalty, eta, epochs_limit, epsilon, seed)
+                   epochs_limit: int, epsilon: float, alpha: float, seed: Optional[int]):
+        nn = NeuralNetwork(activation=activation, architecture=architecture, activation_hidden=activation_hidden,
+                           error_calculator=error_calculator, learning_algorithm=learning_algorithm,
+                           penalty=penalty, eta=eta, epochs_limit=epochs_limit, epsilon=epsilon, seed=seed, alpha=alpha)
         nn.train(self.training_set, self.testing_set)
         train_errs = nn.compute_learning_curve(self.training_set)
         test_errs = nn.compute_learning_curve(self.testing_set)

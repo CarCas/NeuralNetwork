@@ -62,7 +62,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
                                               deltas[i+1].T).T,
                                     activation_hidden.derivative(outputs[i]))
         for i in range(self.len_layers):
-            g_old = np.copy(gradients[i])
+            g_old = np.copy(gradients[i] * eta)
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
             layers[i] += eta * gradients[i] + g_old * alpha
 

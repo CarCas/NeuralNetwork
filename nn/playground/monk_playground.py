@@ -12,7 +12,7 @@ if __name__ == '__main__':
         activation=sigmoid,
         epochs_limit=100,
         eta=0.5,
-        alpha=0.9,
+        alpha=0.1,
         learning_algorithm=batch,
         architecture=MultilayerPerceptron(6, 2, 1),
         n_init=1,
