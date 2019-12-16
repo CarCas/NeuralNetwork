@@ -25,9 +25,11 @@ class MultilayerPerceptron(BaseArchitecure):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
+        alpha: float
     ) -> MLPNeuralNetwork:
         if self.layers is None:
-            layers = [generate_layer(self.layer_sizes[i], self.layer_sizes[i-1]) for i in range(1, len(self.layer_sizes))]
+            layers = [generate_layer(self.layer_sizes[i], self.layer_sizes[i-1])
+                      for i in range(1, len(self.layer_sizes))]
         else:
             layers = self.layers
 
@@ -35,5 +37,6 @@ class MultilayerPerceptron(BaseArchitecure):
             layers=layers,
             activation=activation,
             activation_hidden=activation_hidden,
-            eta=eta
+            eta=eta,
+            alpha=alpha,
         )

@@ -10,12 +10,14 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         layers: Sequence[Sequence[Sequence[float]]],
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
-        eta: float
+        eta: float,
+        alpha: float
     ):
         self.layers = [np.array(layer) for layer in layers]
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
+        self.alpha: float = alpha
 
         self.len_layers = len(layers)
 
@@ -25,14 +27,14 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         self._deltas = [np.array(0)] * self.len_layers
         self._gradients = [np.array(0)] * self.len_layers
 
-    def __call__(self, *input: Sequence[float]) -> Sequence[Sequence[float]]:
+    def __call__(self, *inp: Sequence[float]) -> Sequence[Sequence[float]]:
         layers = self.layers
         inputs = self._inputs
         outputs = self._outputs
         len_layers = self.len_layers
         activation_hidden = self.activation_hidden
 
-        inputs[0] = np.insert(input, 0, 1, 1)
+        inputs[0] = np.insert(inp, 0, 1, 1)
         for i in range(len_layers-1):
             outputs[i] = activation_hidden(inputs[i] @ layers[i].T)
             inputs[i+1] = np.insert(outputs[i], 0, 1, 1)
@@ -47,7 +49,10 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         gradients = self._gradients
         activation_hidden = self.activation_hidden
         eta = self.eta
+        alpha = self.alpha
 
+        x: Sequence[Sequence[float]]
+        d: Sequence[Sequence[float]]
         x, d = zip(*patterns)
         self(*x)
 
@@ -56,10 +61,10 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
             deltas[i] = np.multiply(np.matmul(layers[i+1].T[1:],
                                               deltas[i+1].T).T,
                                     activation_hidden.derivative(outputs[i]))
-
         for i in range(self.len_layers):
+            g_old = np.copy(gradients[i])
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
-            layers[i] += eta * gradients[i]
+            layers[i] += eta * gradients[i] + g_old * alpha
 
     @property
     def weights(self) -> Sequence[Sequence[Sequence[float]]]:

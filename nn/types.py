@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple, Sequence, Any
+from typing import Tuple, Sequence, Any
 import abc
 
 Pattern = Tuple[Sequence[float], Sequence[float]]
@@ -51,5 +51,6 @@ class Architecture(abc.ABC):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
+        alpha: float
     ) -> BaseNeuralNetwork:
         pass

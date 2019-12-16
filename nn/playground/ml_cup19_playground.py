@@ -15,13 +15,14 @@ if __name__ == '__main__':
     nn = NeuralNetwork(
         seed=0,
         activation=identity,
-        eta=0.05,
-        architecture=MultilayerPerceptron(input_size, 1, output_size),
-        epochs_limit=100
+        eta=0.01,
+        alpha=0.1,
+        architecture=MultilayerPerceptron(input_size, 100, output_size),
+        epochs_limit=1000
     )
     nn_internal = deepcopy(nn.internal_network)
 
     print(timeit(lambda: nn.train(data), number=1))
-    print(timeit(lambda: [nn_internal.train(data) for _ in range(nn.epochs_limit)], number=1))
+    # print(timeit(lambda: [nn_internal.train(data) for _ in range(nn.epochs_limit)], number=1))
 
     plot(nn.compute_learning_curve(data))

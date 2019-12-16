@@ -24,7 +24,7 @@ class GenericSigmoid(ActivationFunction):
         return 1/(1+np.exp(-self.a*x))
 
     def derivative(self, out):
-        return self.a * out * (1-out)
+        return np.multiply(np.multiply(self.a, out), np.subtract(1, out))
 
 
 identity = SimpleActivationFunction(lambda x: x, lambda _: 1)
