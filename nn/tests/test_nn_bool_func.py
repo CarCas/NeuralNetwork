@@ -8,11 +8,13 @@ class TestNNBoolFunc(unittest.TestCase):
     def setUp(self):
         self.nn = NN(
             seed=0,
-            activation=sigmoid,
-            eta=0.99,
             learning_algorithm=online,
             error_calculator=ErrorCalculator.MIS,
-            architecture=MultilayerPerceptron(2, 2, 1))
+            architecture=MultilayerPerceptron(
+                2, 2, 1,
+                activation=sigmoid,
+                eta=0.99,
+            ))
 
     def test_and(self):
         self.try_data([

@@ -8,11 +8,11 @@ class TestMiniBatch(unittest.TestCase):
         nn = NeuralNetwork(
             architecture=MultilayerPerceptron(
                 layers=[[[0, 1.5, 2], [0, 3, 0.5]],
-                    [[0, -1.5, 1.5], [0, -0.5, 2]]]
+                        [[0, -1.5, 1.5], [0, -0.5, 2]]],
+                eta=0.5,
+                activation=sigmoid,
+                activation_hidden=sigmoid,
             ),
-            eta=0.5,
-            activation=sigmoid,
-            activation_hidden=sigmoid,
             learning_algorithm=minibatch(.5)
         )
 

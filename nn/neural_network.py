@@ -45,18 +45,14 @@ class NeuralNetwork(BaseNeuralNetwork):
     def __init__(
         self,
 
-        activation: ActivationFunction,
         architecture: Architecture,
 
-        activation_hidden: ActivationFunction = sigmoid,
         error_calculator: ErrorCalculator = ErrorCalculator.MSE,
 
         learning_algorithm: LearningAlgorithm = batch,
 
         penalty: float = 0.1,
 
-        eta: float = 0.5,
-        alpha: float = 0,
         epochs_limit: int = 1,
         epsilon: float = -1,
 
@@ -69,22 +65,13 @@ class NeuralNetwork(BaseNeuralNetwork):
             np.random.seed(seed)
 
         self.architecture = architecture
-        self.internal_network: BaseNeuralNetwork = architecture(
-            eta=eta,
-            alpha=alpha,
-            activation=activation,
-            activation_hidden=activation_hidden,
-        )
+        self.internal_network: BaseNeuralNetwork = architecture()
 
-        self.activation: ActivationFunction = activation
-        self.activation_hidden: ActivationFunction = activation_hidden
         self.learning_algorithm: LearningAlgorithm = learning_algorithm
         self.error_calculator: ErrorCalculator = error_calculator
 
-        self.eta: float = eta
-        self.alpha: float = alpha
-        self.epochs_limit: int = epochs_limit
         self.epsilon: float = epsilon
+        self.epochs_limit: int = epochs_limit
 
         self.penalty: float = penalty
         self.dim_mini_batch = dim_mini_batch

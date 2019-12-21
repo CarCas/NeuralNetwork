@@ -46,11 +46,5 @@ class BaseNeuralNetwork(abc.ABC):
 
 class Architecture(abc.ABC):
     @abc.abstractmethod
-    def __call__(
-        self,
-        activation: ActivationFunction,
-        activation_hidden: ActivationFunction,
-        eta: float,
-        alpha: float
-    ) -> BaseNeuralNetwork:
+    def __call__(self) -> BaseNeuralNetwork:
         pass

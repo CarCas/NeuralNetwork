@@ -10,12 +10,10 @@ class TestMonk(unittest.TestCase):
     def test_monk1(self):
         nn = NN(
             seed=4,
-            activation=sigmoid,
             epochs_limit=80,
-            eta=0.65,
             learning_algorithm=online,
             error_calculator=ErrorCalculator.MIS,
-            architecture=MultilayerPerceptron(6, 4, 1)
+            architecture=MultilayerPerceptron(6, 4, 1, activation=sigmoid, eta=0.65)
         )
 
         train_data = read_monk_1_tr()
