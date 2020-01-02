@@ -11,13 +11,15 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
-        alpha: float
+        alpha: float,
+        alambd: float,
     ):
         self.layers = [np.array(layer) for layer in layers]
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
         self.alpha: float = alpha
+        self.alambd: float = alambd
 
         self.len_layers = len(layers)
 
@@ -65,6 +67,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
             g_old = np.copy(gradients[i] * eta)
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
             layers[i] += eta * gradients[i] + g_old * alpha
+            layers[i] = layers[i] + gradients[i] - self.alambd * layers[i]
 
     @property
     def weights(self) -> Sequence[Sequence[Sequence[float]]]:
