@@ -66,8 +66,8 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         for i in range(self.len_layers):
             g_old = np.copy(gradients[i] * eta)
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
-            layers[i] += eta * gradients[i] + g_old * alpha
-            layers[i] = layers[i] + gradients[i] - self.alambd * layers[i]
+            layers[i] += eta * gradients[i] + g_old * alpha - self.alambd * layers[i]  # better results <-- potrebbe essere la formula giusta!
+            #  layers[i] = layers[i] + gradients[i] - self.alambd * layers[i]
 
     @property
     def weights(self) -> Sequence[Sequence[Sequence[float]]]:

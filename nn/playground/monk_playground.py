@@ -16,6 +16,7 @@ if __name__ == '__main__':
             eta=0.5,
             alpha=0.9,
             activation=sigmoid,
+            alambd=0.01
         ),
         n_init=1,
     )
