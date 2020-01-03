@@ -46,5 +46,5 @@ class MultilayerPerceptron(BaseArchitecure):
             activation_hidden=self.activation_hidden,
             eta=self.eta,
             alpha=self.alpha,
-            alambd=self.alambd
+            alambd=self.alambd,
         )

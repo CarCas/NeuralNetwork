@@ -2,7 +2,7 @@ from copy import deepcopy
 from timeit import timeit
 
 from nn.neural_network import NeuralNetwork
-from nn import MultilayerPerceptron, sigmoid, identity, batch, online
+from nn import MultilayerPerceptron, sigmoid, identity, batch, online, ErrorCalculator
 
 from nn.playground.utilities import read_ml_cup_tr, plot
 
@@ -19,8 +19,9 @@ if __name__ == '__main__':
             activation=identity,
             eta=0.01,
             alpha=0.1,
+            alambd=0.01
         ),
-        epochs_limit=1000
+        epochs_limit=1000,
     )
     # nn_internal = deepcopy(nn.internal_network)
 
