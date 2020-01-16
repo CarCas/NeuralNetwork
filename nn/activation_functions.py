@@ -29,3 +29,8 @@ class GenericSigmoid(ActivationFunction):
 
 identity = SimpleActivationFunction(lambda x: x, lambda _: 1)
 sigmoid = GenericSigmoid(a=1)
+
+relu = SimpleActivationFunction(
+    lambda x: (x > 0).astype(int) * x,
+    lambda x: (x > 0).astype(int),
+)

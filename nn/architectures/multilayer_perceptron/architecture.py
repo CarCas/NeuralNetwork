@@ -18,9 +18,9 @@ class MultilayerPerceptron(BaseArchitecure):
         *layer_sizes: int,
         activation: ActivationFunction,
         activation_hidden: ActivationFunction = sigmoid,
-        eta: float = 0.5,
-        alpha: float = 0,
-        alambd: float = 0.1,
+        eta: float = 0.001,
+        alpha: float = 0.9,
+        alambd: float = 0.0001,
 
         layers: Optional[Sequence[Sequence[Sequence[float]]]] = None
     ) -> None:

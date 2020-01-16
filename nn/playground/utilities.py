@@ -1,6 +1,25 @@
+from nn.types import Pattern
 from typing import Sequence
 import matplotlib.pyplot as plt
 import csv
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
+import numpy as np
+
+
+def encode_categorical(train_data, test_data):
+    train_without_target, train_target = list(zip(*train_data))
+    test_without_target, test_target = list(zip(*test_data))
+
+    encoder = OneHotEncoder()
+    encoder.fit(train_without_target)
+
+    train_without_target = encoder.transform(train_without_target).toarray()
+    test_without_target = encoder.transform(test_without_target).toarray()
+
+    train_data_norm: Sequence[Pattern] = list(zip(train_without_target, train_target))
+    test_data_norm: Sequence[Pattern] = list(zip(test_without_target, test_target))
+
+    return train_data_norm, test_data_norm
 
 
 def plot(training=[], testing=[], show=True):
@@ -53,42 +72,42 @@ _monk3_train = None
 _monk3_test = None
 
 
-def read_monk_1_tr():
+def read_monk_1_tr() -> Sequence[Pattern]:
     global _monk1_train
     if _monk1_train is None:
         _monk1_train = read_monk_file('1.train')
     return _monk1_train
 
 
-def read_monk_1_ts():
+def read_monk_1_ts() -> Sequence[Pattern]:
     global _monk1_test
     if _monk1_test is None:
         _monk1_test = read_monk_file('1.test')
     return _monk1_test
 
 
-def read_monk_2_tr():
+def read_monk_2_tr() -> Sequence[Pattern]:
     global _monk2_train
     if _monk2_train is None:
         _monk2_train = read_monk_file('2.train')
     return _monk2_train
 
 
-def read_monk_2_ts():
+def read_monk_2_ts() -> Sequence[Pattern]:
     global _monk2_test
     if _monk2_test is None:
         _monk2_test = read_monk_file('2.test')
     return _monk2_test
 
 
-def read_monk_3_tr():
+def read_monk_3_tr() -> Sequence[Pattern]:
     global _monk3_train
     if _monk3_train is None:
         _monk3_train = read_monk_file('3.train')
     return _monk3_train
 
 
-def read_monk_3_ts():
+def read_monk_3_ts() -> Sequence[Pattern]:
     global _monk3_test
     if _monk3_test is None:
         _monk3_test = read_monk_file('3.test')

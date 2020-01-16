@@ -90,7 +90,6 @@ class NeuralNetwork(BaseNeuralNetwork):
     def train(
         self,
         patterns: Sequence[Pattern],
-        test_patterns: Sequence[Pattern] = (),
     ) -> None:
         for _ in range(self.epochs_limit):
             self.learning_algorithm(self.internal_network, patterns)

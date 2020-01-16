@@ -23,11 +23,11 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
 
         self.len_layers = len(layers)
 
-        self._inputs = [np.array(0)] * self.len_layers
-        self._outputs = [np.array(0)] * self.len_layers
-
-        self._deltas = [np.array(0)] * self.len_layers
-        self._gradients = [np.array(0)] * self.len_layers
+        self._inputs = [np.array(0) for _ in range(self.len_layers)]
+        self._outputs = [np.array(0) for _ in range(self.len_layers)]
+        self._deltas = [np.array(0) for _ in range(self.len_layers)]
+        self._gradients = [np.array(0) for _ in range(self.len_layers)]
+        self._delta_w = [np.array(0) for _ in range(self.len_layers)]
 
     def __call__(self, *inp: Sequence[float]) -> Sequence[Sequence[float]]:
         layers = self.layers
@@ -49,9 +49,11 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         outputs = self._outputs
         deltas = self._deltas
         gradients = self._gradients
+        delta_w = self._delta_w
         activation_hidden = self.activation_hidden
         eta = self.eta
         alpha = self.alpha
+        alambd = self.alambd
 
         x: Sequence[Sequence[float]]
         d: Sequence[Sequence[float]]
@@ -60,14 +62,14 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
 
         deltas[-1] = (d - outputs[-1]) * self.activation.derivative(outputs[-1])
         for i in range(self.len_layers)[-2::-1]:
-            deltas[i] = np.multiply(np.matmul(layers[i+1].T[1:],
-                                              deltas[i+1].T).T,
+            deltas[i] = np.multiply(np.dot(layers[i+1].T[1:],
+                                           deltas[i+1].T).T,
                                     activation_hidden.derivative(outputs[i]))
+
         for i in range(self.len_layers):
-            g_old = np.copy(gradients[i] * eta)
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
-            layers[i] += eta * gradients[i] + g_old * alpha - self.alambd * layers[i]  # better results <-- potrebbe essere la formula giusta!
-            #  layers[i] = layers[i] + gradients[i] - self.alambd * layers[i]
+            delta_w[i] = eta * gradients[i] + alpha * delta_w[i]
+            layers[i] += delta_w[i] - alambd * layers[i]
 
     @property
     def weights(self) -> Sequence[Sequence[Sequence[float]]]:
