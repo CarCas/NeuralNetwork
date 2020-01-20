@@ -11,38 +11,20 @@ if __name__ == '__main__':
     train_data, test_data = read_monk(1)
 
     nn = NN(
-        # seed=4,
+        seed=1,
         epochs_limit=500,
         learning_algorithm=batch,
         architecture=MultilayerPerceptron(
-            len(train_data[0][0]), 10, len(test_data[0][0]),
+            len(train_data[0][0]), 2, len(test_data[0][0]),
             eta=0.5,
             alpha=0.8,
             alambd=0,
             activation=sigmoid,
-            activation_hidden=sigmoid,
+            activation_hidden=relu,
         ),
     )
 
-    # w = nn.internal_network.layers
-
-    # nn.train(train_data[:2])
     nn.train(train_data)
-
-    # print('deltaOutput_', nn.internal_network._deltas[-1])
-    # print('deltaHidden_', nn.internal_network._deltas[-2])
-
-    # print()
-
-    # for l in w: print(repr(l.T))
-
-    # nn.error_calculator = ErrorCalculator.MIS
-    # print(nn.compute_error(train_data), nn.compute_error(test_data))
-
-    # nn.error_calculator = ErrorCalculator.MIS
-    # training_error = nn.compute_learning_curve(train_data)
-    # testing_error = nn.compute_learning_curve(test_data)
-    # plot(training_error, testing_error, False)
 
     nn.error_calculator = ErrorCalculator.ACC
     print(nn.compute_error(train_data), nn.compute_error(test_data))
@@ -51,6 +33,3 @@ if __name__ == '__main__':
     training_error = nn.compute_learning_curve(train_data)
     testing_error = nn.compute_learning_curve(test_data)
     plot(training_error, testing_error)
-
-    # nn.error_calculator = ErrorCalculator.MIS
-    # print(nn.compute_error(train_data), nn.compute_error(test_data))
