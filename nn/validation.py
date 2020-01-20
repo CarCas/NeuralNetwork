@@ -1,36 +1,66 @@
+import random
 from typing import List, Optional, Sequence, Tuple
-
+import numpy as np
+import itertools
 from nn.types import Architecture, ActivationFunction, Pattern
 from nn.learning_algorithm import LearningAlgorithm
 from nn.error_calculator import ErrorCalculator
 from nn import NeuralNetwork, MultilayerPerceptron, sigmoid
+from nn.playground.utilities import read_monk_1_tr, read_monk_1_ts, plot, read_monk_2_tr, read_monk_2_ts
 
 
 class Validation:
-    idx: int = 0
 
     def __init__(self,
-                 training: Sequence[Pattern],
-                 testing: Sequence[Pattern]):
+                 dataset: Sequence[Pattern]):
         self.architecture: List[Architecture] = []
-        self.training_set = training
-        self.testing_set = testing
-        self.training_errors: List[Tuple[int, Sequence[float]]] = []
-        self.testing_errors: List[Tuple[int, Sequence[float]]] = []
+        self.dataset = random.sample(dataset, len(dataset))
+        self.training_errors: List[Sequence[float]] = []
+        self.min_training_errors: List[float] = []
+        self.avg_training_errors: List[float] = []
+        self.testing_errors: List[Sequence[float]] = []
+        self.min_testing_errors: List[float] = []
+        self.avg_testing_errors: List[float] = []
+        self.argmin_testing_errors: List[int] = []
+
+        self.averages: List[float] = []
+        self.minimums: List[float] = []
+
+    def update_error_lists(self, start: int, end: int, nn: NeuralNetwork):
+        ts_set = self.dataset[start:end]
+        tr_set = list(self.dataset[:start])
+        if end != len(self.dataset):
+            tr_set.extend(itertools.chain(self.dataset[end:]))
+        train_errs = nn.compute_learning_curve(tr_set)
+        test_errs = nn.compute_learning_curve(ts_set)
+        self.training_errors.append(train_errs)
+        self.avg_training_errors.append(np.mean(train_errs).mean())
+        el = np.argmin(test_errs)
+        assert isinstance(el, np.int64)
+        self.min_training_errors.append(train_errs[el])
+        self.testing_errors.append(test_errs)
+        self.avg_testing_errors.append(np.mean(test_errs).mean())
+        self.min_testing_errors.append(test_errs[el])
+        self.argmin_testing_errors.append(el)
 
     def nn_calling(self, architecture: Architecture, learning_algorithm: LearningAlgorithm,
                    error_calculator: ErrorCalculator, penalty: float,
-                   epochs_limit: int, epsilon: float, seed: Optional[int], dim_mini_batch: int = -1):
+                   epochs_limit: int, epsilon: float, seed: Optional[int], dim_mini_batch: int = -1,
+                   kfold: Optional[int] = None):
         nn = NeuralNetwork(architecture=architecture, error_calculator=error_calculator,
                            learning_algorithm=learning_algorithm, penalty=penalty,
                            epochs_limit=epochs_limit, epsilon=epsilon, seed=seed, dim_mini_batch=dim_mini_batch)
-        nn.train(self.training_set, self.testing_set)
-        train_errs = nn.compute_learning_curve(self.training_set)
-        test_errs = nn.compute_learning_curve(self.testing_set)
-        global idx
-        self.training_errors.append((idx, train_errs))
-        self.testing_errors.append((idx, test_errs))
-        idx += 1
+        if kfold is None:
+            self.update_error_lists(0, round(len(self.dataset) * 4 / 5), nn)
+        else:
+            indexes = np.ceil((len(self.dataset) / kfold))
+            for i in range(indexes - 1):
+                self.update_error_lists(i * kfold, (i + 1) * kfold, nn)
+            self.update_error_lists((indexes - 1) * kfold, len(self.dataset), nn)
+        avg_err = sum(err for (_, err) in self.avg_training_errors) / len(self.avg_training_errors)
+        min_err = min(err for (_, err) in self.min_training_errors)
+        self.averages.append(avg_err)
+        self.minimums.append(min_err)
 
     @staticmethod
     def architecture_create(
@@ -68,12 +98,22 @@ class Validation:
                  for lmb in alambd]
         return archs
 
-    def grid_search(self, layer_sizes: List[Tuple[int]], activation: List[ActivationFunction],
-                    activation_hidden: List[ActivationFunction], learning_algorithm: List[LearningAlgorithm],
-                    error_calculator: List[ErrorCalculator], penalty: List[float], eta: List[float],
-                    epochs_limit: List[int], epsilon: List[float], alpha: List[float], alambd: List[float],
-                    dim_mini_batch: List[int], seed: List[Optional[int]],
-                    layers: Optional[Sequence[Sequence[Sequence[float]]]] = None):
+    def grid_search(
+            self,
+            layer_sizes: List[Tuple[int]],
+            activation: List[ActivationFunction],
+            activation_hidden: List[ActivationFunction],
+            learning_algorithm: List[LearningAlgorithm],
+            error_calculator: List[ErrorCalculator],
+            penalty: List[float],
+            eta: List[float],
+            epochs_limit: List[int],
+            epsilon: List[float],
+            alpha: List[float],
+            alambd: List[float],
+            dim_mini_batches: List[int],
+            seed: Optional[int],
+            layers: Optional[Sequence[Sequence[Sequence[float]]]] = None):
         self.architecture.extend(self.list_archs(layer_sizes=layer_sizes, activation=activation,
                                                  activation_hidden=activation_hidden, eta=eta, alpha=alpha,
                                                  alambd=alambd, layers=layers))
@@ -83,16 +123,14 @@ class Validation:
                     for p in penalty:
                         for el in epochs_limit:
                             for eps in epsilon:
-                                for s in seed:
-                                    for mb in dim_mini_batch:
-                                        self.nn_calling(arch, la, ec, p, el, eps, s, mb)
+                                for mb in dim_mini_batches:
+                                    self.nn_calling(arch, la, ec, p, el, eps, seed, mb)
 
-        return self.training_errors, self.testing_errors
+        return self.training_errors, self.testing_errors, self.averages, self.minimums
 
 
 def validate(
-        train_set: Sequence[Pattern],
-        test_set: Sequence[Pattern],
+        dataset: Sequence[Pattern],
         layer_sizes: List[Tuple[int]],
         activation: List[ActivationFunction],
         learning_algorithm: List[LearningAlgorithm],
@@ -101,7 +139,7 @@ def validate(
         epochs_limit: List[int],
         epsilon: List[float],
         penalty: List[float],
-        seed: List[Optional[int]],
+        seed: Optional[int],
         activation_hidden: List[ActivationFunction] = sigmoid,
         eta: List[float] = 0.5,
         alpha: List[float] = 0,
@@ -109,9 +147,15 @@ def validate(
 
         layers: Optional[Sequence[Sequence[Sequence[float]]]] = None,
 ):
-    v = Validation(train_set, test_set)
-    training_errors, testing_errors =\
+    v = Validation(dataset)
+    training_errors, testing_errors, average_errors, minimum_errors = \
         v.grid_search(layer_sizes=layer_sizes, activation=activation, activation_hidden=activation_hidden,
                       learning_algorithm=learning_algorithm, eta=eta, alpha=alpha, alambd=alambd,
-                      error_calculator=error_calculator, dim_mini_batch=dim_mini_batch, epochs_limit=epochs_limit,
+                      error_calculator=error_calculator, dim_mini_batches=dim_mini_batch, epochs_limit=epochs_limit,
                       epsilon=epsilon, penalty=penalty, seed=seed, layers=layers)
+    return training_errors, testing_errors, average_errors, minimum_errors
+
+'''
+if __name__ == '__main__':
+    validate()
+'''

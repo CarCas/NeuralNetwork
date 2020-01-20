@@ -2,7 +2,7 @@ from nn.learning_algorithm import LearningAlgorithm
 from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, online, minibatch, batch, relu
 from nn import ErrorCalculator
 from nn.activation_functions import identity
-from nn.playground.utilities import encode_categorical, plot
+from nn.playground.utilities import encode_categorical, plot, encode_categorical2
 from nn.playground.utilities import (
     read_monk_1_tr,
     read_monk_1_ts,
@@ -18,7 +18,25 @@ if __name__ == '__main__':
     train_data = read_monk_3_tr()
     test_data = read_monk_3_ts()
 
-    train_data, test_data = encode_categorical(train_data, test_data)
+    train_data1, test_data1 = encode_categorical(train_data, test_data)
+    train_data2, test_data2 = encode_categorical2(train_data, test_data)
+
+    print(len(train_data1[0][0]), len(train_data1[0][0]))
+
+    for i, _ in enumerate(train_data1):
+        if train_data1[i] == train_data2[i]:
+            print("Sbagliato! Wrong!!")
+            break
+    print(":D")
+
+    print(1)
+    for x in train_data1[:10]:
+        print(x)
+    print(2)
+    for x in train_data2[:10]:
+        print(x)
+
+    train_data, test_data = train_data2, test_data2
 
     nn = NN(
         # seed=4,
@@ -64,3 +82,4 @@ if __name__ == '__main__':
 
     # nn.error_calculator = ErrorCalculator.MIS
     # print(nn.compute_error(train_data), nn.compute_error(test_data))
+

@@ -1,20 +1,72 @@
 from nn.types import Pattern
-from typing import Sequence
+from typing import Sequence, Dict, Set, Hashable, Tuple, List
 import matplotlib.pyplot as plt
 import csv
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 import numpy as np
+
+
+Encoder = Dict[Tuple[int, Hashable], Sequence]
+
+
+def one_hot_encoder(
+    train_without_target: Sequence[Sequence[Hashable]]
+) -> Encoder:
+    values2group: List[Set[Hashable]] = [set() for _ in train_without_target[0]]
+    for t in train_without_target:
+        for idx, el in enumerate(t):
+            values2group[idx].add(el)
+
+    encoder: Encoder = {}
+    for k, val in enumerate(values2group):
+        valdim = len(val)
+        for idx, v in enumerate(val):
+            ohe = np.zeros(valdim)
+            ohe[idx] = 1
+            print(k, v)
+            encoder[(k, v)] = ohe
+
+    return encoder
+
+
+def transform(
+    dataset: Sequence[Sequence[Hashable]],
+    encoder: Encoder
+) -> Sequence[Sequence[int]]:
+    lst = []
+    for d in dataset:
+        lst2 = []
+        for idx, val in enumerate(d):
+            lst2.extend(encoder[idx, val])
+        lst.append(np.array(lst2))
+    return np.array(lst)
 
 
 def encode_categorical(train_data, test_data):
     train_without_target, train_target = list(zip(*train_data))
     test_without_target, test_target = list(zip(*test_data))
 
-    encoder = OneHotEncoder()
-    encoder.fit(train_without_target)
+    enc = OneHotEncoder()
 
-    train_without_target = encoder.transform(train_without_target).toarray()
-    test_without_target = encoder.transform(test_without_target).toarray()
+    enc.fit(train_without_target)
+
+    train_without_target = enc.transform(train_without_target).toarray()
+    test_without_target = enc.transform(test_without_target).toarray()
+
+    train_data_norm: Sequence[Pattern] = list(zip(train_without_target, train_target))
+    test_data_norm: Sequence[Pattern] = list(zip(test_without_target, test_target))
+
+    return train_data_norm, test_data_norm
+
+
+def encode_categorical2(train_data, test_data):
+    train_without_target, train_target = list(zip(*train_data))
+    test_without_target, test_target = list(zip(*test_data))
+
+    enc = one_hot_encoder(train_without_target)
+
+    train_without_target = transform(train_without_target, enc)
+    test_without_target = transform(test_without_target, enc)
 
     train_data_norm: Sequence[Pattern] = list(zip(train_without_target, train_target))
     test_data_norm: Sequence[Pattern] = list(zip(test_without_target, test_target))
