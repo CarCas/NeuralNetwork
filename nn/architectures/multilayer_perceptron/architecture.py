@@ -34,6 +34,8 @@ class MultilayerPerceptron(BaseArchitecure):
         self.layers: Optional[Sequence[Sequence[Sequence[float]]]] = layers
 
     def __call__(self) -> MLPNeuralNetwork:
+        layers: Sequence[Sequence[Sequence[float]]]
+
         if self.layers is None:
             layers = [generate_layer(self.layer_sizes[i], self.layer_sizes[i-1])
                       for i in range(1, len(self.layer_sizes))]
