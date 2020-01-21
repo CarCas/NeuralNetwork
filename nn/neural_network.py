@@ -78,7 +78,7 @@ class NeuralNetwork(BaseNeuralNetwork):
     def __call__(self, *args: Sequence[float]) -> Sequence[Sequence[float]]:
         return self._current_network(*args)
 
-    def train(
+    def fit(
         self,
         patterns: Sequence[Pattern],
     ) -> None:

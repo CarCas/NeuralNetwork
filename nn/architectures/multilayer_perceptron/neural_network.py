@@ -43,7 +43,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         outputs[-1] = self.activation(inputs[-1] @ layers[-1].T)
         return outputs[-1]
 
-    def train(self, patterns: Sequence[Pattern]) -> None:
+    def fit(self, patterns: Sequence[Pattern]) -> None:
         layers = self.layers
         inputs = self._inputs
         outputs = self._outputs

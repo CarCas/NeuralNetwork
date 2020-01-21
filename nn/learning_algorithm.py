@@ -7,12 +7,12 @@ LearningAlgorithm = Callable[[BaseNeuralNetwork, Sequence[Pattern]], None]
 
 
 def batch(nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
-    nn.train(patterns)
+    nn.fit(patterns)
 
 
 def online(nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
     for pattern in patterns:
-        nn.train([pattern])
+        nn.fit([pattern])
 
 
 class minibatch:
@@ -22,4 +22,4 @@ class minibatch:
     def __call__(self, nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
         r = round(len(patterns) * self.size)
         r = r if r else 1
-        nn.train(random.sample(patterns, r))
+        nn.fit(random.sample(patterns, r))

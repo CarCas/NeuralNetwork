@@ -25,7 +25,7 @@ if __name__ == '__main__':
         ),
     )
 
-    nn.train(train_data)
+    nn.fit(train_data)
 
     nn.error_calculator = ErrorCalculator.ACC
     print(nn.compute_error(train_data), nn.compute_error(test_data))

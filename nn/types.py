@@ -20,7 +20,7 @@ class BaseNeuralNetwork(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def train(self, patterns: Sequence[Pattern]) -> None:
+    def fit(self, patterns: Sequence[Pattern]) -> None:
         pass
 
     @property
