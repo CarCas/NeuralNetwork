@@ -1,27 +1,43 @@
-from typing import Sequence
+from typing import Sequence, Optional, Any
 import numpy as np
 
 from nn.types import BaseNeuralNetwork, Pattern, ActivationFunction
 
 
+def _generate_layer(size_layer: int, size_previous_layer: int) -> Sequence[Sequence[float]]:
+    range_weights = 1/np.sqrt(size_previous_layer)
+    nodes_rand = np.random.uniform(-range_weights, range_weights, (size_layer, size_previous_layer))
+    return np.insert(nodes_rand, 0, 0, 1)
+
+
 class MLPNeuralNetwork(BaseNeuralNetwork):
     def __init__(
         self,
-        layers: Sequence[Sequence[Sequence[float]]],
+        size_hidden_layers: Sequence[int],  # Sequence[Sequence[Sequence[float]]],
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,
         alpha: float,
         alambd: float,
+
+        layers: Optional[Sequence[Sequence[Sequence[float]]]] = None,
     ):
-        self.layers = [np.array(layer) for layer in layers]
+        self.size_hidden_layers = size_hidden_layers
         self.activation: ActivationFunction = activation
         self.activation_hidden: ActivationFunction = activation_hidden
         self.eta: float = eta
         self.alpha: float = alpha
         self.alambd: float = alambd
 
-        self.len_layers = len(layers)
+        self.len_layers = len(size_hidden_layers) + 1
+
+        self._are_layers_init = False
+        self.layers = [np.array(0) for _ in range(self.len_layers)]
+
+        if layers is not None:
+            self._are_layers_init = True
+            self.layers = [np.array(layer) for layer in layers]
+            self.len_layers = len(layers)
 
         self._inputs = [np.array(0) for _ in range(self.len_layers)]
         self._outputs = [np.array(0) for _ in range(self.len_layers)]
@@ -30,6 +46,9 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         self._delta_w = [np.array(0) for _ in range(self.len_layers)]
 
     def __call__(self, *inp: Sequence[float]) -> Sequence[Sequence[float]]:
+        if not self._are_layers_init:
+            raise RuntimeError('Network not fitted')
+
         layers = self.layers
         inputs = self._inputs
         outputs = self._outputs
@@ -44,6 +63,9 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         return outputs[-1]
 
     def fit(self, patterns: Sequence[Pattern]) -> None:
+        if not self._are_layers_init:
+            self._compute_layers(len(patterns[0][0]), len(patterns[0][1]))
+
         layers = self.layers
         inputs = self._inputs
         outputs = self._outputs
@@ -71,8 +93,23 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
             delta_w[i] = eta * gradients[i] + alpha * delta_w[i]
             layers[i] += delta_w[i] - alambd * layers[i]
 
+    def _compute_layers(self, input_size: int, output_size: int) -> None:
+        size_layers = list(self.size_hidden_layers)
+
+        size_layers = [input_size] + size_layers + [output_size]
+
+        tmp_layers = [_generate_layer(size_layers[i], size_layers[i-1])
+                      for i in range(1, len(size_layers))]
+
+        layers = [np.array(layer) for layer in tmp_layers]
+
+        self._are_layers_init, self.layers = True, layers
+
     @property
     def weights(self) -> Sequence[Sequence[Sequence[float]]]:
+        if not self._are_layers_init:
+            raise RuntimeError('Network not fitted')
+
         return self.layers
 
     @property

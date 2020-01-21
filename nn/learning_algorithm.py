@@ -1,5 +1,5 @@
-import random
 from typing import Sequence, Callable
+import numpy as np
 
 from nn.types import BaseNeuralNetwork, Pattern
 
@@ -22,4 +22,4 @@ class minibatch:
     def __call__(self, nn: BaseNeuralNetwork, patterns: Sequence[Pattern]):
         r = round(len(patterns) * self.size)
         r = r if r else 1
-        nn.fit(random.sample(patterns, r))
+        nn.fit(np.random.permutation(patterns)[:r])

@@ -10,13 +10,10 @@ from nn.playground.utilities import read_ml_cup_tr, plot
 if __name__ == '__main__':
     train_data = read_ml_cup_tr()
 
-    input_size = len(train_data[0][0])
-    output_size = len(train_data[0][1])
-
     nn = NeuralNetwork(
         seed=0,
         architecture=MultilayerPerceptron(
-            input_size, 10, output_size,
+            10,
             activation=identity,
             activation_hidden=relu,
             eta=0.01,
@@ -26,7 +23,7 @@ if __name__ == '__main__':
         epochs_limit=1000,
     )
 
-    print('time', timeit(lambda: nn.train(train_data), number=1))
+    print('time', timeit(lambda: nn.fit(train_data), number=1))
 
     nn.error_calculator = ErrorCalculator.ACC
     print(nn.compute_error(train_data))

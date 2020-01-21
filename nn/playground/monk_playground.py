@@ -14,14 +14,14 @@ if __name__ == '__main__':
         # seed=1,
         epochs_limit=500,
         learning_algorithm=batch,
-        n_init=10,
+        n_init=1,
         architecture=MultilayerPerceptron(
-            len(train_data[0][0]), 10, len(test_data[0][0]),
+            2,
             eta=0.5,
             alpha=0.8,
             alambd=0,
             activation=sigmoid,
-            activation_hidden=sigmoid,
+            activation_hidden=relu,
         ),
     )
 
