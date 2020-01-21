@@ -11,15 +11,15 @@ if __name__ == '__main__':
     train_data, test_data = read_monk(1)
 
     nn = NN(
-        # seed=1,
+        seed=0,
         epochs_limit=500,
         learning_algorithm=batch,
-        n_init=1,
+        n_init=50,
         architecture=MultilayerPerceptron(
             2,
-            eta=0.5,
-            alpha=0.8,
-            alambd=0,
+            eta=0.9,
+            alpha=0.9,
+            alambd=0.001,
             activation=sigmoid,
             activation_hidden=relu,
         ),
@@ -28,7 +28,10 @@ if __name__ == '__main__':
     nn.fit(train_data)
 
     nn.error_calculator = ErrorCalculator.ACC
-    print(nn.compute_error(train_data), nn.compute_error(test_data))
+    print('acc', nn.compute_error(train_data), nn.compute_error(test_data))
+
+    nn.error_calculator = ErrorCalculator.MSE
+    print('mse', nn.compute_error(train_data), nn.compute_error(test_data))
 
     nn.error_calculator = ErrorCalculator.MSE
     training_error = nn.compute_learning_curve(train_data)

@@ -20,6 +20,8 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         alpha: float,
         alambd: float,
 
+        eta_decay: float,
+
         layers: Optional[Sequence[Sequence[Sequence[float]]]] = None,
     ):
         self.size_hidden_layers = size_hidden_layers
@@ -28,6 +30,10 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         self.eta: float = eta
         self.alpha: float = alpha
         self.alambd: float = alambd
+
+        self.eta_decay: float = eta_decay
+        self.eta_min: float = self.eta / 100
+        self.iterations: int = 0
 
         self.len_layers = len(size_hidden_layers) + 1
 
@@ -62,7 +68,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         outputs[-1] = self.activation(inputs[-1] @ layers[-1].T)
         return outputs[-1]
 
-    def fit(self, patterns: Sequence[Pattern]) -> None:
+    def fit(self, patterns: Sequence[Pattern], iteration: Optional[int] = None) -> None:
         if not self._are_layers_init:
             self._compute_layers(len(patterns[0][0]), len(patterns[0][1]))
 
@@ -73,7 +79,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         gradients = self._gradients
         delta_w = self._delta_w
         activation_hidden = self.activation_hidden
-        eta = self.eta
+        eta = max(self.eta_min, self.eta * (1. / (1. + self.eta_decay * self.iterations)))
         alpha = self.alpha
         alambd = self.alambd
 
@@ -92,6 +98,8 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
             delta_w[i] = eta * gradients[i] + alpha * delta_w[i]
             layers[i] += delta_w[i] - alambd * layers[i]
+
+        self.iterations += 1
 
     def _compute_layers(self, input_size: int, output_size: int) -> None:
         size_layers = list(self.size_hidden_layers)

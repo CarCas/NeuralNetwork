@@ -13,7 +13,7 @@ if __name__ == '__main__':
     nn = NeuralNetwork(
         seed=0,
         architecture=MultilayerPerceptron(
-            10,
+            100,
             activation=identity,
             activation_hidden=relu,
             eta=0.01,

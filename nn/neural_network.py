@@ -82,7 +82,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         self,
         patterns: Sequence[Pattern],
     ) -> None:
-        container_best_trained_network: Container[Tuple[float, Optional[NeuralNetwork]]] = [(-1, None)]
+        container_best_trained_network: Container[Tuple[float, Optional[NeuralNetwork]]] = [(float("inf"), None)]
 
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):
@@ -94,10 +94,12 @@ class NeuralNetwork(BaseNeuralNetwork):
             self._update_best_trained_network(container_best_trained_network, patterns)
         self._fetch_best_trained_network(container_best_trained_network[0])
 
-    def compute_error(self, patterns: Sequence[Pattern]) -> float:
+    def compute_error(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> float:
+        error_calculator = self.error_calculator if error_calculator is None else error_calculator
         return self.error_calculator([self], patterns)[0]
 
-    def compute_learning_curve(self, patterns: Sequence[Pattern]) -> Sequence[float]:
+    def compute_learning_curve(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> Sequence[float]:
+        error_calculator = self.error_calculator if error_calculator is None else error_calculator
         return self.error_calculator(self._internal_networks, patterns)
 
     def _update_internal_networks(self) -> None:
@@ -108,8 +110,8 @@ class NeuralNetwork(BaseNeuralNetwork):
         container_best_network: Container[Tuple[float, Optional[NeuralNetwork]]],
         patterns: Sequence[Pattern]
     ) -> None:
-        score = self.compute_error(patterns)
-        if score > container_best_network[0][0]:
+        score = self.compute_error(patterns, ErrorCalculator.MSE)
+        if score < container_best_network[0][0]:
             container_best_network[0] = score, deepcopy(self)
         self.set()
 
