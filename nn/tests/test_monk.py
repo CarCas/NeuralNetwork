@@ -1,34 +1,34 @@
 import unittest
 
-from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron
-from nn.learning_algorithm import online
+from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, relu
+from nn.learning_algorithm import online, batch
 from nn.error_calculator import ErrorCalculator
-from nn.playground.utilities import read_monk_1_tr, read_monk_1_ts
+from nn.playground.utilities import read_monk
 
 
 class TestMonk(unittest.TestCase):
     def test_monk1(self):
         nn = NN(
             seed=4,
-            epochs_limit=80,
-            learning_algorithm=online,
+            epochs_limit=400,
+            learning_algorithm=batch,
             error_calculator=ErrorCalculator.MIS,
-            architecture=MultilayerPerceptron(6, 4, 1, activation=sigmoid, eta=0.65)
+            architecture=MultilayerPerceptron(
+                4,
+                activation=sigmoid,
+                activation_hidden=relu,
+                eta=0.5,
+                alambd=0,
+                alpha=0.8,
+            )
         )
 
-        train_data = read_monk_1_tr()
-        test_data = read_monk_1_ts()
+        train_data, test_data = read_monk(1)
 
-        nn.train(train_data, test_data)
+        nn.fit(train_data)
         train_errs = nn.compute_learning_curve(train_data)
-        print("TRAINING ERRORS: ")
-        for e in train_errs:
-            print(e)
 
         test_errs = nn.compute_learning_curve(test_data)
-        print("TESTING ERRORS:")
-        for e in test_errs:
-            print(e)
 
         error_train = 0
         for x, d in train_data:

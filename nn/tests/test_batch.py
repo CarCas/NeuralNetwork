@@ -17,9 +17,11 @@ class TestBatch(unittest.TestCase):
         nn = MultilayerPerceptron(
             layers=[[[0, 1.5, 2], [0, 3, 0.5]],
                     [[0, -1.5, 1.5], [0, -0.5, 2]]],
-            eta=0.5, activation=sigmoid, activation_hidden=sigmoid)()
+            alambd=0, alpha=0, eta=0.5, activation=sigmoid, activation_hidden=sigmoid)()
 
-        nn.train([([1, 1], [0, 1]), ([2, 2], [1, 1])])
+        nn.fit([([1, 1], [0, 1]), ([2, 2], [1, 1])])
+
+        print(nn.layers[1])
 
         self.assertTrue(np.isclose(
             nn.layers[1],

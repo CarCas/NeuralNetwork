@@ -11,7 +11,9 @@ class TestLayersDimension(unittest.TestCase):
     def test_layers_dimension(self):
         np.random.seed(seed=0)
 
-        nn = MultilayerPerceptron(3, 1, 4, 10, activation=identity, activation_hidden=sigmoid, eta=0.5)()
+        nn = MultilayerPerceptron(1, 4, activation=identity, activation_hidden=sigmoid, eta=0.5)()
+        nn.fit([([1 for _ in range(3)], [1 for _ in range(10)])])
+
         np.testing.assert_equal(len(nn.layers), 3)
 
         np.testing.assert_equal(len(nn.layers[0]), 1)

@@ -8,9 +8,11 @@ from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwo
 
 class TestNeuralNetwork(unittest.TestCase):
     def setUp(self):
-        self.nn = MultilayerPerceptron(2, 2, 2, eta=0.5, activation=identity, activation_hidden=sigmoid)()
-        self.nn.layers[0] = np.array([[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]])
-        self.nn.layers[1] = np.array([[0.6, 0.4, 0.45], [0.6, 0.5, 0.55]])
+        layers = [
+            np.array([[0.35, 0.15, 0.2], [0.35, 0.25, 0.3]]),
+            np.array([[0.6, 0.4, 0.45], [0.6, 0.5, 0.55]]),
+        ]
+        self.nn = MultilayerPerceptron(2, eta=0.5, alambd=0, alpha=0, activation=identity, activation_hidden=sigmoid, layers=layers)()
 
     def test_feed_forward(self):
         nn = self.nn
@@ -25,7 +27,7 @@ class TestNeuralNetwork(unittest.TestCase):
 
     def test_backpropagation(self):
         nn = self.nn
-        nn.train([([1, 1], [1, 1])])
+        nn.fit([([1, 1], [1, 1])])
 
         np.testing.assert_array_almost_equal(
             nn([1, 1],
@@ -37,7 +39,7 @@ class TestNeuralNetwork(unittest.TestCase):
 
     def test_batch(self):
         nn = self.nn
-        nn.train([([1, 1], [1, 1])])
+        nn.fit([([1, 1], [1, 1])])
 
         np.testing.assert_array_almost_equal(
             nn([1, 1],

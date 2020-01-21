@@ -10,7 +10,9 @@ class TestGlorotBengio(unittest.TestCase):
     def setUp(self):
         np.random.seed(seed=1)
 
-        self.nn: MLPNeuralNetwork = MultilayerPerceptron(200, 1000, 500, activation=sigmoid, activation_hidden=sigmoid, eta=0.5)()
+        self.nn: MLPNeuralNetwork = MultilayerPerceptron(1000, activation=sigmoid, activation_hidden=sigmoid, eta=0.5)()
+        self.nn._compute_layers(200, 500)
+
         output_layer = self.nn.layers[-1]
         self.hidden_layer = self.nn.layers[0]
 
