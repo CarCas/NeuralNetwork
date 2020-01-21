@@ -16,7 +16,7 @@ if __name__ == '__main__':
         learning_algorithm=batch,
         n_init=10,
         architecture=MultilayerPerceptron(
-            len(train_data[0][0]), 2, len(test_data[0][0]),
+            len(train_data[0][0]), 10, len(test_data[0][0]),
             eta=0.5,
             alpha=0.8,
             alambd=0,

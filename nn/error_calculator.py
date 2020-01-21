@@ -14,10 +14,10 @@ class ErrorFunctionContainer(NamedTuple):
 
 class ErrorCalculator(enum.Enum):
     # mean square error
-    MSE = ErrorFunctionContainer(lambda d, out: np.mean(np.sum(np.square(np.subtract(d, out)), axis=1)))
+    MSE = ErrorFunctionContainer(lambda d, out: np.mean(np.mean(np.square(np.subtract(d, out)))))
 
     # mean euclidean error
-    MEE = ErrorFunctionContainer(lambda d, out: np.mean(np.linalg.norm(np.subtract(d, out), axis=1)))
+    MEE = ErrorFunctionContainer(lambda d, out: np.mean(np.linalg.norm(np.subtract(d, out))))
 
     # mismatch
     MIS = ErrorFunctionContainer(lambda d, out: np.mean(np.not_equal(d, np.round(out)).astype(float)))

@@ -100,6 +100,22 @@ def read_ml_cup_tr():
     return _ml_cup_tr
 
 
+_ml_cup_tr = None
+
+
+def read_ml_cup_ts():
+    global _ml_cup_tr
+    if _ml_cup_tr is None:
+        with open('ML-CUP19/ML-CUP19-TS.csv', mode='r') as file:
+            readCSV = csv.reader(file, delimiter=',')
+            _ml_cup_tr = tuple(map(
+                lambda row: (
+                    list((map(lambda input: float(input), row[1:-2]))),
+                    list((map(lambda input: float(input), row[-2:]))),
+                ), readCSV))
+    return _ml_cup_tr
+
+
 _monks: Dict[Hashable, Tuple[Sequence[Pattern], Sequence[Pattern]]] = {}
 
 
