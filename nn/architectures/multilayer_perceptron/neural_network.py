@@ -68,7 +68,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         outputs[-1] = self.activation(inputs[-1] @ layers[-1].T)
         return outputs[-1]
 
-    def fit(self, patterns: Sequence[Pattern], iteration: Optional[int] = None) -> None:
+    def fit(self, patterns: Sequence[Pattern]) -> None:
         if not self._are_layers_init:
             self._compute_layers(len(patterns[0][0]), len(patterns[0][1]))
 

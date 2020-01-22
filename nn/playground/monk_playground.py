@@ -8,18 +8,18 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    train_data, test_data = read_monk(1)
+    train_data, test_data = read_monk(3)
 
     nn = NN(
         seed=0,
         epochs_limit=1000,
         learning_algorithm=batch,
-        n_init=20,
+        n_init=10,
         architecture=MultilayerPerceptron(
             2,
-            eta=0.9,
-            alpha=0.9,
-            alambd=0.001,
+            eta=0.5,
+            alpha=0.8,
+            alambd=0,
             activation=sigmoid,
             activation_hidden=relu,
         ),

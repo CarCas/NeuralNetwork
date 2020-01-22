@@ -3,7 +3,7 @@ import numpy as np
 
 from nn.types import Architecture as BaseArchitecure, ActivationFunction
 from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
-from nn.activation_functions import sigmoid
+from nn.activation_functions import relu
 
 
 class MultilayerPerceptron(BaseArchitecure):
@@ -11,10 +11,10 @@ class MultilayerPerceptron(BaseArchitecure):
         self,
         *size_hidden_layers: int,
         activation: ActivationFunction,
-        activation_hidden: ActivationFunction = sigmoid,
+        activation_hidden: ActivationFunction = relu,
         eta: float = 0.1,
-        alpha: float = 0.9,
-        alambd: float = 0.0001,
+        alpha: float = 0,
+        alambd: float = 0,
 
         eta_decay: float = 0,
         eta_min: float = 0.01,
