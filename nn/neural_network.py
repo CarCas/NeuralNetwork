@@ -52,7 +52,8 @@ class NeuralNetwork(BaseNeuralNetwork):
         error_calculator: ErrorCalculator = ErrorCalculator.MSE,
         learning_algorithm: LearningAlgorithm = batch,
         epochs_limit: int = 1,
-        epsilon: float = -1,
+        epsilon: float = 1e-5,
+        patience: int = 10,
         n_init: int = 1,
         seed: Optional[int] = None,
         **kwargs
@@ -61,10 +62,16 @@ class NeuralNetwork(BaseNeuralNetwork):
         self.error_calculator: ErrorCalculator = error_calculator
         self.learning_algorithm: LearningAlgorithm = learning_algorithm
         self.epochs_limit: int = epochs_limit
+
         self.epsilon: float = epsilon
+        self.patience: int = patience
+
         self.n_init: int = n_init
         if seed is not None:
             np.random.seed(seed)
+
+        self._last_gradient: int = 0
+        self._current_patience: int = 0
 
         self._current_network: BaseNeuralNetwork = architecture()
         self._internal_networks: MutableSequence[BaseNeuralNetwork] = []
@@ -122,8 +129,14 @@ class NeuralNetwork(BaseNeuralNetwork):
 
     def _early_stopping(self) -> bool:
         if self.epsilon >= 0:
-            l2_gradient = np.sqrt(np.sum([np.sum(np.square(x)) for x in self._current_network.gradients]))
-            return l2_gradient <= self.epsilon
+            l2_gradient = np.linalg.norm(self.gradients[-1])
+            diff = np.abs(self._last_gradient - l2_gradient)
+            self._last_gradient = l2_gradient
+            if diff < self.epsilon:
+                self._current_patience += 1
+                return self._current_patience >= self.patience
+            else:
+                self._current_patience = 0
         return False
 
     @property

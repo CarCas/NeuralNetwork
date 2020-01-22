@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
     nn = NN(
         seed=0,
-        epochs_limit=500,
+        epochs_limit=1000,
         learning_algorithm=batch,
-        n_init=50,
+        n_init=20,
         architecture=MultilayerPerceptron(
             2,
             eta=0.9,
