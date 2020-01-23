@@ -34,3 +34,13 @@ relu = SimpleActivationFunction(
     lambda x: (x > 0).astype(int) * x,
     lambda x: (x > 0).astype(int),
 )
+
+tanh = SimpleActivationFunction(
+    np.tanh,
+    lambda x: 1 - np.square(x)
+)
+
+tanh_classification = SimpleActivationFunction(
+    lambda x: (np.tanh(x) + 1) / 2,
+    lambda x: 1 - np.square((x * 2)-1)
+)
