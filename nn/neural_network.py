@@ -103,11 +103,11 @@ class NeuralNetwork(BaseNeuralNetwork):
 
     def compute_error(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> float:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
-        return self.error_calculator([self], patterns)[0]
+        return error_calculator([self], patterns)[0]
 
     def compute_learning_curve(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> Sequence[float]:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
-        return self.error_calculator(self._internal_networks, patterns)
+        return error_calculator(self._internal_networks, patterns)
 
     def _update_internal_networks(self) -> None:
         self._internal_networks.append(deepcopy(self._current_network))
