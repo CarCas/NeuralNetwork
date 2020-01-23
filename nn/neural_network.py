@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, MutableSequence, Optional, Dict, Any, Tuple, TypeVar
+from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar
 import numpy as np
 from copy import deepcopy
 
@@ -124,7 +124,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         score = self.compute_error(patterns)
 
         if container_best_network[0] is None or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
-            container_best_network[0] = score, deepcopy(self)
+            container_best_network[0] = score, self.copy()
 
         self.set()
 
@@ -160,3 +160,6 @@ class NeuralNetwork(BaseNeuralNetwork):
     @property
     def gradients(self) -> Sequence[Sequence[Sequence[float]]]:
         return self._current_network.gradients
+
+    def copy(self) -> NeuralNetwork:
+        return deepcopy(self)

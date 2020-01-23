@@ -13,7 +13,7 @@ def _generate_layer(size_layer: int, size_previous_layer: int) -> Sequence[Seque
 class MLPNeuralNetwork(BaseNeuralNetwork):
     def __init__(
         self,
-        size_hidden_layers: Sequence[int],  # Sequence[Sequence[Sequence[float]]],
+        size_hidden_layers: Sequence[int],
         activation: ActivationFunction,
         activation_hidden: ActivationFunction,
         eta: float,

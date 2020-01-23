@@ -1,12 +1,12 @@
 from nn.learning_algorithm import LearningAlgorithm
-from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, online, minibatch, batch, relu, ErrorCalculator
+from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, online, minibatch, batch, relu, ErrorCalculator, \
+    NeuralNetwork
 from nn import ErrorCalculator
 from nn.activation_functions import identity, tanh, tanh_classification
 from nn.playground.utilities import encode_categorical, plot
 from nn.playground.utilities import read_monk
 import numpy as np
-from nn.validation import validation, k_fold_CV, split_dataset, shuffle
-
+from nn.validation import validation, k_fold_CV, split_dataset, shuffle, grid_search
 
 if __name__ == '__main__':
     np.random.seed(0)
@@ -27,7 +27,7 @@ if __name__ == '__main__':
             activation=sigmoid,
             activation_hidden=relu)
     )
-
+    """
     print('len_training', len(train_data))
 
     print('validation', validation(nn.set(), train_data, test_data, error_calculator=ErrorCalculator.ACC))
@@ -43,3 +43,20 @@ if __name__ == '__main__':
     training_error = nn.compute_learning_curve(train_data, ErrorCalculator.ACC)
     testing_error = nn.compute_learning_curve(test_data, ErrorCalculator.ACC)
     plot(training_error, testing_error)
+    """
+
+    params_ar = {
+        'size_hidden_layers': [[2], [2, 2]],
+        'eta': [0.3, 0.5, 0.65],
+        'alambd': [0, 0.01, 0.001],
+        'alpha': [0.5, 0.2, 0.8],
+        'activation': [sigmoid],
+    }
+    params_nnn = {
+        'learning_algorithm': [batch, online]
+    }
+
+    funcall = grid_search(NeuralNetwork, train_data, params_nn=params_nnn, params_architecture=params_ar,
+                          cv_params=dict(cv=10))
+
+    print(funcall[0])
