@@ -14,7 +14,7 @@ def validation(
     training_set: Sequence[Pattern],
     validation_set: Sequence[Pattern],
     error_calculator: ErrorCalculator = ErrorCalculator.MSE
-) -> Tuple[int, float]:
+) -> Tuple[int, float, float]:
     nn.fit(training_set)
 
     learning_curve_training = nn.compute_learning_curve(training_set, error_calculator)
@@ -22,7 +22,7 @@ def validation(
 
     idx, score = error_calculator.choose(learning_curve_validation)
 
-    return idx, score
+    return idx, score, learning_curve_training[idx]
 
 
 def shuffle(patterns: Sequence[Pattern], seed: Optional[int] = None) -> Sequence[Pattern]:
@@ -32,7 +32,7 @@ def shuffle(patterns: Sequence[Pattern], seed: Optional[int] = None) -> Sequence
 
 
 def _compute_size_given_percentage(dataset: Sequence[Pattern], percentage: float):
-    assert(percentage > 0 and percentage < 1)
+    assert(0 < percentage < 1)
     return int(np.round(len(dataset) * percentage))
 
 
@@ -58,14 +58,14 @@ def k_fold_CV(
     error_calculator: ErrorCalculator = ErrorCalculator.MSE,
     to_shuffle: bool = False,
     seed: Optional[int] = None,
-) -> Tuple[float, float, Sequence[Tuple[int, float]]]:
+) -> Tuple[float, float, Sequence[Tuple[int, float, float]]]:
     if to_shuffle:
         dataset = shuffle(dataset, seed)
 
     len_training = int(np.round(len(dataset)*(cv-1)/cv))
     shift_size = int(np.round(len_training))
 
-    scores: MutableSequence[Tuple[int, float]] = []
+    scores: MutableSequence[Tuple[int, float, float]] = []
 
     for i in range(cv):
         training_set, validation_set = split_dataset(np.roll(dataset, shift_size*i), size=len_training)
@@ -73,8 +73,8 @@ def k_fold_CV(
 
     scores_1 = list(map(lambda x: x[1], scores))
 
-    score = np.mean(scores_1)
-    std = np.std(scores_1)
+    score = float(np.mean(scores_1))
+    std = float(np.std(scores_1))
 
     return score, std, scores
 

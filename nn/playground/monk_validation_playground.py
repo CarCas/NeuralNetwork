@@ -35,7 +35,8 @@ if __name__ == '__main__':
     shuffled_train_data = shuffle(train_data)
     splitted_train_set, splitted_valid_set = split_dataset(shuffled_train_data, 9/10)
     print('dims', len(splitted_train_set), len(splitted_valid_set))
-    print('validation splitted', validation(nn.set(), splitted_train_set, splitted_valid_set, error_calculator=ErrorCalculator.ACC))
+    print('validation splitted', validation(nn.set(), splitted_train_set, splitted_valid_set,
+                                            error_calculator=ErrorCalculator.ACC))
 
     print('k_fold_CV ', k_fold_CV(nn.set(), train_data, error_calculator=ErrorCalculator.ACC, cv=10, to_shuffle=True))
 

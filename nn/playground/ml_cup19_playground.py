@@ -1,4 +1,3 @@
-from copy import deepcopy
 from timeit import timeit
 
 from nn.neural_network import NeuralNetwork
