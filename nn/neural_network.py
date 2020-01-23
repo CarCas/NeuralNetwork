@@ -89,7 +89,9 @@ class NeuralNetwork(BaseNeuralNetwork):
         self,
         patterns: Sequence[Pattern],
     ) -> None:
-        container_best_trained_network: Container[Tuple[float, Optional[NeuralNetwork]]] = [(float("inf"), None)]
+        container_best_trained_network: Container[Optional[Tuple[float, NeuralNetwork]]] = [
+            None
+        ]
 
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):
@@ -99,7 +101,9 @@ class NeuralNetwork(BaseNeuralNetwork):
                     break
 
             self._update_best_trained_network(container_best_trained_network, patterns)
-        self._fetch_best_trained_network(container_best_trained_network[0])
+
+        if container_best_trained_network[0] is not None:
+            self._fetch_best_trained_network(container_best_trained_network[0])
 
     def compute_error(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> float:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
@@ -114,12 +118,14 @@ class NeuralNetwork(BaseNeuralNetwork):
 
     def _update_best_trained_network(
         self,
-        container_best_network: Container[Tuple[float, Optional[NeuralNetwork]]],
+        container_best_network: Container[Optional[Tuple[float, NeuralNetwork]]],
         patterns: Sequence[Pattern]
     ) -> None:
-        score = self.compute_error(patterns, ErrorCalculator.MSE)
-        if score < container_best_network[0][0]:
+        score = self.compute_error(patterns)
+
+        if container_best_network[0] is None or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
             container_best_network[0] = score, deepcopy(self)
+
         self.set()
 
     def _fetch_best_trained_network(self, best_network: Tuple[float, Optional[NeuralNetwork]]):
