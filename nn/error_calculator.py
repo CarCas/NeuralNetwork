@@ -10,11 +10,11 @@ BestScore = Callable[[Sequence[float]], Tuple[int, float]]
 
 
 def min_best_score(x: Sequence[float]):
-    return (np.argmin(x), np.min(x))
+    return np.argmin(x), np.min(x)
 
 
 def max_best_score(x: Sequence[float]):
-    return (np.argmax(x), np.max(x))
+    return np.argmax(x), np.max(x)
 
 
 class ErrorFunctionContainer(NamedTuple):

@@ -1,12 +1,12 @@
-import abc
-from typing import List, Optional, Sequence, Tuple, MutableSequence, Any, Mapping, NamedTuple, Dict
+import csv
+from typing import Optional, Sequence, Tuple, MutableSequence, Any, Mapping, NamedTuple, Dict
 import numpy as np
 from itertools import product
-from nn.types import Architecture, ActivationFunction, Pattern
-from nn.learning_algorithm import LearningAlgorithm, batch, online
+
+from nn.learning_algorithm import LearningAlgorithm
+from nn.types import Pattern
 from nn.error_calculator import ErrorCalculator
-from nn import NeuralNetwork, MultilayerPerceptron, NNParams, MLPParams, sigmoid
-from nn.playground.utilities import read_monk
+from nn import NeuralNetwork, MultilayerPerceptron, MLPParams
 from multiprocessing import Pool
 
 
@@ -18,6 +18,16 @@ class ValidationResult(NamedTuple):
 class KFoldCVResult(NamedTuple):
     score: float
     std: float
+
+
+class NNParams(NamedTuple):
+    architecture: MLPParams
+    error_calculator: ErrorCalculator
+    learning_algorithm: LearningAlgorithm
+    epochs_limit: int
+    epsilon: float
+    patience: int
+    n_init: int
 
 
 class GridSearchResult(NamedTuple):
@@ -152,7 +162,32 @@ def grid_search(
     print("run to generate:", len(params), "combinations")
 
     pool = Pool(processes=n_jobs)
-    pool_params = map(lambda params: GridSearchTaskParams(*params), product([dataset], [cv_params], params))
+    pool_params = map(lambda _params: GridSearchTaskParams(*_params), product([dataset], [cv_params], params))
     results: Sequence[GridSearchResult] = pool.map(grid_search_task, pool_params)
 
     return sorted(results, key=lambda x: x[1][0])
+
+
+def write_on_file(results: Sequence[GridSearchResult], filename: str) -> None:
+    # res = OrderedDict(results)
+    nn_keys = list(results[0].params._asdict().keys())[1:]
+    nn_keys = list(map(lambda x: 'nn_' + x, nn_keys))
+
+    arch_keys = list(results[0].params.architecture._asdict().keys())
+    arch_keys = list(map(lambda x: 'arch_' + x, arch_keys))
+
+    val_keys = list(results[0].k_fold_cv_result._asdict().keys())
+    keys = val_keys + nn_keys + arch_keys
+    print(keys)
+
+    values = []
+    for res in results:
+        nn_vals = list(res.params._asdict().values())[1:]
+        arch_vals = list(res.params.architecture._asdict().values())
+        val_vals = list(res.k_fold_cv_result._asdict().values())
+        values.append(val_vals + nn_vals + arch_vals)
+
+    with open(filename + ".csv", "w") as f:
+        w = csv.writer(f)
+        w.writerow(keys)
+        w.writerows(values)

@@ -1,5 +1,4 @@
 from typing import Sequence, Optional, NamedTuple
-import numpy as np
 
 from nn.types import Architecture as BaseArchitecure, ActivationFunction
 from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwork
@@ -14,7 +13,6 @@ class MLPParams(NamedTuple):
     alpha: float
     alambd: float
     eta_decay: float
-    eta_min: float
 
 
 class MultilayerPerceptron(BaseArchitecure):
@@ -28,7 +26,6 @@ class MultilayerPerceptron(BaseArchitecure):
         alpha: float = 0,
         alambd: float = 0,
         eta_decay: float = 0,
-        eta_min: float = 0.01,
 
         layers: Optional[Sequence[Sequence[Sequence[float]]]] = None
     ) -> None:
@@ -44,7 +41,6 @@ class MultilayerPerceptron(BaseArchitecure):
         self.alambd = alambd
 
         self.eta_decay = eta_decay
-
         self.layers = layers
 
     def __call__(self) -> MLPNeuralNetwork:

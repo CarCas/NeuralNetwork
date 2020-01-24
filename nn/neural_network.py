@@ -1,27 +1,16 @@
 from __future__ import annotations
 
-from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar, NamedTuple
+from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar
 import numpy as np
 from copy import deepcopy
 
-from nn.types import Pattern, Architecture, BaseNeuralNetwork, ActivationFunction
+from nn.types import Pattern, Architecture, BaseNeuralNetwork
 from nn.learning_algorithm import LearningAlgorithm, batch
-from nn.activation_functions import sigmoid
 from nn.error_calculator import ErrorCalculator
 
 
 T = TypeVar('T')
 Container = MutableSequence[T]
-
-
-class NNParams(NamedTuple):
-    architecture: Architecture
-    error_calculator: ErrorCalculator
-    learning_algorithm: LearningAlgorithm
-    epochs_limit: int
-    epsilon: float
-    patience: int
-    n_init: int
 
 
 class NeuralNetwork(BaseNeuralNetwork):
@@ -115,11 +104,19 @@ class NeuralNetwork(BaseNeuralNetwork):
         if container_best_trained_network[0] is not None:
             self._fetch_best_trained_network(container_best_trained_network[0])
 
-    def compute_error(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> float:
+    def compute_error(
+            self,
+            patterns: Sequence[Pattern],
+            error_calculator: ErrorCalculator = None
+    ) -> float:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
         return error_calculator([self], patterns)[0]
 
-    def compute_learning_curve(self, patterns: Sequence[Pattern], error_calculator: ErrorCalculator = None) -> Sequence[float]:
+    def compute_learning_curve(
+            self,
+            patterns: Sequence[Pattern],
+            error_calculator: ErrorCalculator = None
+    ) -> Sequence[float]:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
         return error_calculator(self._internal_networks, patterns)
 
@@ -133,7 +130,8 @@ class NeuralNetwork(BaseNeuralNetwork):
     ) -> None:
         score = self.compute_error(patterns)
 
-        if container_best_network[0] is None or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
+        if container_best_network[0] is None \
+                or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
             container_best_network[0] = score, self.copy()
 
         self.set()

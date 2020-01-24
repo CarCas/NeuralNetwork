@@ -12,7 +12,7 @@ class TestMonk(unittest.TestCase):
             seed=4,
             epochs_limit=400,
             learning_algorithm=batch,
-            error_calculator=ErrorCalculator.MIS,
+            error_calculator=ErrorCalculator.MSE,
             architecture=MultilayerPerceptron(
                 4,
                 activation=sigmoid,
@@ -26,9 +26,9 @@ class TestMonk(unittest.TestCase):
         train_data, test_data = read_monk(1)
 
         nn.fit(train_data)
-        train_errs = nn.compute_learning_curve(train_data)
+        train_errs = nn.compute_learning_curve(train_data, ErrorCalculator.MIS)
 
-        test_errs = nn.compute_learning_curve(test_data)
+        test_errs = nn.compute_learning_curve(test_data, ErrorCalculator.MIS)
 
         error_train = 0
         for x, d in train_data:
