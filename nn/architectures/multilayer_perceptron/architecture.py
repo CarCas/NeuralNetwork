@@ -1,4 +1,4 @@
-from typing import Sequence, Optional
+from typing import Sequence, Optional, NamedTuple
 import numpy as np
 
 from nn.types import Architecture as BaseArchitecure, ActivationFunction
@@ -6,22 +6,37 @@ from nn.architectures.multilayer_perceptron.neural_network import MLPNeuralNetwo
 from nn.activation_functions import relu
 
 
+class MLPParams(NamedTuple):
+    size_hidden_layers: Sequence[int]
+    activation: ActivationFunction
+    activation_hidden: ActivationFunction
+    eta: float
+    alpha: float
+    alambd: float
+    eta_decay: float
+    eta_min: float
+
+
 class MultilayerPerceptron(BaseArchitecure):
     def __init__(
         self,
-        *size_hidden_layers: int,
+        *size_hidden_layers_seq: int,
+        size_hidden_layers: Optional[Sequence[int]] = None,
         activation: ActivationFunction,
         activation_hidden: ActivationFunction = relu,
         eta: float = 0.1,
         alpha: float = 0,
         alambd: float = 0,
-
         eta_decay: float = 0,
         eta_min: float = 0.01,
 
         layers: Optional[Sequence[Sequence[Sequence[float]]]] = None
     ) -> None:
-        self.size_hidden_layers = size_hidden_layers
+        if size_hidden_layers is not None:
+            self.size_hidden_layers = size_hidden_layers
+        else:
+            self.size_hidden_layers = size_hidden_layers_seq
+
         self.activation = activation
         self.activation_hidden = activation_hidden
         self.eta = eta

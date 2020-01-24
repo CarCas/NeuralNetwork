@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar
+from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar, NamedTuple
 import numpy as np
 from copy import deepcopy
 
@@ -12,6 +12,16 @@ from nn.error_calculator import ErrorCalculator
 
 T = TypeVar('T')
 Container = MutableSequence[T]
+
+
+class NNParams(NamedTuple):
+    architecture: Architecture
+    error_calculator: ErrorCalculator
+    learning_algorithm: LearningAlgorithm
+    epochs_limit: int
+    epsilon: float
+    patience: int
+    n_init: int
 
 
 class NeuralNetwork(BaseNeuralNetwork):

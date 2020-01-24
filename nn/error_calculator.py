@@ -8,8 +8,13 @@ from nn.types import Pattern, BaseNeuralNetwork
 ErrorFunction = Callable[[Sequence[BaseNeuralNetwork], Sequence[Sequence[float]]], float]
 BestScore = Callable[[Sequence[float]], Tuple[int, float]]
 
-min_best_score: BestScore = lambda x: (np.argmin(x), np.min(x))
-max_best_score: BestScore = lambda x: (np.argmax(x), np.max(x))
+
+def min_best_score(x: Sequence[float]):
+    return (np.argmin(x), np.min(x))
+
+
+def max_best_score(x: Sequence[float]):
+    return (np.argmax(x), np.max(x))
 
 
 class ErrorFunctionContainer(NamedTuple):
@@ -17,18 +22,34 @@ class ErrorFunctionContainer(NamedTuple):
     choose: BestScore
 
 
+def mse(d, out):
+    return np.mean(np.mean(np.square(np.subtract(d, out))))
+
+
+def mee(d, out):
+    return np.mean(np.linalg.norm(np.subtract(d, out)))
+
+
+def mis(d, out):
+    return np.mean(np.not_equal(d, np.round(out)).astype(float))
+
+
+def acc(d, out):
+    return np.mean(np.equal(d, np.round(out)).astype(float))
+
+
 class ErrorCalculator(enum.Enum):
     # mean square error
-    MSE = ErrorFunctionContainer(lambda d, out: np.mean(np.mean(np.square(np.subtract(d, out)))), min_best_score)
+    MSE = ErrorFunctionContainer(mse, min_best_score)
 
     # mean euclidean error
-    MEE = ErrorFunctionContainer(lambda d, out: np.mean(np.linalg.norm(np.subtract(d, out))), min_best_score)
+    MEE = ErrorFunctionContainer(mee, min_best_score)
 
     # mismatch
-    MIS = ErrorFunctionContainer(lambda d, out: np.mean(np.not_equal(d, np.round(out)).astype(float)), min_best_score)
+    MIS = ErrorFunctionContainer(mis, min_best_score)
 
     # accuracy
-    ACC = ErrorFunctionContainer(lambda d, out: np.mean(np.equal(d, np.round(out)).astype(float)), max_best_score)
+    ACC = ErrorFunctionContainer(acc, max_best_score)
 
     def __call__(
         self,
@@ -42,3 +63,9 @@ class ErrorCalculator(enum.Enum):
     @property
     def choose(self) -> BestScore:
         return self.value.choose
+
+    def __repr__(self) -> str:
+        return self.name
+
+    def __str__(self) -> str:
+        return repr(self)
