@@ -14,7 +14,7 @@ if __name__ == '__main__':
         epochs_limit=[500],
         n_init=[10],
         epsilon=[0.00001],
-        patience=[10],
+        patience=[100],
     )
     params_architecture: Mapping[str, Sequence[Any]] = dict(
         size_hidden_layers=[(2,)],
@@ -32,13 +32,20 @@ if __name__ == '__main__':
         to_shuffle=True,
     )
 
+    validation_params: Mapping[str, Any] = dict(
+        validation_set=test_data,
+        error_calculator=ErrorCalculator.ACC,
+    )
+
     grid_search_results = grid_search(
         train_data,
         params_nn=params_nn,
         params_architecture=params_architecture,
-        cv_params=cv_params,
+        # cv_params=cv_params,
+        validation_params=validation_params,
 
-        n_jobs=8
+        n_jobs=8,
+        seed=1,
     )
 
     for i, entry in enumerate(grid_search_results[::-1][:3]):

@@ -7,6 +7,7 @@ from nn.learning_algorithm import LearningAlgorithm
 from nn.types import Pattern
 from nn.error_calculator import ErrorCalculator
 from nn import NeuralNetwork, MultilayerPerceptron, MLPParams
+import multiprocessing
 from multiprocessing import Pool
 
 
@@ -32,7 +33,8 @@ class NNParams(NamedTuple):
 
 class GridSearchResult(NamedTuple):
     params: NNParams
-    k_fold_cv_result: KFoldCVResult
+    score: float
+    std: float
 
 
 def validation(
@@ -110,29 +112,38 @@ def k_fold_CV(
     )
 
 
-class GridSearchTaskParams(NamedTuple):
-    dataset: Sequence[Pattern]
-    cv_params: Mapping[str, Any]
-    pm: Dict[str, Any]
+def grid_search_task_init(dataset_: Sequence[Pattern], cv_params_: Mapping[str, Any], validation_params_: Optional[Mapping[str, Any]]) -> None:
+    global dataset_process, cv_params_process, validation_params_process
+
+    dataset_process, cv_params_process, validation_params_process = dataset_, cv_params_, validation_params_  # type: ignore
 
 
-def grid_search_task(params: GridSearchTaskParams) -> GridSearchResult:
-    pm_with_architecture = dict(**params.pm)
-    pm_with_architecture['architecture'] = MultilayerPerceptron(**params.pm['architecture'])
+def grid_search_task(pm: Dict[str, Any]) -> GridSearchResult:
+    pm_with_architecture = dict(**pm)
+    pm_with_architecture['architecture'] = MultilayerPerceptron(**pm['architecture'])
     nn = NeuralNetwork(**pm_with_architecture)
-    kf = k_fold_CV(nn, params.dataset, **params.cv_params)
-    params.pm.update(architecture=MLPParams(**params.pm['architecture']))
-    typed_pm: NNParams = NNParams(**params.pm)
+    if validation_params_process is None:  # type: ignore
+        kf = k_fold_CV(nn, dataset_process, **cv_params_process)  # type: ignore
+    else:
+        kf = KFoldCVResult(validation(
+            nn,
+            dataset_process,  # type: ignore
+            **validation_params_process,  # type: ignore
+        ).score_validation, 0)
+    pm.update(architecture=MLPParams(**pm['architecture']))
+    typed_pm: NNParams = NNParams(**pm)
 
     # print('done')
-    return GridSearchResult(typed_pm, kf)
+    return GridSearchResult(typed_pm, *kf)
 
 
 def grid_search(
         dataset: Sequence[Pattern],
         params_nn: Mapping[str, Sequence[Any]],
         params_architecture: Mapping[str, Sequence[Any]],
-        cv_params: Mapping[str, Any],
+        cv_params: Mapping[str, Any] = {},
+
+        validation_params: Optional[Mapping[str, Any]] = None,
 
         n_jobs: int = 4,
 
@@ -161,30 +172,27 @@ def grid_search(
 
     print("run to generate:", len(params), "combinations")
 
-    pool = Pool(processes=n_jobs)
-    pool_params = map(lambda _params: GridSearchTaskParams(*_params), product([dataset], [cv_params], params))
-    results: Sequence[GridSearchResult] = pool.map(grid_search_task, pool_params)
+    pool = Pool(processes=n_jobs, initializer=grid_search_task_init, initargs=(dataset, cv_params, validation_params))
+    results: Sequence[GridSearchResult] = pool.map(grid_search_task, params)
 
-    return sorted(results, key=lambda x: x[1][0])
+    return sorted(results, key=lambda x: x[1])
 
 
 def write_on_file(results: Sequence[GridSearchResult], filename: str) -> None:
-    # res = OrderedDict(results)
     nn_keys = list(results[0].params._asdict().keys())[1:]
     nn_keys = list(map(lambda x: 'nn_' + x, nn_keys))
 
     arch_keys = list(results[0].params.architecture._asdict().keys())
     arch_keys = list(map(lambda x: 'arch_' + x, arch_keys))
 
-    val_keys = list(results[0].k_fold_cv_result._asdict().keys())
+    val_keys = list(results[0]._asdict().keys())[1:]
     keys = val_keys + nn_keys + arch_keys
-    print(keys)
 
     values = []
     for res in results:
         nn_vals = list(res.params._asdict().values())[1:]
         arch_vals = list(res.params.architecture._asdict().values())
-        val_vals = list(res.k_fold_cv_result._asdict().values())
+        val_vals = list(res[1:])
         values.append(val_vals + nn_vals + arch_vals)
 
     with open(filename + ".csv", "w") as f:
