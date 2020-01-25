@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar
 import numpy as np
 from copy import deepcopy
@@ -11,13 +12,7 @@ T = TypeVar('T')
 Container = MutableSequence[T]
 
 
-class _NeuralNetwork:  # type: ignore
-    def __init__(self):
-        self._internal_networks = None
-        self._current_network = []
-
-
-class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
+class NeuralNetwork(BaseNeuralNetwork):
     """
     Params and istance variables
     ----------------------------------------
@@ -79,7 +74,7 @@ class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
         self._current_network: BaseNeuralNetwork = architecture()
         self._internal_networks: MutableSequence[BaseNeuralNetwork] = []
 
-    def set(self, **kwargs) -> _NeuralNetwork:
+    def set(self, **kwargs) -> 'NeuralNetwork':
         self.__dict__.update(**kwargs)
         self.__init__(**self.__dict__)  # type: ignore
         return self
@@ -92,7 +87,7 @@ class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
         self,
         patterns: Sequence[Pattern],
     ) -> None:
-        container_best_trained_network: Container[Optional[Tuple[float, _NeuralNetwork]]] = [
+        container_best_trained_network: Container[Optional[Tuple[float, 'NeuralNetwork']]] = [
             None
         ]
 
@@ -129,7 +124,7 @@ class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
 
     def _update_best_trained_network(
         self,
-        container_best_network: Container[Optional[Tuple[float, _NeuralNetwork]]],
+        container_best_network: Container[Optional[Tuple[float, 'NeuralNetwork']]],
         patterns: Sequence[Pattern]
     ) -> None:
         score = self.compute_error(patterns)
@@ -140,7 +135,7 @@ class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
 
         self.set()
 
-    def _fetch_best_trained_network(self, best_network: Tuple[float, Optional[_NeuralNetwork]]):
+    def _fetch_best_trained_network(self, best_network: Tuple[float, Optional['NeuralNetwork']]):
         if best_network[1] is not None:
             self._current_network = best_network[1]._current_network
             self._internal_networks = best_network[1]._internal_networks
@@ -173,5 +168,5 @@ class NeuralNetwork(_NeuralNetwork, BaseNeuralNetwork):
     def gradients(self) -> Sequence[Sequence[Sequence[float]]]:
         return self._current_network.gradients
 
-    def copy(self) -> _NeuralNetwork:
+    def copy(self) -> 'NeuralNetwork':
         return deepcopy(self)
