@@ -61,7 +61,7 @@ def _relu(x):
 
 
 def _relu_fprime(x):
-    return (x > 0).astype(int) * x
+    return (x > 0).astype(int)
 
 
 relu = SimpleActivationFunction(_relu, _relu_fprime, 'relu')
