@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Sequence, MutableSequence, Optional, Tuple, TypeVar
 import numpy as np
 from copy import deepcopy
