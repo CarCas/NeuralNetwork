@@ -1,9 +1,7 @@
 from nn.types import Pattern
-from typing import Sequence, Dict, Set, Hashable, Tuple, List, Optional
+from typing import Sequence, Dict, Set, Hashable, Tuple, List
 import matplotlib.pyplot as plt
-import csv
 import numpy as np
-from collections import defaultdict
 import csv
 
 
@@ -94,8 +92,8 @@ def read_ml_cup_tr():
             readCSV = csv.reader(file, delimiter=',')
             _ml_cup_tr = tuple(map(
                 lambda row: (
-                    list((map(lambda input: float(input), row[1:-2]))),
-                    list((map(lambda input: float(input), row[-2:]))),
+                    list((map(lambda _input: float(_input), row[1:-2]))),
+                    list((map(lambda _input: float(_input), row[-2:]))),
                 ), readCSV))
     return _ml_cup_tr
 
@@ -110,8 +108,8 @@ def read_ml_cup_ts():
             readCSV = csv.reader(file, delimiter=',')
             _ml_cup_tr = tuple(map(
                 lambda row: (
-                    list((map(lambda input: float(input), row[1:-2]))),
-                    list((map(lambda input: float(input), row[-2:]))),
+                    list((map(lambda _input: float(_input), row[1:-2]))),
+                    list((map(lambda _input: float(_input), row[-2:]))),
                 ), readCSV))
     return _ml_cup_tr
 

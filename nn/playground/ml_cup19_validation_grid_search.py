@@ -2,13 +2,12 @@ from typing import Mapping, Sequence, Any, Dict
 
 from nn import ErrorCalculator
 from nn import sigmoid, batch, relu
-from nn.playground.utilities import read_monk
+from nn.playground.utilities import read_ml_cup_tr, read_ml_cup_ts
 from nn.validation import grid_search, write_on_file
 
-import sys
-
 if __name__ == '__main__':
-    train_data, test_data = read_monk(1)
+    train_data = read_ml_cup_tr()
+    test_data = read_ml_cup_ts()
 
     params_nn: Dict[str, Sequence[Any]] = dict(
         error_calculator=[ErrorCalculator.MSE],
@@ -29,7 +28,7 @@ if __name__ == '__main__':
     )
 
     cv_params: Mapping[str, Any] = dict(
-        cv=10,  # devo cambiare a 3 o 5
+        cv=5,
         error_calculator=ErrorCalculator.ACC,
         to_shuffle=True,
     )
@@ -54,4 +53,4 @@ if __name__ == '__main__':
         for key, value in entry._asdict().items():
             print('{}:'.format(key), value)
 
-    write_on_file(grid_search_results, filename=sys.argv[1])
+    write_on_file(grid_search_results, filename="mlcup")
