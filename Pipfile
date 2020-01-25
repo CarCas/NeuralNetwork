@@ -13,4 +13,4 @@ nn = {editable = true,path = "."}
 numpy = "*"
 matplotlib = "*"
 pytest = "*"
-
+tqdm = "*"

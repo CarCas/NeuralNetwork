@@ -20,8 +20,8 @@ if __name__ == '__main__':
         size_hidden_layers=[(2,)],
         activation=[sigmoid],
         activation_hidden=[relu],
-        eta=[0.3, 0.5],
-        alpha=[0.8],
+        eta=[0.3, 0.5, 0.8],
+        alpha=[0.3, 0.5, 0.8],
         alambd=[0],
         eta_decay=[0],
     )

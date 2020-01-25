@@ -9,6 +9,7 @@ from nn.error_calculator import ErrorCalculator
 from nn import NeuralNetwork, MultilayerPerceptron, MLPParams
 import multiprocessing
 from multiprocessing import Pool
+from tqdm import tqdm
 
 
 class ValidationResult(NamedTuple):
@@ -170,10 +171,19 @@ def grid_search(
 
         params.append(pm_nn)
 
-    print("run to generate:", len(params), "combinations")
+    n_combination = len(params)
+
+    print("run to generate:", n_combination, "combinations")
+    pbar = tqdm(total=n_combination)
 
     pool = Pool(processes=n_jobs, initializer=grid_search_task_init, initargs=(dataset, cv_params, validation_params))
-    results: Sequence[GridSearchResult] = pool.map(grid_search_task, params)
+
+    # results: Sequence[GridSearchResult] = pool.map(grid_search_task, params)
+
+    res = [pool.apply_async(grid_search_task, args=(params_,),
+           callback=lambda _: pbar.update(1)) for params_ in params]
+
+    results: Sequence[GridSearchResult] = [p.get() for p in res]
 
     return sorted(results, key=lambda x: x[1])
 
