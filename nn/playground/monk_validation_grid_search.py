@@ -50,8 +50,8 @@ if __name__ == '__main__':
         seed=1,
     )
 
-    for i, entry in enumerate(grid_search_results[::-1][:3]):
-        for key, value in entry._asdict().items():
-            print('{}:'.format(key), value)
+    # for i, entry in enumerate(grid_search_results[::-1][:3]):
+    #     for key, value in entry._asdict().items():
+    #         print('{}:'.format(key), value)
 
     write_on_file(grid_search_results, filename=sys.argv[1])
