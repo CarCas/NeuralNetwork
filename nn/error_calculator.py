@@ -23,11 +23,11 @@ class ErrorFunctionContainer(NamedTuple):
 
 
 def mse(d, out):
-    return np.mean(np.mean(np.square(np.subtract(d, out))))
+    return np.mean(np.square(np.subtract(d, out)))
 
 
 def mee(d, out):
-    return np.mean(np.linalg.norm(np.subtract(d, out)))
+    return np.mean(np.linalg.norm(np.subtract(d, out), axis=1))
 
 
 def mis(d, out):
