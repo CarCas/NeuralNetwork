@@ -4,7 +4,7 @@ from itertools import product
 from typing import Mapping, Sequence, Any, Dict
 
 from nn import ErrorCalculator
-from nn import sigmoid, batch, relu
+from nn import sigmoid, batch, relu, identity
 from nn.playground.utilities import read_ml_cup_tr, read_ml_cup_ts
 from nn.validation import grid_search, write_on_file
 
@@ -25,15 +25,15 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=list(product(range(5, 16, 5), repeat=1)),# +
-                           # list(product(range(5, 16, 5), repeat=2)) +
-                           # list(product(range(5, 16, 5), repeat=3)),  # +
-                           # list(product(range(5, 21, 5), repeat=4)),
-        activation=[sigmoid, relu],
-        activation_hidden=[relu],
-        eta=[0.1],  # ], 0.4, 0.8],
-        alpha=[0.1],  # , 0.4, 0.8],
-        alambd=[0],  # , 0.1, 0.4],
+        size_hidden_layers=list(product(range(5, 16, 5), repeat=1)),  # +
+        # list(product(range(5, 16, 5), repeat=2)) +
+        # list(product(range(5, 16, 5), repeat=3)),  # +
+        # list(product(range(5, 21, 5), repeat=4)),
+        activation=[identity],
+        activation_hidden=[sigmoid, relu],
+        eta=[0.1, 0.4, 0.8],
+        alpha=[0, 0.1],
+        alambd=[0.1, 0.01, 0.001, 0.0001],  # , 0.1, 0.4],
         eta_decay=[0],  # , 0.01],
     )
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
         train_data,
         params_nn=params_nn,
         params_architecture=params_architecture,
-        # cv_params=cv_params,
-        validation_params=validation_params,
+        cv_params=cv_params,
+        # validation_params=validation_params,
 
         n_jobs=multiprocessing.cpu_count(),
         seed=1,
