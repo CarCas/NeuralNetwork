@@ -12,16 +12,16 @@ if __name__ == '__main__':
 
     nn = NN(
         seed=0,
-        epochs_limit=2000,
+        epochs_limit=500,
         learning_algorithm=batch,
-        n_init=50,
-        error_calculator=ErrorCalculator.MEE,
+        n_init=10,
+        error_calculator=ErrorCalculator.MSE,
         architecture=MultilayerPerceptron(
             2,
-            eta=0.5,
+            eta=0.8,
             alpha=0.8,
-            # alambd=0.001,
-            activation=sigmoid,
+            alambd=0,
+            activation=tanh_classification,
             activation_hidden=relu,
         ),
     )
@@ -34,7 +34,10 @@ if __name__ == '__main__':
     nn.error_calculator = ErrorCalculator.MSE
     print('mse', nn.compute_error(train_data), nn.compute_error(test_data))
 
-    nn.error_calculator = ErrorCalculator.ACC
+    nn.error_calculator = ErrorCalculator.MEE
+    print('mee', nn.compute_error(train_data), nn.compute_error(test_data))
+
+    nn.error_calculator = ErrorCalculator.MSE
     training_error = nn.compute_learning_curve(train_data)
     testing_error = nn.compute_learning_curve(test_data)
     plot(training_error, testing_error)
