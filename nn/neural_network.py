@@ -52,6 +52,8 @@ class NeuralNetwork(BaseNeuralNetwork):
         epsilon: float = 1e-5,
         patience: int = 10,
         n_init: int = 1,
+
+        save_internal_networks: bool = True,
         seed: Optional[int] = None,
         **kwargs
     ) -> None:
@@ -67,11 +69,14 @@ class NeuralNetwork(BaseNeuralNetwork):
         if seed is not None:
             np.random.seed(seed)
 
+        self.save_internal_networks = save_internal_networks
+
         self._last_gradient: int = 0
         self._current_patience: int = 0
 
         self._current_network: BaseNeuralNetwork = architecture()
         self._internal_networks: MutableSequence[BaseNeuralNetwork] = []
+        self._errors: MutableSequence[float] = []
 
     def set(self, **kwargs) -> 'NeuralNetwork':
         self.__dict__.update(**kwargs)
@@ -93,7 +98,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):
                 self.learning_algorithm(self._current_network, patterns)
-                self._update_internal_networks()
+                self._update_internal_networks(patterns)
                 if self._early_stopping():
                     break
 
@@ -116,10 +121,16 @@ class NeuralNetwork(BaseNeuralNetwork):
             error_calculator: ErrorCalculator = None
     ) -> Sequence[float]:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
-        return error_calculator(self._internal_networks, patterns)
+        if self.save_internal_networks:
+            return error_calculator(self._internal_networks, patterns)
+        else:
+            return self._errors
 
-    def _update_internal_networks(self) -> None:
-        self._internal_networks.append(deepcopy(self._current_network))
+    def _update_internal_networks(self, patterns) -> None:
+        if self.save_internal_networks:
+            self._internal_networks.append(deepcopy(self._current_network))
+        else:
+            self._errors.append(self.compute_error(patterns))
 
     def _update_best_trained_network(
         self,
@@ -138,6 +149,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         if best_network[1] is not None:
             self._current_network = best_network[1]._current_network
             self._internal_networks = best_network[1]._internal_networks
+            self._errors = best_network[1]._errors
 
     def _early_stopping(self) -> bool:
         if self.epsilon >= 0:
@@ -168,4 +180,19 @@ class NeuralNetwork(BaseNeuralNetwork):
         return self._current_network.gradients
 
     def copy(self) -> 'NeuralNetwork':
-        return deepcopy(self)
+        # return deepcopy(self)
+        nn = NeuralNetwork(
+            architecture=self.architecture,
+            error_calculator=self.error_calculator,
+            learning_algorithm=self.learning_algorithm,
+            epochs_limit=self.epochs_limit,
+            epsilon=self.epsilon,
+            patience=self.patience,
+            n_init=self.n_init,
+
+            save_internal_networks=self.save_internal_networks,
+        )
+        nn._current_network = deepcopy(self._current_network)
+        nn._internal_networks = self._internal_networks
+        nn._errors = self._errors
+        return nn

@@ -29,6 +29,7 @@ class NNParams(NamedTuple):
     epsilon: float
     patience: int
     n_init: int
+    save_internal_networks: bool = False
 
 
 class GridSearchResult(NamedTuple):
