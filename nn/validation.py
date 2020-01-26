@@ -7,7 +7,6 @@ from nn.learning_algorithm import LearningAlgorithm
 from nn.types import Pattern
 from nn.error_calculator import ErrorCalculator
 from nn import NeuralNetwork, MultilayerPerceptron, MLPParams
-import multiprocessing
 from multiprocessing import Pool
 from tqdm import tqdm
 
@@ -113,7 +112,11 @@ def k_fold_CV(
     )
 
 
-def grid_search_task_init(dataset_: Sequence[Pattern], cv_params_: Mapping[str, Any], validation_params_: Optional[Mapping[str, Any]]) -> None:
+def grid_search_task_init(
+        dataset_: Sequence[Pattern],
+        cv_params_: Mapping[str, Any],
+        validation_params_: Optional[Mapping[str, Any]]
+) -> None:
     global dataset_process, cv_params_process, validation_params_process
 
     dataset_process, cv_params_process, validation_params_process = dataset_, cv_params_, validation_params_  # type: ignore

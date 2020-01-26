@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Mapping, Sequence, Any, Dict
 
 from nn import ErrorCalculator
@@ -17,8 +18,12 @@ if __name__ == '__main__':
         epsilon=[0.00001],
         patience=[100],
     )
+
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=[(2,), (2, 4)],
+        size_hidden_layers=list(product(range(5, 21, 5), repeat=1)) +
+                           list(product(range(5, 21, 5), repeat=2)) +
+                           list(product(range(5, 21, 5), repeat=3)) +
+                           list(product(range(5, 21, 5), repeat=4)),
         activation=[sigmoid, relu],
         activation_hidden=[relu],
         eta=[0.1, 0.4, 0.8],

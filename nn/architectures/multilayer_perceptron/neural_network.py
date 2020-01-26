@@ -1,4 +1,4 @@
-from typing import Sequence, Optional, Any
+from typing import Sequence, Optional
 import numpy as np
 
 from nn.types import BaseNeuralNetwork, Pattern, ActivationFunction
