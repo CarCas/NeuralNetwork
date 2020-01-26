@@ -1,3 +1,4 @@
+import multiprocessing
 from itertools import product
 from typing import Mapping, Sequence, Any, Dict
 
@@ -20,10 +21,10 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=list(product(range(5, 21, 5), repeat=1)) +
-                           list(product(range(5, 21, 5), repeat=2)) +
-                           list(product(range(5, 21, 5), repeat=3)) +
-                           list(product(range(5, 21, 5), repeat=4)),
+        size_hidden_layers=list(product(range(5, 16, 5), repeat=1)) +
+                           list(product(range(5, 16, 5), repeat=2)) +
+                           list(product(range(5, 16, 5), repeat=3)),  # +
+                           # list(product(range(5, 21, 5), repeat=4)),
         activation=[sigmoid, relu],
         activation_hidden=[relu],
         eta=[0.1, 0.4, 0.8],
@@ -50,7 +51,7 @@ if __name__ == '__main__':
         # cv_params=cv_params,
         validation_params=validation_params,
 
-        n_jobs=8,
+        n_jobs=multiprocessing.cpu_count(),
         seed=1,
     )
 
