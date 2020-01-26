@@ -1,4 +1,5 @@
 import multiprocessing
+import sys
 from itertools import product
 from typing import Mapping, Sequence, Any, Dict
 
@@ -8,6 +9,9 @@ from nn.playground.utilities import read_ml_cup_tr, read_ml_cup_ts
 from nn.validation import grid_search, write_on_file
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Insert the path of the results file")
+        exit(1)
     train_data = read_ml_cup_tr()
     test_data = read_ml_cup_ts()
 
@@ -21,16 +25,16 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=list(product(range(5, 16, 5), repeat=1)) +
-                           list(product(range(5, 16, 5), repeat=2)) +
-                           list(product(range(5, 16, 5), repeat=3)),  # +
+        size_hidden_layers=list(product(range(5, 16, 5), repeat=1)),# +
+                           # list(product(range(5, 16, 5), repeat=2)) +
+                           # list(product(range(5, 16, 5), repeat=3)),  # +
                            # list(product(range(5, 21, 5), repeat=4)),
         activation=[sigmoid, relu],
         activation_hidden=[relu],
-        eta=[0.1, 0.4, 0.8],
-        alpha=[0.1, 0.4, 0.8],
-        alambd=[0, 0.1, 0.4],
-        eta_decay=[0, 0.01],
+        eta=[0.1],  # ], 0.4, 0.8],
+        alpha=[0.1],  # , 0.4, 0.8],
+        alambd=[0],  # , 0.1, 0.4],
+        eta_decay=[0],  # , 0.01],
     )
 
     cv_params: Mapping[str, Any] = dict(
@@ -59,4 +63,4 @@ if __name__ == '__main__':
         for key, value in entry._asdict().items():
             print('{}:'.format(key), value)
 
-    write_on_file(grid_search_results, filename="mlcup")
+    write_on_file(grid_search_results, filename=sys.argv[1])
