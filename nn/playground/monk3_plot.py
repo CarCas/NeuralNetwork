@@ -68,9 +68,9 @@ if __name__ == '__main__':
     nn.error_calculator = ErrorCalculator.MSE
     training_curve = nn.compute_learning_curve(train_data)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, testing=testing_curve)
+    plot(training_curve, testing=testing_curve, title='monk3 - MEE')
 
     nn.error_calculator = ErrorCalculator.ACC
     training_curve = nn.compute_learning_curve(train_data)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, testing=testing_curve)
+    plot(training_curve, testing=testing_curve, title='monk3 - accuracy')
