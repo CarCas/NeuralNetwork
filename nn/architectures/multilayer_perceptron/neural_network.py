@@ -97,7 +97,7 @@ class MLPNeuralNetwork(BaseNeuralNetwork):
         for i in range(self.len_layers):
             gradients[i] = np.mean((deltas[i] * inputs[i][np.newaxis].T).T, axis=1)
             delta_w[i] = eta * gradients[i] + alpha * delta_w[i]
-            layers[i] += delta_w[i] - alambd * layers[i]
+            layers[i] += delta_w[i] - 2 * alambd * layers[i]
 
         self.iterations += 1
 
