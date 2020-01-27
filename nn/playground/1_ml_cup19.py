@@ -12,15 +12,15 @@ if __name__ == '__main__':
 
     params_nn: Dict[str, Sequence[Any]] = dict(
         error_calculator=[ErrorCalculator.MEE],
-        learning_algorithm=[minibatch(0.3)],
-        epochs_limit=[2000],
+        learning_algorithm=[minibatch(0.1)],
+        epochs_limit=[500],
         n_init=[3],
-        epsilon=[0.001],
+        epsilon=[0.00001],
         patience=[10],
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=((10,), (20,), (50,), (100,), (200)),
+        size_hidden_layers=((10,), (20,), (50,)),
         activation=[identity],
         activation_hidden=[relu, sigmoid, tanh],
         eta=[0.01, 0.005, 0.001],

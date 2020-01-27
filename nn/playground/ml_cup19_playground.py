@@ -12,13 +12,13 @@ if __name__ == '__main__':
     train_data = read_ml_cup_tr()
 
     nn = NeuralNetwork(
-        seed=0,
-        learning_algorithm=minibatch(0.3),
+        # seed=0,
+        learning_algorithm=minibatch(1),
         architecture=MultilayerPerceptron(
-            100,
+            25, 25,
             activation=identity,
             activation_hidden=relu,
-            eta=0.01,
+            eta=0.007,
             # alpha=0.8,
             # alambd=0.1,
             # eta_decay=0.1
@@ -26,8 +26,8 @@ if __name__ == '__main__':
         error_calculator=ErrorCalculator.MSE,
         n_init=1,
         epochs_limit=100,
-        epsilon=1e-3,
-        save_internal_networks=False,
+        # epsilon=1e-3,
+        save_internal_networks=True,
     )
 
     print('time', timeit(lambda: nn.fit(train_data), number=1))
