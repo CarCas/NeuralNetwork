@@ -12,48 +12,44 @@ if __name__ == '__main__':
     train_data, test_data = read_monk(3)
 
     nn = NN(
-        # seed=0,
-        epochs_limit=83,
+        seed=0,
+        epochs_limit=500,
         learning_algorithm=batch,
         n_init=50,
         error_calculator=ErrorCalculator.MSE,
         architecture=MultilayerPerceptron(
-            size_hidden_layers=(2, 2),
-            eta=0.8,
-            alpha=0.5,
-            alambd=0.001,
-            eta_decay=0.8,
+            size_hidden_layers=(2,),
+            eta=0.6,
+            alpha=0.4,
+            alambd=0.002,
             activation=tanh_classification,
             activation_hidden=relu,
         ),
     )
 
-    # train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True)
+    train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True)
 
-    # val_result = validation(nn, train_set, validation_set, ErrorCalculator.ACC)
+    val_result = validation(nn, train_set, validation_set, ErrorCalculator.MSE)
 
-    # print(val_result)
-    # testing_curve = [0] * 1000
+    print(val_result)
+
+    nn = NN(
+        seed=0,
+        epochs_limit=val_result.epoch + 1,
+        learning_algorithm=batch,
+        n_init=1,
+        error_calculator=ErrorCalculator.MSE,
+        architecture=MultilayerPerceptron(
+            size_hidden_layers=(2,),
+            eta=0.6,
+            alpha=0.4,
+            alambd=0.002,
+            activation=tanh_classification,
+            activation_hidden=relu,
+        ),
+    )
 
     nn.fit(train_data)
-
-    # nn.error_calculator = ErrorCalculator.MSE
-    # training_curve = nn.compute_learning_curve(train_set)
-    # validation_curve = nn.compute_learning_curve(validation_set)
-    # # testing_curve = nn.compute_learning_curve(test_data)
-    # print('mse', training_curve[val_result.epoch], validation_curve[val_result.epoch], testing_curve[val_result.epoch])
-
-    # nn.error_calculator = ErrorCalculator.MEE
-    # training_curve = nn.compute_learning_curve(train_set)
-    # validation_curve = nn.compute_learning_curve(validation_set)
-    # # testing_curve = nn.compute_learning_curve(test_data)
-    # print('mee', training_curve[val_result.epoch], validation_curve[val_result.epoch], testing_curve[val_result.epoch])
-
-    # nn.error_calculator = ErrorCalculator.ACC
-    # training_curve = nn.compute_learning_curve(train_set)
-    # validation_curve = nn.compute_learning_curve(validation_set)
-    # # testing_curve = nn.compute_learning_curve(test_data)
-    # print('acc', training_curve[val_result.epoch], validation_curve[val_result.epoch], testing_curve[val_result.epoch])
 
     nn.error_calculator = ErrorCalculator.MSE
     print('mse', nn.compute_error(train_data), nn.compute_error(test_data))
@@ -63,6 +59,11 @@ if __name__ == '__main__':
 
     nn.error_calculator = ErrorCalculator.ACC
     print('acc', nn.compute_error(train_data), nn.compute_error(test_data))
+
+    nn.error_calculator = ErrorCalculator.MSE
+    training_curve = nn.compute_learning_curve(train_data)
+    testing_curve = nn.compute_learning_curve(test_data)
+    plot(training_curve, testing=testing_curve)
 
     nn.error_calculator = ErrorCalculator.ACC
     training_curve = nn.compute_learning_curve(train_data)
