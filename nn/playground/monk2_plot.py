@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True)
 
-    val_result = validation(nn, train_set, validation_set, ErrorCalculator.MSE)
+    val_result = validation(nn, train_set, validation_set, ErrorCalculator.ACC)
 
     print(val_result)
 

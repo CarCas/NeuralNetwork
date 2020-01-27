@@ -11,17 +11,22 @@ from nn import validation, split_dataset
 if __name__ == '__main__':
     train_data, test_data = read_monk(3)
 
+    layers = (2, 2)
+    eta = 0.6
+    alpha = 0
+    alambd = 0.001
+
     nn = NN(
         seed=0,
         epochs_limit=500,
         learning_algorithm=batch,
-        n_init=50,
+        n_init=10,
         error_calculator=ErrorCalculator.MSE,
         architecture=MultilayerPerceptron(
-            size_hidden_layers=(2,),
-            eta=0.6,
-            alpha=0.4,
-            alambd=0.002,
+            size_hidden_layers=layers,
+            eta=eta,
+            alpha=alpha,
+            alambd=alambd,
             activation=tanh_classification,
             activation_hidden=relu,
         ),
@@ -29,7 +34,7 @@ if __name__ == '__main__':
 
     train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True)
 
-    val_result = validation(nn, train_set, validation_set, ErrorCalculator.MSE)
+    val_result = validation(nn, train_set, validation_set, ErrorCalculator.ACC)
 
     print(val_result)
 
@@ -37,13 +42,13 @@ if __name__ == '__main__':
         seed=0,
         epochs_limit=val_result.epoch + 1,
         learning_algorithm=batch,
-        n_init=1,
+        n_init=10,
         error_calculator=ErrorCalculator.MSE,
         architecture=MultilayerPerceptron(
-            size_hidden_layers=(2,),
-            eta=0.6,
-            alpha=0.4,
-            alambd=0.002,
+            size_hidden_layers=layers,
+            eta=eta,
+            alpha=alpha,
+            alambd=alambd,
             activation=tanh_classification,
             activation_hidden=relu,
         ),
