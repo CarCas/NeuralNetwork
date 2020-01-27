@@ -18,18 +18,18 @@ params_nn: Dict[str, Sequence[Any]] = dict(
     patience=[10],
 )
 params_architecture: Mapping[str, Sequence[Any]] = dict(
-    size_hidden_layers=[(2,), (4,), (2, 2)],
-    activation=[sigmoid, tanh_classification],
-    activation_hidden=[relu, tanh],
-    eta=[0.1, 0.3, 0.5, 0.65, 0.8],
-    alpha=[0, 0.1, 0.35, 0.5, 0.65, 0.8],
-    alambd=[0, 0.0001, 0.001, 0.01],
-    eta_decay=[0, 0.001],
+    size_hidden_layers=[(2,)],
+    activation=[tanh_classification],
+    activation_hidden=[relu],
+    eta=[0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    alpha=[0, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    alambd=[0, 0.0001, 0.001],
+    eta_decay=[0, 0.9, 0.5, 0.1],
 )
 
 cv_params: Mapping[str, Any] = dict(
-    cv=10,
-    error_calculator=ErrorCalculator.ACC,
+    cv=3,
+    error_calculator=ErrorCalculator.MSE,
     to_shuffle=True,
 )
 
@@ -42,4 +42,4 @@ grid_search_results = grid_search(
     n_jobs=8,
 )
 
-write_on_file(grid_search_results[::-1], 'monk3')
+write_on_file(grid_search_results, 'results/monk3-mse')

@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     nn = NN(
         seed=0,
-        epochs_limit=500,
+        epochs_limit=10,
         learning_algorithm=batch,
         n_init=10,
         error_calculator=ErrorCalculator.MSE,
