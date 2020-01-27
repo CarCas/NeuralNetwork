@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
     ml_cup_training_dataset = read_ml_cup_tr()
 
-    train_set, test_set = split_dataset(ml_cup_training_dataset)
+    train_set, test_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
 
     params_nn: Dict[str, Sequence[Any]] = dict(
         error_calculator=[ErrorCalculator.MEE],

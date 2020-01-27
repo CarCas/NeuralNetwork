@@ -72,7 +72,13 @@ def split_dataset(
         dataset: Sequence[Pattern],
         percentage: float = 0.7,
         size: Optional[int] = None,
+
+        to_shuffle: bool = False,
+        seed: Optional[int] = None,
 ) -> Tuple[Sequence[Pattern], Sequence[Pattern]]:
+    if to_shuffle:
+        dataset = shuffle(dataset, seed)
+
     if size is not None:
         len_training = size
     else:
