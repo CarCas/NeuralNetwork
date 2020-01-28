@@ -104,7 +104,7 @@ class NeuralNetwork(BaseNeuralNetwork):
                 if self._early_stopping():
                     break
 
-            self._update_best_trained_network(container_best_trained_network, patterns, validation_patterns)
+            self._update_best_trained_network(container_best_trained_network, patterns)
 
         if container_best_trained_network[0] is not None:
             self._fetch_best_trained_network(container_best_trained_network[0])
@@ -136,19 +136,15 @@ class NeuralNetwork(BaseNeuralNetwork):
         else:
             if training_curve:
                 self.training_curve.append(self.compute_error(patterns))
-            self.validation_curve.append(self.compute_error(validation_patterns))
+            if len(validation_patterns):
+                self.validation_curve.append(self.compute_error(validation_patterns))
 
     def _update_best_trained_network(
         self,
         container_best_network: Container[Optional[Tuple[float, 'NeuralNetwork']]],
         patterns: Sequence[Pattern],
-        validation_patterns: Optional[Sequence[Pattern]],
     ) -> None:
-        if validation_patterns is None:
-            score = self.compute_error(patterns)
-        else:
-            # score = self.training_curve[-1]
-            score = self.compute_error(patterns)
+        score = self.compute_error(patterns)
 
         if container_best_network[0] is None \
                 or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
