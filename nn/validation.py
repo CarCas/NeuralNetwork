@@ -47,8 +47,7 @@ def validation(
 
     nn.error_calculator = error_calculator
 
-    nn.fit(training_set, validation_set)
-
+    nn.fit(training_set, validation_set, training_curve=False)
     learning_curve_validation = nn.validation_curve
 
     idx, score = error_calculator.choose(learning_curve_validation)
