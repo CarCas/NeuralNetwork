@@ -57,16 +57,16 @@ def encode_categorical(train_data, test_data):
 
 def plot(training=[], validation=[], testing=[], show=True, log=False, title=''):
     if log:
-        plot_f = plt.loglog
+        plt.yscale('log')
     else:
-        plot_f = plt.plot
+        plt.yscale('linear')
 
     if len(training):
-        plot_f(training, label='training', linestyle='-')
+        plt.plot(training, label='training', linestyle='-')
     if len(validation):
-        plot_f(validation, label='validation', linestyle='dotted')
+        plt.plot(validation, label='validation', linestyle='dotted')
     if len(testing):
-        plot_f(testing, label='testing', linestyle='--')
+        plt.plot(testing, label='testing', linestyle='--')
     if show:
         plt.title(title)
         plt.legend()

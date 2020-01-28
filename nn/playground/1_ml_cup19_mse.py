@@ -14,7 +14,7 @@ if __name__ == '__main__':
     np.random.seed()
 
     params_nn: Dict[str, Sequence[Any]] = dict(
-        error_calculator=[ErrorCalculator.MEE],
+        error_calculator=[ErrorCalculator.MSE],
         learning_algorithm=[minibatch(0.1)],
         epochs_limit=[100],
         n_init=[3],
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=((100,)),
+        size_hidden_layers=((50,), (100,), (150,), (200,)),
         activation=[identity],
         activation_hidden=[tanh, relu],
         eta=[0.015, 0.01, 0.005, 0.001],
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     cv_params: Mapping[str, Any] = dict(
         cv=10,
-        error_calculator=ErrorCalculator.MEE,
+        error_calculator=ErrorCalculator.MSE,
         to_shuffle=True,
     )
 
@@ -47,4 +47,4 @@ if __name__ == '__main__':
         n_jobs=1,
     )
 
-    write_on_file(grid_search_results, filename='results/1_mlcup')
+    write_on_file(grid_search_results, filename='results/1_mlcup-mse')

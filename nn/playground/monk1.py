@@ -39,7 +39,7 @@ grid_search_results = grid_search(
     params_architecture=params_architecture,
     cv_params=cv_params,
 
-    n_jobs=8,
+    n_jobs=2,
 )
 
-write_on_file(grid_search_results, 'results/monk1-3-mse')
+write_on_file(grid_search_results, 'results/monk1-mse-fix')

@@ -1,9 +1,0 @@
-score,std,nn_error_calculator,nn_learning_algorithm,nn_epochs_limit,nn_epsilon,nn_patience,nn_n_init,nn_save_internal_networks,arch_size_hidden_layers,arch_activation,arch_activation_hidden,arch_eta,arch_alpha,arch_alambd,arch_eta_decay
-2.476263487753309,1.351760098361236,MEE,minibatch 0.3,1000,0.001,10,3,False,"(50,)",identity,relu,0.01,0,0,0
-2.481676156823606,1.347016259083254,MEE,minibatch 0.3,1000,0.001,10,3,False,"(100,)",identity,relu,0.01,0,0,0
-2.5080642243581397,1.3244017984152605,MEE,minibatch 0.3,1000,0.001,10,3,False,"(10,)",identity,relu,0.01,0,0,0
-2.5093167197575452,1.3122563992052207,MEE,minibatch 0.3,1000,0.001,10,3,False,"(20,)",identity,relu,0.01,0,0,0
-2.851490623224904,1.0835690725090221,MEE,minibatch 0.3,1000,0.001,10,3,False,"(20,)",identity,relu,0.01,0,0,0.01
-2.8595052450125054,1.0761133994484364,MEE,minibatch 0.3,1000,0.001,10,3,False,"(10,)",identity,relu,0.01,0,0,0.01
-2.875595458697059,1.0643418932681439,MEE,minibatch 0.3,1000,0.001,10,3,False,"(50,)",identity,relu,0.01,0,0,0.01
-2.878695752892112,1.0606829124850239,MEE,minibatch 0.3,1000,0.001,10,3,False,"(100,)",identity,relu,0.01,0,0,0.01

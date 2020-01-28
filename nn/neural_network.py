@@ -53,7 +53,6 @@ class NeuralNetwork(BaseNeuralNetwork):
         patience: int = 10,
         n_init: int = 1,
 
-        save_internal_networks: bool = True,
         seed: Optional[int] = None,
         **kwargs
     ) -> None:
@@ -68,8 +67,6 @@ class NeuralNetwork(BaseNeuralNetwork):
         self.n_init: int = n_init
         if seed is not None:
             np.random.seed(seed)
-
-        self.save_internal_networks = save_internal_networks
 
         self._last_gradient: int = 0
         self._current_patience: int = 0
@@ -121,16 +118,10 @@ class NeuralNetwork(BaseNeuralNetwork):
             error_calculator: ErrorCalculator = None
     ) -> Sequence[float]:
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
-        if self.save_internal_networks:
-            return error_calculator(self._internal_networks, patterns)
-        else:
-            return self._errors
+        return error_calculator(self._internal_networks, patterns)
 
     def _update_internal_networks(self, patterns) -> None:
-        if self.save_internal_networks:
-            self._internal_networks.append(deepcopy(self._current_network))
-        else:
-            self._errors.append(self.compute_error(patterns))
+        self._internal_networks.append(deepcopy(self._current_network))
 
     def _update_best_trained_network(
         self,
@@ -189,8 +180,6 @@ class NeuralNetwork(BaseNeuralNetwork):
             epsilon=self.epsilon,
             patience=self.patience,
             n_init=self.n_init,
-
-            save_internal_networks=self.save_internal_networks,
         )
         nn._current_network = deepcopy(self._current_network)
         nn._internal_networks = self._internal_networks
