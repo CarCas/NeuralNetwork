@@ -11,14 +11,14 @@ from nn import validation, split_dataset
 if __name__ == '__main__':
     train_data, test_data = read_monk(3)
 
-    layers = (2, 2)
-    eta = 0.6
-    alpha = 0
-    alambd = 0.001
+    layers = (4,)
+    eta = 0.01
+    alpha = 0.9
+    alambd = 0
 
     nn = NN(
         seed=0,
-        epochs_limit=500,
+        epochs_limit=5000,
         learning_algorithm=batch,
         n_init=10,
         error_calculator=ErrorCalculator.MSE,

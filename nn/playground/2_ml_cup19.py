@@ -23,7 +23,7 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=(list(map(lambda x: (x,), list(np.arange(100, 150, 5))))),
+        size_hidden_layers=(list(map(lambda x: (x,), list(np.arange(100, 151, 10))))),
         activation=[identity],
         activation_hidden=[tanh],
         eta=[0.015],
