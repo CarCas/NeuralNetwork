@@ -75,6 +75,9 @@ class NeuralNetwork(BaseNeuralNetwork):
         self._internal_networks: MutableSequence[BaseNeuralNetwork] = []
         self._errors: MutableSequence[float] = []
 
+        self.training_curve: MutableSequence[float] = []
+        self.validation_curve: MutableSequence[float] = []
+
     def set(self, **kwargs) -> 'NeuralNetwork':
         self.__dict__.update(**kwargs)
         self.__init__(**self.__dict__)  # type: ignore
@@ -87,6 +90,7 @@ class NeuralNetwork(BaseNeuralNetwork):
     def fit(
         self,
         patterns: Sequence[Pattern],
+        validation_patterns: Optional[Sequence[Pattern]] = None,
     ) -> None:
         container_best_trained_network: Container[Optional[Tuple[float, 'NeuralNetwork']]] = [
             None
@@ -95,11 +99,11 @@ class NeuralNetwork(BaseNeuralNetwork):
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):
                 self.learning_algorithm(self._current_network, patterns)
-                self._update_internal_networks(patterns)
+                self._update_internal_networks(patterns, validation_patterns)
                 if self._early_stopping():
                     break
 
-            self._update_best_trained_network(container_best_trained_network, patterns)
+            self._update_best_trained_network(container_best_trained_network, patterns, validation_patterns)
 
         if container_best_trained_network[0] is not None:
             self._fetch_best_trained_network(container_best_trained_network[0])
@@ -120,15 +124,27 @@ class NeuralNetwork(BaseNeuralNetwork):
         error_calculator = self.error_calculator if error_calculator is None else error_calculator
         return error_calculator(self._internal_networks, patterns)
 
-    def _update_internal_networks(self, patterns) -> None:
-        self._internal_networks.append(deepcopy(self._current_network))
+    def _update_internal_networks(
+        self,
+        patterns: Sequence[Pattern],
+        validation_patterns: Optional[Sequence[Pattern]],
+    ) -> None:
+        if validation_patterns is None:
+            self._internal_networks.append(deepcopy(self._current_network))
+        else:
+            self.training_curve.append(self.compute_error(patterns))
+            self.validation_curve.append(self.compute_error(validation_patterns))
 
     def _update_best_trained_network(
         self,
         container_best_network: Container[Optional[Tuple[float, 'NeuralNetwork']]],
-        patterns: Sequence[Pattern]
+        patterns: Sequence[Pattern],
+        validation_patterns: Optional[Sequence[Pattern]],
     ) -> None:
-        score = self.compute_error(patterns)
+        if validation_patterns is None:
+            score = self.compute_error(patterns)
+        else:
+            score = self.training_curve[-1]
 
         if container_best_network[0] is None \
                 or self.error_calculator.choose((score, container_best_network[0][0]))[0] == 0:
@@ -141,6 +157,9 @@ class NeuralNetwork(BaseNeuralNetwork):
             self._current_network = best_network[1]._current_network
             self._internal_networks = best_network[1]._internal_networks
             self._errors = best_network[1]._errors
+
+            self.training_curve = best_network[1].training_curve
+            self.validation_curve = best_network[1].validation_curve
 
     def _early_stopping(self) -> bool:
         if self.epsilon >= 0:
@@ -184,4 +203,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         nn._current_network = deepcopy(self._current_network)
         nn._internal_networks = self._internal_networks
         nn._errors = self._errors
+
+        nn.training_curve = self.training_curve
+        nn.validation_curve = self.validation_curve
         return nn

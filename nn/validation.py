@@ -43,11 +43,17 @@ def validation(
         validation_set: Sequence[Pattern],
         error_calculator: ErrorCalculator = ErrorCalculator.MSE
 ) -> ValidationResult:
-    nn.fit(training_set)
+    old_error = nn.error_calculator
 
-    learning_curve_validation = nn.compute_learning_curve(validation_set, error_calculator)
+    nn.error_calculator = error_calculator
+
+    nn.fit(training_set, validation_set)
+
+    learning_curve_validation = nn.validation_curve
 
     idx, score = error_calculator.choose(learning_curve_validation)
+
+    nn.error_calculator = old_error
 
     return ValidationResult(
         epoch=idx,
