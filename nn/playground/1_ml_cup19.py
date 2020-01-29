@@ -16,8 +16,8 @@ if __name__ == '__main__':
     params_nn: Dict[str, Sequence[Any]] = dict(
         error_calculator=[ErrorCalculator.MEE],
         learning_algorithm=[minibatch(0.1)],
-        epochs_limit=[1000],
-        n_init=[3],
+        epochs_limit=[5000],
+        n_init=[1],
         epsilon=[0],
         patience=[10],
     )
@@ -26,14 +26,14 @@ if __name__ == '__main__':
         size_hidden_layers=[(150,)],
         activation=[identity],
         activation_hidden=[tanh, relu],
-        eta=[0.01, 0.005, 0.001],
-        alpha=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+        eta=[0.01, 0.005, 0.001, 0.0005],
+        alpha=[0, 0.3, 0.5, 0.9],
         alambd=[0, 0.001, 0.0001],
         eta_decay=[0],
     )
 
     cv_params: Mapping[str, Any] = dict(
-        cv=10,
+        cv=3,
         error_calculator=ErrorCalculator.MEE,
         to_shuffle=True,
     )

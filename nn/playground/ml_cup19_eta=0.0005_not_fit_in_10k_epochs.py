@@ -26,8 +26,8 @@ if __name__ == '__main__':
         size_hidden_layers=[(100,)],
         activation=[identity],
         activation_hidden=[tanh, relu],
-        eta=[0.001],
-        alpha=[0, 0.1, 0.3, 0.5, 0.9],
+        eta=[0.0005],
+        alpha=[0, 0.1, 0.5, 0.9],
         alambd=[0, 0.001, 0.0001, 0.00001],
         eta_decay=[0],
     )
@@ -47,4 +47,4 @@ if __name__ == '__main__':
         n_jobs=1,
     )
 
-    write_on_file(grid_search_results, filename='results/2_mlcup')
+    write_on_file(grid_search_results, filename='results/ml_cup19_eta=0.0005_not_fit_in_10k_epochs')

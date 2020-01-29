@@ -55,7 +55,7 @@ def validation(
     nn.error_calculator = old_error
 
     return ValidationResult(
-        epoch=idx,
+        epoch=idx + 1,
         score_validation=score,
     )
 

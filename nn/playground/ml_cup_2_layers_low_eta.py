@@ -23,12 +23,12 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=[(100,)],
+        size_hidden_layers=[[40, 35], [40, 30]],
         activation=[identity],
-        activation_hidden=[tanh, relu],
-        eta=[0.001],
-        alpha=[0, 0.1, 0.3, 0.5, 0.9],
-        alambd=[0, 0.001, 0.0001, 0.00001],
+        activation_hidden=[tanh],
+        eta=[0.008, 0.0085, 0.007],
+        alpha=[0.5, 0.55, 0.6],
+        alambd=[1e-05],
         eta_decay=[0],
     )
 
@@ -47,4 +47,4 @@ if __name__ == '__main__':
         n_jobs=1,
     )
 
-    write_on_file(grid_search_results, filename='results/2_mlcup')
+    write_on_file(grid_search_results, filename='ml_cup_2_layers_low_eta')

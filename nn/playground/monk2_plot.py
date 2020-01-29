@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     nn = NN(
         seed=1,
-        epochs_limit=val_result.epoch + 1,
+        epochs_limit=val_result.epoch,
         learning_algorithm=batch,
         n_init=50,
         error_calculator=ErrorCalculator.MSE,

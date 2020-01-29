@@ -16,18 +16,18 @@ if __name__ == '__main__':
     params_nn: Dict[str, Sequence[Any]] = dict(
         error_calculator=[ErrorCalculator.MEE],
         learning_algorithm=[minibatch(0.05)],
-        epochs_limit=[10000],
+        epochs_limit=[1000],
         n_init=[1],
         epsilon=[0],
         patience=[10],
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=[(100,)],
+        size_hidden_layers=[[50, 50], [75, 75], [100, 100]],
         activation=[identity],
-        activation_hidden=[tanh, relu],
-        eta=[0.001],
-        alpha=[0, 0.1, 0.3, 0.5, 0.9],
+        activation_hidden=[tanh],
+        eta=[0.009, 0.0085, 0.008],
+        alpha=[0.6],
         alambd=[0, 0.001, 0.0001, 0.00001],
         eta_decay=[0],
     )
@@ -47,4 +47,4 @@ if __name__ == '__main__':
         n_jobs=1,
     )
 
-    write_on_file(grid_search_results, filename='results/2_mlcup')
+    write_on_file(grid_search_results, filename='ml_cup_2_layers')

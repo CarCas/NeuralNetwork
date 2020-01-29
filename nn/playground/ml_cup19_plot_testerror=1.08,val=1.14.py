@@ -11,12 +11,12 @@ if __name__ == '__main__':
     learning_algorithm = batch
     epochs_limit = 10000
     n_init = 1
-    size_hidden_layers = [100]
+    size_hidden_layers = [40, 30]
     activation = identity
     activation_hidden = tanh
-    eta = 0.0004
-    alpha = 0.9
-    alambd = 0
+    eta = 0.007
+    alpha = 0.55
+    alambd = 1e-05
     eta_decay = 0
     error_calculator = ErrorCalculator.MEE
     epsilon = 0
@@ -43,6 +43,8 @@ if __name__ == '__main__':
 
     val_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE)
 
+    print('trained', len(nn.validation_curve), 'epoches')
+
     print(val_result)
 
     # nn.error_calculator = ErrorCalculator.MEE
@@ -53,7 +55,7 @@ if __name__ == '__main__':
         seed=seed,
         learning_algorithm=learning_algorithm,
         n_init=n_init,
-        epochs_limit=val_result.epoch + 1,
+        epochs_limit=val_result.epoch,
         architecture=MultilayerPerceptron(
             size_hidden_layers=size_hidden_layers,
             activation=activation,
@@ -72,8 +74,11 @@ if __name__ == '__main__':
     training_curve = nn_good.training_curve
     testing_curve = nn_good.validation_curve
 
+    idx, score = nn.error_calculator.choose(testing_curve)
+
     nn_good.error_calculator = ErrorCalculator.MEE
     print('mee', training_curve[-1], testing_curve[-1])
+    print('best accuracy:', idx+1)
 
     nn_good.error_calculator = ErrorCalculator.MEE
     # training_curve = nn_good.compute_learning_curve(train_data)

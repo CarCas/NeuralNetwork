@@ -9,14 +9,14 @@ if __name__ == '__main__':
 
     seed = 0
     learning_algorithm = batch
-    epochs_limit = 10000
+    epochs_limit = 5000
     n_init = 1
     size_hidden_layers = [100]
     activation = identity
     activation_hidden = tanh
-    eta = 0.0004
+    eta = 0.01
     alpha = 0.9
-    alambd = 0
+    alambd = 0.0001
     eta_decay = 0
     error_calculator = ErrorCalculator.MEE
     epsilon = 0
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         epsilon=epsilon,
     )
 
-    train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True)
+    train_set, validation_set = split_dataset(train_data, percentage=9/10, to_shuffle=True)
 
     val_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE)
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         seed=seed,
         learning_algorithm=learning_algorithm,
         n_init=n_init,
-        epochs_limit=val_result.epoch + 1,
+        epochs_limit=val_result.epoch,
         architecture=MultilayerPerceptron(
             size_hidden_layers=size_hidden_layers,
             activation=activation,
