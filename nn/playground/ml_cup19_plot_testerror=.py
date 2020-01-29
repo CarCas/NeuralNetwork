@@ -8,9 +8,8 @@ if __name__ == '__main__':
     train_data, test_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
 
     seed = 0
-    # learning_algorithm = minibatch(0.05)
     learning_algorithm = batch
-    epochs_limit = 100
+    epochs_limit = 10000
     n_init = 1
     size_hidden_layers = [40, 10, 30]
     activation = identity
@@ -70,7 +69,7 @@ if __name__ == '__main__':
         epsilon=epsilon,
     )
 
-    nn_good.fit(train_data, test_set)
+    nn_good.fit(train_set, test_set)
 
     training_curve = nn_good.training_curve
     testing_curve = nn_good.validation_curve

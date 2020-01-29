@@ -19,6 +19,7 @@ class ValidationResult(NamedTuple):
 class KFoldCVResult(NamedTuple):
     score: float
     std: float
+    epoch_mean: int
 
 
 class NNParams(NamedTuple):
@@ -29,12 +30,14 @@ class NNParams(NamedTuple):
     epsilon: float
     patience: int
     n_init: int
+    seed: Optional[int] = None
 
 
 class GridSearchResult(NamedTuple):
     params: NNParams
     score: float
     std: float
+    epoch_mean: int
 
 
 def validation(
@@ -112,14 +115,17 @@ def k_fold_CV(
         training_set, validation_set = split_dataset(np.roll(dataset, shift_size * i), size=len_training)
         scores.append(validation(nn.set(), training_set, validation_set, error_calculator=error_calculator))
 
-    scores_1 = list(map(lambda x: x[1], scores))
+    scores_1 = list(map(lambda x: x.score_validation, scores))
+    epochs = list(map(lambda x: x.epoch, scores))
 
     score = float(np.mean(scores_1))
     std = float(np.std(scores_1))
+    epoch_mean = int(np.round(epochs))
 
     return KFoldCVResult(
         score=score,
         std=std,
+        epoch_mean=epoch_mean
     )
 
 
@@ -140,15 +146,15 @@ def grid_search_task(pm: Dict[str, Any]) -> GridSearchResult:
     if validation_params_process is None:  # type: ignore
         kf = k_fold_CV(nn, dataset_process, **cv_params_process)  # type: ignore
     else:
-        kf = KFoldCVResult(validation(
+        validation_result = validation(
             nn,
             dataset_process,  # type: ignore
             **validation_params_process,  # type: ignore
-        ).score_validation, 0)
+        )
+        kf = KFoldCVResult(validation_result.score_validation, 0, validation_result.epoch)
     pm.update(architecture=MLPParams(**pm['architecture']))
     typed_pm: NNParams = NNParams(**pm)
 
-    # print('done')
     return GridSearchResult(typed_pm, *kf)
 
 

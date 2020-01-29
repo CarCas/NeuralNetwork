@@ -65,8 +65,6 @@ class NeuralNetwork(BaseNeuralNetwork):
         self.patience: int = patience
 
         self.n_init: int = n_init
-        if seed is not None:
-            np.random.seed(seed)
 
         self._last_gradient: int = 0
         self._current_patience: int = 0
@@ -77,6 +75,8 @@ class NeuralNetwork(BaseNeuralNetwork):
 
         self.training_curve: MutableSequence[float] = []
         self.validation_curve: MutableSequence[float] = []
+
+        self.seed = seed
 
     def set(self, **kwargs) -> 'NeuralNetwork':
         self.__dict__.update(**kwargs)
@@ -96,6 +96,9 @@ class NeuralNetwork(BaseNeuralNetwork):
         container_best_trained_network: Container[Optional[Tuple[float, 'NeuralNetwork']]] = [
             None
         ]
+
+        if self.seed is not None:
+            np.random.seed(self.seed)
 
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):

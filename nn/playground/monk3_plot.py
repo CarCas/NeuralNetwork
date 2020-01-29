@@ -10,20 +10,23 @@ from nn import validation, split_dataset
 
 if __name__ == '__main__':
     train_data, test_data = read_monk(3)
+    train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True, seed=0)
 
-    layers = (4,)
-    eta = 0.01
-    alpha = 0.9
-    alambd = 0
+    seed = 78
+    epochs_limit = 466
+    eta = 0.1
+    alpha = 0.5
+    alambd = 0.001
+    validation_error = ErrorCalculator.MSE
 
     nn = NN(
-        seed=0,
-        epochs_limit=5000,
+        seed=seed,
+        epochs_limit=epochs_limit,
         learning_algorithm=batch,
-        n_init=10,
+        n_init=1,
         error_calculator=ErrorCalculator.MSE,
         architecture=MultilayerPerceptron(
-            size_hidden_layers=layers,
+            size_hidden_layers=(2, 2),
             eta=eta,
             alpha=alpha,
             alambd=alambd,
@@ -32,45 +35,25 @@ if __name__ == '__main__':
         ),
     )
 
-    train_set, validation_set = split_dataset(train_data, 2/3, to_shuffle=True)
-
-    val_result = validation(nn, train_set, validation_set, ErrorCalculator.ACC)
-
-    print(val_result)
-
-    nn = NN(
-        seed=0,
-        epochs_limit=val_result.epoch,
-        learning_algorithm=batch,
-        n_init=10,
-        error_calculator=ErrorCalculator.MSE,
-        architecture=MultilayerPerceptron(
-            size_hidden_layers=layers,
-            eta=eta,
-            alpha=alpha,
-            alambd=alambd,
-            activation=tanh_classification,
-            activation_hidden=relu,
-        ),
-    )
-
-    nn.fit(train_data)
+    nn.fit(train_set)
 
     nn.error_calculator = ErrorCalculator.MSE
-    print('mse', nn.compute_error(train_data), nn.compute_error(test_data))
+    print('mse', nn.compute_error(train_set), nn.compute_error(validation_set), nn.compute_error(test_data))
 
     nn.error_calculator = ErrorCalculator.MEE
-    print('mee', nn.compute_error(train_data), nn.compute_error(test_data))
+    print('mee', nn.compute_error(train_set), nn.compute_error(validation_set), nn.compute_error(test_data))
 
     nn.error_calculator = ErrorCalculator.ACC
-    print('acc', nn.compute_error(train_data), nn.compute_error(test_data))
+    print('acc', nn.compute_error(train_set), nn.compute_error(validation_set), nn.compute_error(test_data))
 
     nn.error_calculator = ErrorCalculator.MSE
-    training_curve = nn.compute_learning_curve(train_data)
+    training_curve = nn.compute_learning_curve(train_set)
+    validation_curve = nn.compute_learning_curve(validation_set)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, testing=testing_curve, title='monk3 - MEE')
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - MSE')
 
     nn.error_calculator = ErrorCalculator.ACC
-    training_curve = nn.compute_learning_curve(train_data)
+    training_curve = nn.compute_learning_curve(train_set)
+    validation_curve = nn.compute_learning_curve(validation_set)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, testing=testing_curve, title='monk3 - accuracy')
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - accuracy')

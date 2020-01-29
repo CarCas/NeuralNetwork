@@ -62,9 +62,9 @@ def plot(training=[], validation=[], testing=[], show=True, log=False, title='')
         plt.yscale('linear')
 
     if len(training):
-        plt.plot(training, label='training', linestyle='-')
+        plt.plot(training, label='training', linestyle='-.')
     if len(validation):
-        plt.plot(validation, label='validation', linestyle='dotted')
+        plt.plot(validation, label='validation', linestyle=':')
     if len(testing):
         plt.plot(testing, label='testing', linestyle='--')
     if show:
