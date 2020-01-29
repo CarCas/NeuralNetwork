@@ -55,7 +55,7 @@ def encode_categorical(train_data, test_data):
     return train_data_norm, test_data_norm
 
 
-def plot(training=[], validation=[], testing=[], show=True, log=False, title='', y_label=''):
+def plot(training=[], validation=[], testing=[], show=True, log=False, title='', x_label='', y_label=''):
     if log:
         plt.yscale('log')
     else:
@@ -69,8 +69,8 @@ def plot(training=[], validation=[], testing=[], show=True, log=False, title='',
         plt.plot(testing, label='testing', linestyle='--')
     if show:
         plt.title(title, fontsize=12)
-        plt.legend(prop={'size': 11})
-        plt.xlabel('epochs', fontsize=11)
+        plt.legend(prop={'size': 14})
+        plt.xlabel(x_label, fontsize=11)
         plt.ylabel(y_label, fontsize=11)
         plt.show()
 

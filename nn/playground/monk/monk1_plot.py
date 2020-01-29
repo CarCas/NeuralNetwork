@@ -53,7 +53,7 @@ if __name__ == '__main__':
     testing_curve = nn.compute_learning_curve(test_data)
 
     print('mse_last_curve', training_curve[-1], validation_curve[-1], testing_curve[-1])
-    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk1', y_label='MSE')
+    plot(training_curve, validation=validation_curve, testing=testing_curve)
 
     # ACC
     nn.error_calculator = ErrorCalculator.ACC
@@ -62,4 +62,4 @@ if __name__ == '__main__':
     testing_curve = nn.compute_learning_curve(test_data)
 
     print('acc_last_curve', training_curve[-1], validation_curve[-1], testing_curve[-1])
-    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk1', y_label='accuracy')
+    plot(training_curve, validation=validation_curve, testing=testing_curve)
