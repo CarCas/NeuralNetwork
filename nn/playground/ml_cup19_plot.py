@@ -5,77 +5,45 @@ from nn.playground.utilities import read_ml_cup_tr, plot
 
 if __name__ == '__main__':
     ml_cup_training_dataset = read_ml_cup_tr()
-    train_data, test_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
+    train_data, test_data = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
+    train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True, seed=0)
 
-    seed = 0
+    seed = 10
     learning_algorithm = batch
+    # epochs_limit = 5401
     epochs_limit = 10000
-    n_init = 1
-    size_hidden_layers = [100]
-    activation = identity
+    size_hidden_layers = [40, 30]
     activation_hidden = tanh
-    eta = 0.0004
-    alpha = 0.9
-    alambd = 0
-    eta_decay = 0
-    error_calculator = ErrorCalculator.MEE
-    epsilon = 0
+    eta = 0.007
+    alpha = 0.55
+    alambd = 1e-05
 
     nn = NeuralNetwork(
         seed=seed,
-        learning_algorithm=learning_algorithm,
-        n_init=n_init,
         epochs_limit=epochs_limit,
+        learning_algorithm=batch,
+        n_init=1,
+        epsilon=0,
+        error_calculator=ErrorCalculator.MEE,
         architecture=MultilayerPerceptron(
             size_hidden_layers=size_hidden_layers,
-            activation=activation,
-            activation_hidden=activation_hidden,
             eta=eta,
             alpha=alpha,
             alambd=alambd,
-            eta_decay=eta_decay,
-        ),
-        error_calculator=error_calculator,
-        epsilon=epsilon,
-    )
-
-    train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True)
-
-    val_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE)
-
-    print(val_result)
-
-    # nn.error_calculator = ErrorCalculator.MEE
-    # validation_curvee = nn.validation_curve
-    # plot(validation=validation_curvee, title='mlcup19 - MEE', log=True)
-
-    nn_good = NeuralNetwork(
-        seed=seed,
-        learning_algorithm=learning_algorithm,
-        n_init=n_init,
-        epochs_limit=val_result.epoch + 1,
-        architecture=MultilayerPerceptron(
-            size_hidden_layers=size_hidden_layers,
-            activation=activation,
+            activation=identity,
             activation_hidden=activation_hidden,
-            eta=eta,
-            alpha=alpha,
-            alambd=alambd,
-            eta_decay=eta_decay,
         ),
-        error_calculator=error_calculator,
-        epsilon=epsilon,
     )
 
-    nn_good.fit(train_data, test_set)
+    nn.fit(train_set, validation_set)
+    training_curve = nn.training_curve
+    validation_curve = nn.validation_curve
 
-    training_curve = nn_good.training_curve
-    testing_curve = nn_good.validation_curve
+    nn.error_calculator = ErrorCalculator.MEE
+    print('mee', nn.compute_error(train_set), nn.compute_error(validation_set), nn.compute_error(test_data))
 
-    nn_good.error_calculator = ErrorCalculator.MEE
-    print('mee', training_curve[-1], testing_curve[-1])
+    nn.error_calculator = ErrorCalculator.MEE
+    testing_curve = nn.compute_learning_curve(test_data)
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - MSE')
 
-    nn_good.error_calculator = ErrorCalculator.MEE
-    # training_curve = nn_good.compute_learning_curve(train_data)
-    # testing_curve = nn_good.compute_learning_curve(test_set)
-    plot(training_curve, testing=testing_curve, title='mlcup19 - MEE')
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - accuracy')

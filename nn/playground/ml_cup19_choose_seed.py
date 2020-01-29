@@ -11,10 +11,10 @@ train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle
 epsilon = 0
 
 params_nn: Dict[str, Sequence[Any]] = dict(
-    seed=list(range(10)),
+    seed=list(range(0, 8)),
     error_calculator=[ErrorCalculator.MEE],
     learning_algorithm=[batch],
-    epochs_limit=[10000],
+    epochs_limit=[13000],
     n_init=[1],
     epsilon=[0],
     patience=[10],
@@ -43,4 +43,4 @@ grid_search_results = grid_search(
     n_jobs=8,
 )
 
-write_on_file(grid_search_results, 'results/ml_cup_choose_seed')
+write_on_file(grid_search_results, 'results/ml_cup_choose_seed_0-7')

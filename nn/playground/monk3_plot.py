@@ -46,14 +46,20 @@ if __name__ == '__main__':
     nn.error_calculator = ErrorCalculator.ACC
     print('acc', nn.compute_error(train_set), nn.compute_error(validation_set), nn.compute_error(test_data))
 
+    # MSE
     nn.error_calculator = ErrorCalculator.MSE
     training_curve = nn.compute_learning_curve(train_set)
     validation_curve = nn.compute_learning_curve(validation_set)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - MSE')
 
+    print('mse_last_curve', training_curve[-1], validation_curve[-1], testing_curve[-1])
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk1', y_label='MSE')
+
+    # ACC
     nn.error_calculator = ErrorCalculator.ACC
     training_curve = nn.compute_learning_curve(train_set)
     validation_curve = nn.compute_learning_curve(validation_set)
     testing_curve = nn.compute_learning_curve(test_data)
-    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk3 - accuracy')
+
+    print('acc_last_curve', training_curve[-1], validation_curve[-1], testing_curve[-1])
+    plot(training_curve, validation=validation_curve, testing=testing_curve, title='monk1', y_label='accuracy')
