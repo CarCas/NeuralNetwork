@@ -1,0 +1,9 @@
+score,std,epoch_mean,nn_error_calculator,nn_learning_algorithm,nn_epochs_limit,nn_epsilon,nn_patience,nn_n_init,nn_seed,arch_size_hidden_layers,arch_activation,arch_activation_hidden,arch_eta,arch_alpha,arch_alambd,arch_eta_decay
+1.1107195095108826,0,10465,MEE,batch,13000,0,10,1,4,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1220713472730695,0,7267,MEE,batch,13000,0,10,1,5,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1287101588564845,0,7347,MEE,batch,13000,0,10,1,7,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.128899404271357,0,11951,MEE,batch,13000,0,10,1,2,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1323690580997663,0,6730,MEE,batch,13000,0,10,1,3,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1458063434866825,0,8865,MEE,batch,13000,0,10,1,1,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1464286499401692,0,8047,MEE,batch,13000,0,10,1,0,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0
+1.1513213420345034,0,10972,MEE,batch,13000,0,10,1,6,"[40, 30]",identity,tanh,0.007,0.55,1e-05,0

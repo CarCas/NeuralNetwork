@@ -75,6 +75,7 @@ class NeuralNetwork(BaseNeuralNetwork):
 
         self.training_curve: MutableSequence[float] = []
         self.validation_curve: MutableSequence[float] = []
+        self.testing_curve: MutableSequence[float] = []
 
         self.seed = seed
 
@@ -91,6 +92,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         self,
         patterns: Sequence[Pattern],
         validation_patterns: Optional[Sequence[Pattern]] = None,
+        testing_patterns: Optional[Sequence[Pattern]] = None,
         training_curve=True,
     ) -> None:
         container_best_trained_network: Container[Optional[Tuple[float, 'NeuralNetwork']]] = [
@@ -103,7 +105,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         for _ in range(self.n_init):
             for _ in range(self.epochs_limit):
                 self.learning_algorithm(self._current_network, patterns)
-                self._update_internal_networks(patterns, validation_patterns, training_curve)
+                self._update_internal_networks(patterns, validation_patterns, testing_patterns, training_curve)
                 if self._early_stopping():
                     break
 
@@ -132,6 +134,7 @@ class NeuralNetwork(BaseNeuralNetwork):
         self,
         patterns: Sequence[Pattern],
         validation_patterns: Optional[Sequence[Pattern]],
+        testing_patterns: Optional[Sequence[Pattern]],
         training_curve: bool = True
     ) -> None:
         if validation_patterns is None:
@@ -141,6 +144,8 @@ class NeuralNetwork(BaseNeuralNetwork):
                 self.training_curve.append(self.compute_error(patterns))
             if len(validation_patterns):
                 self.validation_curve.append(self.compute_error(validation_patterns))
+            if testing_patterns is not None:
+                self.testing_curve.append(self.compute_error(testing_patterns))
 
     def _update_best_trained_network(
         self,
@@ -163,6 +168,7 @@ class NeuralNetwork(BaseNeuralNetwork):
 
             self.training_curve = best_network[1].training_curve
             self.validation_curve = best_network[1].validation_curve
+            self.testing_curve = best_network[1].testing_curve
 
     def _early_stopping(self) -> bool:
         if self.epsilon >= 0:
@@ -209,4 +215,5 @@ class NeuralNetwork(BaseNeuralNetwork):
 
         nn.training_curve = self.training_curve
         nn.validation_curve = self.validation_curve
+        nn.testing_curve = self.testing_curve
         return nn
