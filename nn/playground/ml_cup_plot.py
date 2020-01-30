@@ -10,15 +10,15 @@ if __name__ == '__main__':
     train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True, seed=0)
 
     seed = 0
-    learning_algorithm = minibatch(0.05)
+    # learning_algorithm = minibatch(0.05)
+    # epochs_limit = 50000
+    learning_algorithm = batch
     epochs_limit = 1000
-    # learning_algorithm = batch
-    # epochs_limit = 100
-    size_hidden_layers = [50, 50]
-    activation_hidden = relu
-    eta = 0.01
-    alpha = 0.5
-    alambd = 0
+    size_hidden_layers = [40, 30]
+    activation_hidden = tanh
+    eta = 0.007
+    alpha = 0.55
+    alambd = 1e-05
 
     nn = NeuralNetwork(
         seed=seed,
@@ -37,15 +37,15 @@ if __name__ == '__main__':
         ),
     )
 
-    validation_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE, False)
+    validation_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE, True)
 
     print(validation_result)
 
-    # training_curve = nn.training_curve
-    # validation_curve = nn.validation_curve
+    training_curve = nn.training_curve
+    validation_curve = nn.validation_curve
 
-    # nn.error_calculator = ErrorCalculator.MEE
-    # print('mee', nn.compute_error(train_set), nn.compute_error(validation_set))
+    nn.error_calculator = ErrorCalculator.MEE
+    print('mee', nn.compute_error(train_set), nn.compute_error(validation_set))
 
-    # nn.error_calculator = ErrorCalculator.MEE
-    # plot(training_curve, validation=validation_curve)
+    nn.error_calculator = ErrorCalculator.MEE
+    plot(training_curve, validation=validation_curve)
