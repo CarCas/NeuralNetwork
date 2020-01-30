@@ -2,7 +2,7 @@ import multiprocessing
 from typing import Mapping, Sequence, Any, Dict
 
 from nn import *
-from nn.playground.utilities import read_ml_cup_tr
+from nn.utilities import read_ml_cup_tr
 import numpy as np
 
 if __name__ == '__main__':

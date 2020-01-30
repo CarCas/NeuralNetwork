@@ -3,7 +3,7 @@ import unittest
 from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, relu
 from nn.learning_algorithm import online, batch
 from nn.error_calculator import ErrorCalculator
-from nn.playground.utilities import read_monk
+from nn.utilities import read_monk
 
 
 class TestMonk(unittest.TestCase):

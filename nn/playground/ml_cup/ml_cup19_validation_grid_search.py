@@ -5,7 +5,7 @@ from typing import Mapping, Sequence, Any, Dict
 
 from nn import ErrorCalculator
 from nn import sigmoid, batch, relu, identity
-from nn.playground.utilities import read_ml_cup_tr, read_ml_cup_ts
+from nn.utilities import read_ml_cup_tr, read_ml_cup_ts
 from nn.validation import grid_search, write_on_file
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@ from nn.learning_algorithm import LearningAlgorithm
 from nn import NeuralNetwork as NN, sigmoid, MultilayerPerceptron, online, minibatch, batch, relu
 from nn import ErrorCalculator
 from nn.activation_functions import identity, tanh, tanh_classification
-from nn.playground.utilities import encode_categorical, plot
-from nn.playground.utilities import read_monk
+from nn.utilities import encode_categorical, plot
+from nn.utilities import read_monk
 import numpy as np
 from nn import validation, split_dataset
 

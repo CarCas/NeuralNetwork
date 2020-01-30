@@ -1,6 +1,6 @@
 from nn import *
 import numpy as np
-from nn.playground.utilities import read_ml_cup_tr, plot
+from nn.utilities import read_ml_cup_tr, plot
 
 
 if __name__ == '__main__':
@@ -11,11 +11,11 @@ if __name__ == '__main__':
     learning_algorithm = batch
     epochs_limit = 10000
     n_init = 1
-    size_hidden_layers = [40, 10, 30]
+    size_hidden_layers = [40, 30]
     activation = identity
     activation_hidden = tanh
     eta = 0.007
-    alpha = 0.7
+    alpha = 0.55
     alambd = 1e-05
     eta_decay = 0
     error_calculator = ErrorCalculator.MEE
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         epsilon=epsilon,
     )
 
-    nn_good.fit(train_set, test_set)
+    nn_good.fit(train_data, test_set)
 
     training_curve = nn_good.training_curve
     testing_curve = nn_good.validation_curve

@@ -2,7 +2,7 @@ from typing import Mapping, Sequence, Any, Dict
 
 from nn import ErrorCalculator
 from nn import sigmoid, batch
-from nn.playground.utilities import read_monk
+from nn.utilities import read_monk
 from nn.activation_functions import relu, tanh, tanh_classification
 from nn.validation import grid_search, write_on_file
 import multiprocessing as mp

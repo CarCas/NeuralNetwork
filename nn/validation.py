@@ -120,7 +120,7 @@ def k_fold_CV(
 
     score = float(np.mean(scores_1))
     std = float(np.std(scores_1))
-    epoch_mean = int(np.round(epochs))
+    epoch_mean = int(np.mean(epochs))
 
     return KFoldCVResult(
         score=score,

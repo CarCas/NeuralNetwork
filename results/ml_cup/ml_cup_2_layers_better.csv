@@ -1,0 +1,10 @@
+score,std,epoch_mean,nn_error_calculator,nn_learning_algorithm,nn_epochs_limit,nn_epsilon,nn_patience,nn_n_init,nn_seed,arch_size_hidden_layers,arch_activation,arch_activation_hidden,arch_eta,arch_alpha,arch_alambd,arch_eta_decay
+1.006944764004605,0.03900897206356649,7160,MEE,minibatch 0.05,10000,0,10,1,,"[75, 75]",identity,tanh,0.009,0.6,1e-05,0
+1.0107571012211445,0.038733236427235175,7644,MEE,minibatch 0.05,10000,0,10,1,,"[50, 50]",identity,tanh,0.009,0.6,1e-05,0
+1.02853993289108,0.031536847297828775,7766,MEE,minibatch 0.05,10000,0,10,1,,"[75, 75]",identity,tanh,0.008,0.6,1e-05,0
+1.0377566932444804,0.023927145607298875,8186,MEE,minibatch 0.05,10000,0,10,1,,"[100, 100]",identity,tanh,0.009,0.6,1e-05,0
+1.0387271307096244,0.03030492752919622,6803,MEE,minibatch 0.05,10000,0,10,1,,"[50, 50]",identity,tanh,0.008,0.6,1e-05,0
+1.0441645283375796,0.043775049014704845,6391,MEE,minibatch 0.05,10000,0,10,1,,"[100, 100]",identity,tanh,0.008,0.6,1e-05,0
+1.0460706301943732,0.027058056815439373,9073,MEE,minibatch 0.05,10000,0,10,1,,"[50, 50]",identity,tanh,0.0085,0.6,1e-05,0
+1.0467038502519588,0.025128813325306625,5842,MEE,minibatch 0.05,10000,0,10,1,,"[75, 75]",identity,tanh,0.0085,0.6,1e-05,0
+1.0495939395397682,0.03421979605112514,7105,MEE,minibatch 0.05,10000,0,10,1,,"[100, 100]",identity,tanh,0.0085,0.6,1e-05,0

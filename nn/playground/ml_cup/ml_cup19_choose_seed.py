@@ -1,7 +1,7 @@
 from nn import *
 from typing import *
 import numpy as np
-from nn.playground.utilities import read_ml_cup_tr, plot
+from nn.utilities import read_ml_cup_tr, plot
 
 
 ml_cup_training_dataset = read_ml_cup_tr()

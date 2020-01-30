@@ -1,6 +1,6 @@
 from nn import *
 import numpy as np
-from nn.playground.utilities import read_ml_cup_tr, plot
+from nn.utilities import read_ml_cup_tr, plot
 
 
 if __name__ == '__main__':
@@ -9,14 +9,14 @@ if __name__ == '__main__':
 
     seed = 0
     learning_algorithm = batch
-    epochs_limit = 5000
+    epochs_limit = 10000
     n_init = 1
-    size_hidden_layers = [100]
+    size_hidden_layers = [40, 35]
     activation = identity
     activation_hidden = tanh
-    eta = 0.01
-    alpha = 0.9
-    alambd = 0.0001
+    eta = 0.009
+    alpha = 0.6
+    alambd = 1e-05
     eta_decay = 0
     error_calculator = ErrorCalculator.MEE
     epsilon = 0
@@ -39,9 +39,11 @@ if __name__ == '__main__':
         epsilon=epsilon,
     )
 
-    train_set, validation_set = split_dataset(train_data, percentage=9/10, to_shuffle=True)
+    train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True)
 
     val_result = validation(nn, train_set, validation_set, ErrorCalculator.MEE)
+
+    print('trained', len(nn.validation_curve), 'epoches')
 
     print(val_result)
 
@@ -72,8 +74,11 @@ if __name__ == '__main__':
     training_curve = nn_good.training_curve
     testing_curve = nn_good.validation_curve
 
+    idx, score = nn.error_calculator.choose(testing_curve)
+
     nn_good.error_calculator = ErrorCalculator.MEE
     print('mee', training_curve[-1], testing_curve[-1])
+    print('best accuracy:', idx+1)
 
     nn_good.error_calculator = ErrorCalculator.MEE
     # training_curve = nn_good.compute_learning_curve(train_data)

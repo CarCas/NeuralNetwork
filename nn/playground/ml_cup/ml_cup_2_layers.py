@@ -2,7 +2,7 @@ import multiprocessing
 from typing import Mapping, Sequence, Any, Dict
 
 from nn import *
-from nn.playground.utilities import read_ml_cup_tr
+from nn.utilities import read_ml_cup_tr
 import numpy as np
 
 if __name__ == '__main__':
@@ -23,12 +23,12 @@ if __name__ == '__main__':
     )
 
     params_architecture: Mapping[str, Sequence[Any]] = dict(
-        size_hidden_layers=[(100,)],
+        size_hidden_layers=[[50, 50], [75, 75], [100, 100]],
         activation=[identity],
-        activation_hidden=[tanh, relu],
-        eta=[0.0005],
-        alpha=[0, 0.1, 0.5, 0.9],
-        alambd=[0, 0.001, 0.0001, 0.00001],
+        activation_hidden=[tanh],
+        eta=[0.009, 0.0085, 0.008],
+        alpha=[0.6],
+        alambd=[0],
         eta_decay=[0],
     )
 
@@ -47,4 +47,4 @@ if __name__ == '__main__':
         n_jobs=1,
     )
 
-    write_on_file(grid_search_results, filename='results/ml_cup19_eta=0.0005_not_fit_in_10k_epochs')
+    write_on_file(grid_search_results, filename='ml_cup_2_layers')
