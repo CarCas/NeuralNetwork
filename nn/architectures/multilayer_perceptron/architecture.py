@@ -16,6 +16,18 @@ class MLPParams(NamedTuple):
 
 
 class MultilayerPerceptron(BaseArchitecure):
+    """
+    This is the subclass of the superclass BaseArchitecture.
+    It takes in input the size of the hidden layers,
+    the activation function for the output layer,
+    the activation function for the hidden layer,
+    the learning rate eta,
+    the momentum alpha,
+    the l2 regularization lambda,
+    the eta_decay, that linearly decreases until eta / 100
+
+    optional argument to manually set the weights in the nn, only if you know what're you doing!!!
+    """
     def __init__(
         self,
         *size_hidden_layers_seq: int,
