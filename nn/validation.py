@@ -46,6 +46,16 @@ def validation(
         validation_set: Sequence[Pattern],
         error_calculator: ErrorCalculator = ErrorCalculator.MSE
 ) -> ValidationResult:
+    """
+
+    :param nn
+    :param training_set
+    :param validation_set
+    :param error_calculator
+    :return: it returns the score and the respective epoch of that score.
+
+    It fits the neural network and applies to the error calculator the validation curve.
+    """
     old_error = nn.error_calculator
 
     nn.error_calculator = error_calculator
@@ -64,6 +74,11 @@ def validation(
 
 
 def shuffle(patterns: Sequence[Pattern], seed: Optional[int] = None) -> Sequence[Pattern]:
+    """
+    :param patterns: the patterns to be shuffled
+    :param seed: the initializer for the random number generator
+    :return: the shuffled dataset
+    """
     if seed is not None:
         np.random.seed(seed)
     return np.random.permutation(patterns)
@@ -83,6 +98,15 @@ def split_dataset(
         to_shuffle: bool = False,
         seed: Optional[int] = None,
 ) -> Tuple[Sequence[Pattern], Sequence[Pattern]]:
+    """
+
+    :param dataset
+    :param percentage: the percentage of the dataset that is going to be splitted
+    :param size: the length of the training (optional)
+    :param to_shuffle: boolean for deciding whether to shuffle the dataset
+    :param seed: the initializer for the random number generator
+    :return: the training set and the validation set
+    """
     if to_shuffle:
         dataset = shuffle(dataset, seed)
 
@@ -170,6 +194,17 @@ def grid_search(
 
         seed: Optional[int] = None,
 ) -> Sequence[GridSearchResult]:
+    """
+
+    :param dataset
+    :param params_nn: the parameters that rules the nn
+    :param params_architecture: the parameters that rules the architecture
+    :param cv_params: the parameters for the cross validation
+    :param validation_params: the validation parameters
+    :param n_jobs: the number of jobs that can be executed at once, by using more processes
+    :param seed: the initializer for the random number generator
+    :return: a sequence of results, obtained by the computation of the grid search
+    """
     if seed is not None:
         np.random.seed(seed)
 

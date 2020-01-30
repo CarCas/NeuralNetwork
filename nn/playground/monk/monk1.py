@@ -17,6 +17,7 @@ params_nn: Dict[str, Sequence[Any]] = dict(
     epsilon=[1e-05],
     patience=[10],
 )
+
 params_architecture: Mapping[str, Sequence[Any]] = dict(
     size_hidden_layers=[(2,)],
     activation=[tanh_classification],

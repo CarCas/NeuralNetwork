@@ -24,24 +24,35 @@ class NeuralNetwork(BaseNeuralNetwork):
     learning_algorithm: callable that train the network given network and patterns
     eta: learning rate
     epochs_limit: max possible float of epoch during a train call
-    epsilon: TODO
+    epsilon: the threshold to set for the tolerance
+    patience: the number of epochs under the epsilon value to wait before the training stops
+    n_init: the number of reruns to compute in which the best model is chosen only depending on the training
+    seed: the pseudo random number that initializes the weights of the nodes.
 
     Istance variables
     ----------------------------------------
     _internal_networks: contains a neural network for each epoch of training,
                        used to compute errors and learning curve
 
-    Debug params
-    ----------------------------------------
-    seed: to set a random seed
-
     Public methods
     ----------------------------------------
     __call__: execute feed forward
     set: reset the network, if some parameters are passed their are setted in the network
-    train: train the network, fill `training_errors` and `testing_errors` instance variable
-    compute_error: compute the error for the patterns of the specified error_generator
-    compute_learning_curve: compute an error for each nn in learning_network
+
+    __fit__: execute the training of the nn. If the validation_patterns or testing_patterns are passed,
+    it saves the learning curves during training. If training_curve is True, then it saves internally the states
+    of the network.
+
+    compute_error: it computes the error on the trained network, given the patterns in input,
+    if an ErrorCalculator is given, it is used instead of the default one
+
+    compute_learning_curve: it computes all the learning curve on the trained network, given the patterns in input,
+    if an ErrorCalculator is given, it is used instead of the default one.
+    It returns an empty list if the learning curve has already been computed during the fit.
+
+    the training_curve, validation_curve and testing_curve contain the respective learning curve,
+    only if the learning curve has been computed during fit (check fit for more detail).
+
     """
     def __init__(
         self,
