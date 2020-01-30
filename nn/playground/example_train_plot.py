@@ -11,15 +11,20 @@ if __name__ == '__main__':
 
     training_set, validation_set = split_dataset(design_set, percentage=2/3, to_shuffle=True)
 
+    seed = None
     learning_algorithm = batch
     epochs_limit = 100
     size_hidden_layers = [50]
     activation_hidden = tanh
+    activation = identity
     eta = 0.005
     alpha = 0.6
     alambd = 0.00001
+    eta_decay = 0
+    patience = 10
 
     nn = NeuralNetwork(
+        seed=seed,
         epochs_limit=epochs_limit,
         learning_algorithm=learning_algorithm,
         n_init=1,
@@ -30,9 +35,11 @@ if __name__ == '__main__':
             eta=eta,
             alpha=alpha,
             alambd=alambd,
-            activation=identity,
+            activation=activation,
             activation_hidden=activation_hidden,
         ),
+        eta_decay=eta_decay,
+        patience=patience,
     )
 
     print(timeit(lambda: nn.fit(training_set, validation_set, testing_set), number=1))
