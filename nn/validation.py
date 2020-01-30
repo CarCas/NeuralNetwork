@@ -44,13 +44,14 @@ def validation(
         nn: NeuralNetwork,
         training_set: Sequence[Pattern],
         validation_set: Sequence[Pattern],
-        error_calculator: ErrorCalculator = ErrorCalculator.MSE
+        error_calculator: ErrorCalculator = ErrorCalculator.MSE,
+        train_curve: bool = False,
 ) -> ValidationResult:
     old_error = nn.error_calculator
 
     nn.error_calculator = error_calculator
 
-    nn.fit(training_set, validation_set, training_curve=False)
+    nn.fit(training_set, validation_set, training_curve=train_curve)
     learning_curve_validation = nn.validation_curve
 
     idx, score = error_calculator.choose(learning_curve_validation)
