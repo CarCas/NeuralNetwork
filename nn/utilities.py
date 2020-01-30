@@ -108,20 +108,20 @@ def read_ml_cup_tr():
     return _ml_cup_tr
 
 
-_ml_cup_tr = None
+_ml_cup_ts = None
 
 
 def read_ml_cup_ts():
-    global _ml_cup_tr
-    if _ml_cup_tr is None:
+    global _ml_cup_ts
+    if _ml_cup_ts is None:
         with open('ML-CUP19/ML-CUP19-TS.csv', mode='r') as file:
             readCSV = csv.reader(file, delimiter=',')
-            _ml_cup_tr = tuple(map(
+            _ml_cup_ts = tuple(map(
                 lambda row: (
-                    list((map(lambda _input: float(_input), row[1:-2]))),
-                    list((map(lambda _input: float(_input), row[-2:]))),
+                    list((map(lambda _input: float(_input), row[1:]))),
+                    row[0],
                 ), readCSV))
-    return _ml_cup_tr
+    return _ml_cup_ts[7:]
 
 
 _monks: Dict[Hashable, Tuple[Sequence[Pattern], Sequence[Pattern]]] = {}
@@ -132,3 +132,71 @@ def read_monk(i: int) -> Tuple[Sequence[Pattern], Sequence[Pattern]]:
     if i not in _monks:
         _monks[i] = encode_categorical(read_monk_file('{}.train'.format(i)), read_monk_file('{}.test'.format(i)))
     return _monks[i]
+
+
+def read_ml_cup_tr_normalized():
+    ml_tr: Sequence[Pattern] = read_ml_cup_tr()
+
+    inputs, outputs = zip(*ml_tr)  # type: ignore
+
+    mins = np.min(inputs, axis=0)
+    maxs = np.max(inputs, axis=0)
+
+    def transform_ml_cup(patterns: Sequence[Pattern]) -> Sequence[Pattern]:
+        ins: Sequence[float]
+        outs: Sequence[float]
+        ins, outs = zip(*patterns)  # type: ignore
+
+        ins_transformed: Sequence[float] = (ins - mins) / (maxs - mins)
+
+        zipped: Sequence[Pattern] = list(zip(ins_transformed, outs))  # type: ignore
+
+        return zipped
+
+    ml_tr_transformed = transform_ml_cup(ml_tr)
+
+    # inputs_tras, outputs_tras = zip(*ml_tr_transformed)  # type: ignore
+
+    # mins_tras = np.min(inputs_tras, axis=0)
+    # maxs_tras = np.max(inputs_tras, axis=0)
+    # means_tras = np.mean(inputs_tras, axis=0)
+
+    # print(len(ml_tr_transformed))
+
+    return ml_tr_transformed
+
+
+def read_ml_cup_ts_normalized():
+    ml_tr: Sequence[Pattern] = read_ml_cup_tr()
+    ml_ts = read_ml_cup_ts()
+
+    inputs, outputs = zip(*ml_tr)  # type: ignore
+    inputs_ts, labels_ts = zip(*ml_ts)
+
+    mins = np.min(inputs, axis=0)
+    maxs = np.max(inputs, axis=0)
+
+    mins_ts = np.min(inputs_ts, axis=0)
+    maxs_ts = np.max(inputs_ts, axis=0)
+
+    def transform_ml_cup(patterns: Sequence[Pattern]) -> Sequence[Pattern]:
+        nonlocal mins_ts, maxs_ts
+        ins, outs = zip(*patterns)  # type: ignore
+
+        ins_transformed = (ins - mins) / (maxs - mins)
+
+        return zip(ins_transformed, outs)  # type:  ignore
+
+    ml_ts_transformed = transform_ml_cup(ml_ts)
+
+    inputs_tras, outputs_tras = zip(*ml_ts_transformed)  # type: ignore
+
+    mins_tras = np.min(inputs_tras, axis=0)
+    maxs_tras = np.max(inputs_tras, axis=0)
+    means_tras = np.mean(inputs_tras, axis=0)
+
+    print(mins_tras)
+    print(maxs_tras)
+    print(means_tras)
+
+    return ml_ts_transformed

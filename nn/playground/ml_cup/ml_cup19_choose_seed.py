@@ -6,14 +6,13 @@ from nn.utilities import read_ml_cup_tr, plot
 
 ml_cup_training_dataset = read_ml_cup_tr()
 train_data, test_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
-train_set, validation_set = split_dataset(train_data, percentage=1/2, to_shuffle=True, seed=0)
+train_set, validation_set = split_dataset(train_data, percentage=2/3, to_shuffle=True, seed=0)
 
-epsilon = 0
 
 params_nn: Dict[str, Sequence[Any]] = dict(
-    seed=list(range(0, 24)),
+    seed=list(range(5,6)),
     error_calculator=[ErrorCalculator.MEE],
-    learning_algorithm=[minibatch(0.05)],
+    learning_algorithm=[minibatch(0.5)],
     epochs_limit=[10000],
     n_init=[1],
     epsilon=[0],

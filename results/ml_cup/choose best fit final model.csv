@@ -1,0 +1,2 @@
+score,std,epoch_mean,nn_error_calculator,nn_learning_algorithm,nn_epochs_limit,nn_epsilon,nn_patience,nn_n_init,nn_seed,arch_size_hidden_layers,arch_activation,arch_activation_hidden,arch_eta,arch_alpha,arch_alambd,arch_eta_decay
+1.103982748956733,0,5013,MEE,minibatch 0.5,10000,0,10,1,5,"[75, 75]",identity,tanh,0.0085,0.6,0,0
