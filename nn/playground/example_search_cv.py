@@ -5,6 +5,8 @@ from nn import *
 from nn.utilities import read_ml_cup_tr
 import numpy as np
 
+# It is a script for applying the grid search with k fold cv, on the data choosen before and
+# then for writing the results into file.
 if __name__ == '__main__':
     ml_cup_training_dataset = read_ml_cup_tr()
     design_set, testing_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)

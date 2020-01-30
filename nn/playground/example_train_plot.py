@@ -3,6 +3,8 @@ import numpy as np
 from nn.utilities import read_ml_cup_tr, plot
 from timeit import timeit
 
+# It is a script for instantiating a neural network for analysing its timing and
+# for plotting the training, validation and testing curves.
 if __name__ == '__main__':
     ml_cup_training_dataset = read_ml_cup_tr()
     design_set, testing_set = split_dataset(ml_cup_training_dataset, to_shuffle=True, seed=0)
